@@ -18,6 +18,7 @@
   --ink-soft: #59645c; /* labels, captions, axis marks */
   --chalk: #2547c8; /* field-marking blue — the reference, the in-range state */
   --flag: #c23b30; /* out-of-range, deviation, the flag on the pin */
+  --near: #c0872a; /* the middle comparison state — close to the range, not in it */
 
   /* Golf accent — turf greens. */
   --fairway: #2e7d46; /* turf green — the primary golf accent */

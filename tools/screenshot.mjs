@@ -92,6 +92,7 @@ const SHOTS = [
   { name: 'landing-hero-desktop', view: 'desktop', fullPage: false, settle: 4200 },
   { name: 'sec-how-desktop', view: 'desktop', fullPage: false, settle: 800, after: sectionShot('.how') },
   { name: 'sec-measures-desktop', view: 'desktop', fullPage: false, settle: 800, after: sectionShot('.measures') },
+  { name: 'sec-scoring-desktop', view: 'desktop', fullPage: false, settle: 800, after: sectionShot('.scoring') },
   { name: 'sec-reference-desktop', view: 'desktop', fullPage: false, settle: 800, after: sectionShot('.reference') },
   { name: 'sec-cta-desktop', view: 'desktop', fullPage: false, settle: 800, after: sectionShot('.hole-cta') },
   {

@@ -4,6 +4,7 @@ import { TopoField } from '../components/TopoField'
 import { Flagstick } from '../components/Flagstick'
 import { Reveal } from '../components/Reveal'
 import { MetricRow, type Metric } from '../components/MetricRow'
+import { ComparisonExplainer } from '../components/ComparisonExplainer'
 import { HoleCTA } from '../components/HoleCTA'
 import './Landing.css'
 
@@ -196,6 +197,26 @@ export function Landing({ onStart }: { onStart: () => void }) {
               Contour measures the body, and says so instead of faking the rest.
             </p>
           </div>
+        </div>
+      </section>
+
+      {/* ── How a reading gets scored ────────────────────── */}
+      <section className="section scoring">
+        <div className="scoring__grid">
+          <Reveal className="scoring__copy">
+            <p className="section__eyebrow label">The read</p>
+            <h2 className="section__title">In, close, or off.</h2>
+            <p className="section__lede">
+              Every measurement lands in one of three states against its tour range —
+              <span className="ink-chalk"> in range</span>,
+              <span className="ink-near"> close</span>, or
+              <span className="ink-flag"> off</span>. The color is the verdict; you don't
+              have to read a table to know where you stand.
+            </p>
+          </Reveal>
+          <Reveal className="scoring__panel" delay={120}>
+            <ComparisonExplainer />
+          </Reveal>
         </div>
       </section>
 

@@ -12,11 +12,19 @@ import './Upload.css'
  * setup, because bad footage is the number one cause of bad output.
  */
 
+// Playback speeds for studying a swing. Full speed down to a crawl.
+const SPEEDS = [1, 0.5, 0.25, 0.1] as const
+// A nudge, in seconds, for frame stepping. We don't trust the file's fps yet
+// (see SWING_SPEC — phone slo-mo lies), so step by a small fixed slice.
+const STEP = 1 / 60
+
 export function Upload({ onBack }: { onBack: () => void }) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [src, setSrc] = useState<string | null>(null)
   const [current, setCurrent] = useState(0)
   const [duration, setDuration] = useState(0)
+  const [playing, setPlaying] = useState(false)
+  const [rate, setRate] = useState<number>(1)
 
   // Revoke the object URL when it changes or the screen unmounts.
   useEffect(() => {
@@ -24,6 +32,11 @@ export function Upload({ onBack }: { onBack: () => void }) {
       if (src) URL.revokeObjectURL(src)
     }
   }, [src])
+
+  // Keep the element's playback rate in sync with the chosen speed.
+  useEffect(() => {
+    if (videoRef.current) videoRef.current.playbackRate = rate
+  }, [rate, src])
 
   function pickFile(file: File | undefined) {
     if (!file) return
@@ -37,6 +50,20 @@ export function Upload({ onBack }: { onBack: () => void }) {
     const v = videoRef.current
     if (!v || !Number.isFinite(v.duration)) return
     v.currentTime = fraction * v.duration
+  }
+
+  function togglePlay() {
+    const v = videoRef.current
+    if (!v) return
+    if (v.paused) void v.play()
+    else v.pause()
+  }
+
+  function step(dir: 1 | -1) {
+    const v = videoRef.current
+    if (!v || !Number.isFinite(v.duration)) return
+    v.pause()
+    v.currentTime = Math.min(Math.max(0, v.currentTime + dir * STEP), v.duration)
   }
 
   const progress = duration > 0 ? current / duration : 0
@@ -53,13 +80,14 @@ export function Upload({ onBack }: { onBack: () => void }) {
               src={src}
               playsInline
               controls={false}
-              onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
-              onTimeUpdate={(e) => setCurrent(e.currentTarget.currentTime)}
-              onClick={(e) => {
-                const v = e.currentTarget
-                if (v.paused) void v.play()
-                else v.pause()
+              onLoadedMetadata={(e) => {
+                setDuration(e.currentTarget.duration)
+                e.currentTarget.playbackRate = rate
               }}
+              onTimeUpdate={(e) => setCurrent(e.currentTarget.currentTime)}
+              onPlay={() => setPlaying(true)}
+              onPause={() => setPlaying(false)}
+              onClick={togglePlay}
             />
           ) : (
             <EmptyState onPick={pickFile} />
@@ -87,8 +115,54 @@ export function Upload({ onBack }: { onBack: () => void }) {
           </p>
         </aside>
 
-        {/* The measuring stick. */}
+        {/* The measuring stick, with its transport. */}
         <div className="upload__scrub">
+          <div className={`transport${src ? '' : ' transport--disabled'}`}>
+            <div className="transport__group">
+              <button
+                className="transport__btn"
+                onClick={() => step(-1)}
+                disabled={!src}
+                aria-label="Step back one frame"
+                title="Step back"
+              >
+                ◂
+              </button>
+              <button
+                className="transport__btn transport__btn--play"
+                onClick={togglePlay}
+                disabled={!src}
+                aria-label={playing ? 'Pause' : 'Play'}
+              >
+                {playing ? '❚❚' : '▶'}
+              </button>
+              <button
+                className="transport__btn"
+                onClick={() => step(1)}
+                disabled={!src}
+                aria-label="Step forward one frame"
+                title="Step forward"
+              >
+                ▸
+              </button>
+            </div>
+
+            <div className="transport__speeds" role="group" aria-label="Playback speed">
+              <span className="label transport__speeds-label">speed</span>
+              {SPEEDS.map((s) => (
+                <button
+                  key={s}
+                  className={`transport__speed${rate === s ? ' is-active' : ''}`}
+                  onClick={() => setRate(s)}
+                  disabled={!src}
+                  aria-pressed={rate === s}
+                >
+                  {s === 1 ? '1×' : `${s}×`}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <ScrubBar
             progress={progress}
             current={current}

@@ -1,0 +1,132 @@
+.cmp {
+  display: grid;
+  gap: var(--gap-3);
+  padding: var(--gap-4);
+  background: var(--paper-deep);
+  border: var(--line-rest) solid var(--paper-edge);
+  border-radius: var(--radius);
+}
+
+.cmp__readout {
+  display: grid;
+  gap: var(--gap-1);
+}
+
+.cmp__value {
+  font-size: 3rem;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  transition: color 140ms linear;
+}
+
+.cmp__unit {
+  margin-left: 0.1em;
+  font-size: 1.25rem;
+  color: var(--ink-soft);
+}
+
+.cmp__state {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  font-size: var(--t-label);
+  text-transform: uppercase;
+  letter-spacing: var(--track-label);
+  font-weight: 500;
+  transition: color 140ms linear;
+}
+
+.cmp__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  transition: background-color 140ms linear;
+}
+
+.cmp__tour {
+  font-size: 0.8125rem;
+  color: var(--ink-soft);
+}
+
+/* The scale with its coloured zones. */
+.cmp__scale {
+  position: relative;
+  display: block;
+  padding: var(--gap-3) 0 var(--gap-2);
+  cursor: pointer;
+}
+
+.cmp__zones {
+  position: relative;
+  height: 12px;
+  border-radius: 1px;
+  overflow: visible;
+}
+
+.cmp__zone {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  opacity: 0.28;
+}
+.cmp__zone:first-child {
+  border-radius: 1px 0 0 1px;
+}
+.cmp__zone:last-child {
+  border-radius: 0 1px 1px 0;
+}
+
+.cmp__edge {
+  position: absolute;
+  top: -6px;
+  height: 24px;
+  width: var(--line-rest);
+  background: var(--ink-soft);
+  transform: translateX(-50%);
+}
+.cmp__edge::after {
+  content: attr(data-v);
+  position: absolute;
+  top: 26px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--face-data);
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+}
+
+/* The draggable reading. */
+.cmp__marker {
+  position: absolute;
+  top: 50%;
+  width: 18px;
+  height: 18px;
+  border: 3px solid var(--chalk);
+  border-radius: 50%;
+  background: var(--paper);
+  transform: translate(-50%, -50%);
+  transition: border-color 140ms linear;
+  box-shadow: 0 1px 3px rgb(20 33 27 / 0.25);
+}
+
+.cmp__input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: ew-resize;
+}
+
+.cmp__scale:focus-within .cmp__marker {
+  outline: var(--line-active) solid var(--chalk);
+  outline-offset: 3px;
+}
+
+.cmp__note {
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--ink-soft);
+}
