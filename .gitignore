@@ -15,3 +15,6 @@ dist
 
 # Pose fixtures ARE committed — they're the test suite.
 !src/**/fixtures/*.json
+
+# TypeScript incremental build info
+*.tsbuildinfo
