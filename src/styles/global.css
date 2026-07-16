@@ -1,0 +1,104 @@
+/*
+ * Global baseline. Sets the paper, the type defaults, and the
+ * survey-paper background. Layout and component styling live with
+ * their components.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--ink);
+  background-color: var(--paper);
+  font-family: var(--face-body);
+  font-size: var(--t-body);
+  line-height: 1.55;
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+
+  /*
+   * Survey paper. A faint fixed contour grid — the pale ruled ground of a
+   * yardage book — laid down in two hairline gradients. It never scrolls,
+   * so the page reads as ink moving over stationary paper.
+   */
+  background-image:
+    linear-gradient(var(--ink-line-soft) var(--line-rest), transparent var(--line-rest)),
+    linear-gradient(90deg, var(--ink-line-soft) var(--line-rest), transparent var(--line-rest));
+  background-size: 2rem 2rem;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+/* Type primitives ---------------------------------------------------- */
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-family: var(--face-display);
+  font-weight: 700;
+  font-stretch: 125%;
+  text-transform: uppercase;
+  letter-spacing: var(--track-display);
+  line-height: 1.02;
+  color: var(--ink);
+}
+
+p {
+  margin: 0;
+  max-width: var(--measure);
+}
+
+a {
+  color: inherit;
+}
+
+/* The label: uppercase, tracked, quiet. Used on every readout and axis. */
+.label {
+  font-family: var(--face-body);
+  font-size: var(--t-label);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: var(--track-label);
+  color: var(--ink-soft);
+}
+
+/* Every measurement is mono. This is a hard rule. */
+.data {
+  font-family: var(--face-data);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+/* Focus — always visible, always chalk. */
+:focus-visible {
+  outline: var(--line-active) solid var(--chalk);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--chalk) 22%, transparent);
+}
+
+/* Utility: visually hidden but available to screen readers. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

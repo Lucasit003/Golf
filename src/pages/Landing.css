@@ -1,0 +1,136 @@
+.landing {
+  width: 100%;
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding: var(--gap-6) var(--gap-4);
+}
+
+/* Asymmetric book spread: the words on the left, the drawing in the margin. */
+.landing__spread {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: var(--gap-6);
+  align-items: center;
+}
+
+.landing__eyebrow {
+  margin-bottom: var(--gap-3);
+}
+
+.landing__headline {
+  font-size: var(--t-display);
+  font-stretch: 125%;
+}
+
+.landing__lede {
+  margin-top: var(--gap-3);
+  max-width: 30rem;
+  font-size: 1.0625rem;
+  color: var(--ink-soft);
+}
+
+.landing__actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--gap-3);
+  margin-top: var(--gap-4);
+}
+
+.landing__local {
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* The specimen list — what gets measured, and against what. */
+.landing__surveyed {
+  margin: var(--gap-5) 0 0;
+  max-width: 26rem;
+  border-top: var(--line-active) solid var(--ink);
+}
+
+.landing__surveyed-head {
+  padding: var(--gap-2) 0 var(--gap-1);
+}
+
+.landing__surveyed-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: var(--gap-2) 0;
+  border-top: var(--line-rest) solid var(--paper-edge);
+}
+
+.landing__surveyed-metric {
+  margin: 0;
+  font-size: 0.9375rem;
+}
+
+.landing__surveyed-range {
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.9375rem;
+}
+
+/* The drawing plate — a framed figure, like a page from the book. */
+.landing__drawing {
+  justify-self: center;
+  width: 100%;
+  max-width: 30rem;
+}
+
+.landing__plate {
+  padding: var(--gap-3);
+  border: var(--line-rest) solid var(--paper-edge);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--paper-deep) 45%, transparent);
+}
+
+.landing__plate-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--gap-2);
+}
+
+.landing__plate-tag {
+  text-transform: none;
+  letter-spacing: 0.1em;
+  color: var(--chalk);
+}
+
+.landing__trace {
+  margin: var(--gap-1) 0;
+}
+
+.landing__plate-foot {
+  margin-top: var(--gap-2);
+  padding-top: var(--gap-2);
+  border-top: var(--line-rest) solid var(--paper-edge);
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--ink-soft);
+}
+
+/* ── Tablet / mobile ────────────────────────────────────── */
+
+@media (max-width: 60rem) {
+  .landing {
+    padding: var(--gap-5) var(--gap-3);
+  }
+
+  .landing__spread {
+    grid-template-columns: 1fr;
+    gap: var(--gap-5);
+  }
+
+  /* Drawing leads on mobile — it's the thesis. */
+  .landing__drawing {
+    order: -1;
+    max-width: 24rem;
+  }
+
+  .landing__headline {
+    font-size: clamp(2.25rem, 11vw, 3.5rem);
+  }
+}

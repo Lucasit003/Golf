@@ -1,0 +1,14 @@
+node_modules
+dist
+.DS_Store
+*.local
+.env
+.env.*
+
+# Test footage — large, and it's Lucas's video
+/footage
+*.mov
+*.mp4
+
+# Pose fixtures ARE committed — they're the test suite.
+!src/**/fixtures/*.json

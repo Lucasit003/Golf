@@ -1,0 +1,70 @@
+/*
+ * Contour design tokens — the whole vocabulary of the app.
+ * Every color, font, size, and line weight comes from here.
+ * If a hex code or font name appears anywhere else, that's a bug.
+ * Source of truth: docs/DESIGN.md
+ */
+
+:root {
+  /* ── Color ──────────────────────────────────────────────
+     Six values. That's the whole palette.
+     chalk = reference / in-range. flag = deviation. Never decorative. */
+  --paper: #e7e9e0; /* survey paper — grey-green, never cream */
+  --paper-deep: #d5d9cc; /* insets, panels, the video well */
+  --ink: #16211c; /* text, contour lines — green-black, never #000 */
+  --ink-soft: #59645c; /* labels, captions, axis marks */
+  --chalk: #2547c8; /* field-marking blue — the reference, the in-range state */
+  --flag: #b8332a; /* out-of-range, deviation, divergence */
+
+  /* Derived, non-semantic tints of the above — for hairline rules and
+     faint contour work only. Never for state. */
+  --ink-line: color-mix(in srgb, var(--ink) 14%, transparent);
+  --ink-line-soft: color-mix(in srgb, var(--ink) 7%, transparent);
+  --paper-edge: color-mix(in srgb, var(--ink) 22%, transparent);
+
+  /* ── Type ───────────────────────────────────────────────
+     Archivo expanded+heavy = stamped lettering, headings only.
+     Public Sans = body. IBM Plex Mono = every number, always. */
+  --face-display: 'Archivo', sans-serif;
+  --face-body: 'Public Sans', sans-serif;
+  --face-data: 'IBM Plex Mono', monospace;
+
+  --t-display: clamp(2.5rem, 7vw, 4.5rem);
+  --t-title: 1.5rem;
+  --t-body: 1rem;
+  --t-label: 0.75rem; /* uppercase, tracked, --ink-soft */
+  --t-data: 1.125rem;
+
+  --track-label: 0.08em;
+  --track-display: -0.01em;
+
+  /* ── Line & shape ───────────────────────────────────────
+     Contours are hairlines. Corners are nearly square — this is paper. */
+  --line-rest: 1px;
+  --line-active: 1.5px;
+  --radius: 2px;
+
+  /* ── Space ──────────────────────────────────────────────
+     A quiet, even rhythm. Reference document, not a landing page. */
+  --gap-1: 0.375rem;
+  --gap-2: 0.75rem;
+  --gap-3: 1.25rem;
+  --gap-4: 2rem;
+  --gap-5: 3.25rem;
+  --gap-6: 5rem;
+
+  --measure: 34rem; /* body text column */
+  --shell: 74rem; /* page max width */
+
+  /* ── Motion ─────────────────────────────────────────────
+     One orchestrated moment: the hero trace drawing itself.
+     Everything else stays still. */
+  --draw-duration: 2800ms;
+  --ease-survey: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --draw-duration: 0ms;
+  }
+}

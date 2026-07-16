@@ -1,0 +1,98 @@
+.scrub {
+  width: 100%;
+}
+
+.scrub__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: var(--gap-2);
+}
+
+.scrub__timecode {
+  font-size: var(--t-data);
+  color: var(--ink);
+}
+
+.scrub__timecode-sep {
+  margin: 0 0.4em;
+  color: var(--ink-soft);
+}
+
+.scrub__timecode-unit {
+  margin-left: 0.15em;
+  color: var(--ink-soft);
+}
+
+/* The ruled track. */
+.scrub__track {
+  position: relative;
+  display: block;
+  cursor: pointer;
+}
+
+.scrub__ruler {
+  position: relative;
+  height: 40px;
+  border-bottom: var(--line-active) solid var(--ink);
+}
+
+/* Graduations rise from the baseline. Majors at 0, mid, and full. */
+.scrub__tick {
+  position: absolute;
+  bottom: 0;
+  width: var(--line-rest);
+  height: 8px;
+  background: var(--paper-edge);
+  transform: translateX(-50%);
+}
+
+.scrub__tick--major {
+  height: 16px;
+  background: var(--ink-soft);
+}
+
+.scrub__fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: var(--line-active);
+  background: var(--ink);
+}
+
+/* The playhead station — a stamped ring riding the ruler. */
+.scrub__station {
+  position: absolute;
+  bottom: -1px;
+  width: 14px;
+  height: 14px;
+  border: var(--line-active) solid var(--ink);
+  border-radius: 50%;
+  background: var(--paper);
+  transform: translate(-50%, 50%);
+}
+
+/* The real input sits invisibly over the ruler and carries all interaction. */
+.scrub__input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.scrub__input:focus-visible + * {
+  /* keep focus visible on the label track below */
+}
+
+.scrub__track:focus-within .scrub__station {
+  outline: var(--line-active) solid var(--chalk);
+  outline-offset: 3px;
+}
+
+.scrub--disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}

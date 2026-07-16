@@ -1,0 +1,102 @@
+/* The hand trace and its self-drawing animation. */
+
+.hand-trace {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+/* Survey contour rings — barely there, the ruled ground under the trace. */
+.hand-trace__topo ellipse {
+  fill: none;
+  stroke: var(--ink-line-soft);
+  stroke-width: var(--line-rest);
+}
+
+/* Plumb line and ground line. */
+.hand-trace__frame line {
+  stroke: var(--ink-line);
+  stroke-width: var(--line-rest);
+  stroke-dasharray: 2 5;
+}
+
+/* The trace. A hairline at rest, drawn with round joins so it reads as ink. */
+.hand-trace__stroke {
+  stroke: var(--ink);
+  stroke-width: var(--line-active);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Stations rest visible (result view, reduced motion). */
+.hand-trace__station circle {
+  fill: var(--paper);
+  stroke: var(--chalk);
+  stroke-width: var(--line-active);
+}
+
+.hand-trace__station-label {
+  font-family: var(--face-body);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  fill: var(--ink-soft);
+}
+
+/*
+ * The one orchestrated moment. On the hero, the stroke draws itself once, then
+ * the stations stamp in behind it. A yardage book doesn't animate — this single
+ * exception earns its place because it is the page's whole thesis.
+ */
+.hand-trace--draw .hand-trace__stroke {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: trace-draw var(--draw-duration) var(--ease-survey) forwards;
+}
+
+.hand-trace__station {
+  opacity: 1;
+}
+
+.hand-trace--draw .hand-trace__station {
+  opacity: 0;
+  animation: station-stamp 520ms var(--ease-survey) forwards;
+}
+
+/* Stagger the stations across the last third of the draw. */
+.hand-trace--draw .hand-trace__station:nth-child(1) {
+  animation-delay: calc(var(--draw-duration) * 0.62);
+}
+.hand-trace--draw .hand-trace__station:nth-child(2) {
+  animation-delay: calc(var(--draw-duration) * 0.82);
+}
+.hand-trace--draw .hand-trace__station:nth-child(3) {
+  animation-delay: calc(var(--draw-duration) * 1);
+}
+
+@keyframes trace-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes station-stamp {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/*
+ * Reduced motion: --draw-duration is 0ms, so the stroke is fully drawn and the
+ * stations resolve to opacity 1 with no perceptible motion. Nothing to draw.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .hand-trace--draw .hand-trace__station {
+    animation: none;
+    opacity: 1;
+  }
+}

@@ -1,0 +1,220 @@
+.upload {
+  width: 100%;
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding: var(--gap-5) var(--gap-4) var(--gap-6);
+}
+
+/*
+ * A book spread: a wide well for the drawing, a narrow margin for the numbers,
+ * the measuring stick spanning the well beneath it.
+ */
+.upload__grid {
+  display: grid;
+  grid-template-columns: 1fr 16rem;
+  grid-template-areas:
+    'well   margin'
+    'scrub  margin';
+  gap: var(--gap-4) var(--gap-5);
+  align-items: start;
+}
+
+/* The video well — an inset panel, ruled at the corners. Never shifts on load. */
+.upload__well {
+  grid-area: well;
+  position: relative;
+  aspect-ratio: 4 / 3;
+  background: var(--paper-deep);
+  border: var(--line-rest) solid var(--paper-edge);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.upload__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: var(--paper-deep);
+  cursor: pointer;
+}
+
+.upload__margin {
+  grid-area: margin;
+}
+
+.upload__margin-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-bottom: var(--gap-2);
+  border-bottom: var(--line-active) solid var(--ink);
+}
+
+.upload__margin-status {
+  color: var(--ink-soft);
+}
+
+.upload__margin-note {
+  margin-top: var(--gap-3);
+  padding-top: var(--gap-3);
+  border-top: var(--line-rest) solid var(--paper-edge);
+  font-size: 0.8125rem;
+  color: var(--ink-soft);
+}
+
+.upload__scrub {
+  grid-area: scrub;
+}
+
+.upload__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-3);
+  max-width: var(--shell);
+  margin: var(--gap-5) auto 0;
+  padding: 0 var(--gap-4);
+}
+
+.upload__replace {
+  position: relative;
+  font-size: 0.875rem;
+  color: var(--ink-soft);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.upload__replace input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* ── Empty state ────────────────────────────────────────── */
+
+.empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: var(--gap-4);
+}
+
+/* A framing reticle — the camera-alignment mark of a capture setup. */
+.empty__frame {
+  position: absolute;
+  inset: var(--gap-4);
+  pointer-events: none;
+}
+
+.empty__crosshair {
+  position: absolute;
+  background: var(--ink-line);
+}
+.empty__crosshair--v {
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: var(--line-rest);
+}
+.empty__crosshair--h {
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: var(--line-rest);
+}
+
+.empty__corner {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: var(--line-active) solid var(--ink-soft);
+}
+.empty__corner--tl {
+  top: 0;
+  left: 0;
+  border-right: none;
+  border-bottom: none;
+}
+.empty__corner--tr {
+  top: 0;
+  right: 0;
+  border-left: none;
+  border-bottom: none;
+}
+.empty__corner--bl {
+  bottom: 0;
+  left: 0;
+  border-right: none;
+  border-top: none;
+}
+.empty__corner--br {
+  bottom: 0;
+  right: 0;
+  border-left: none;
+  border-top: none;
+}
+
+.empty__body {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: var(--gap-2);
+  max-width: 24rem;
+  text-align: center;
+  background: color-mix(in srgb, var(--paper-deep) 78%, transparent);
+  padding: var(--gap-4);
+  border-radius: var(--radius);
+}
+
+.empty__title {
+  font-size: var(--t-title);
+}
+
+.empty__how {
+  font-size: 0.9375rem;
+  color: var(--ink-soft);
+}
+
+.empty__pick {
+  position: relative;
+  margin-top: var(--gap-1);
+  overflow: hidden;
+}
+
+.empty__pick input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.empty__privacy {
+  margin-top: var(--gap-1);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+/* ── Mobile: stack to one column ────────────────────────── */
+
+@media (max-width: 48rem) {
+  .upload {
+    padding: var(--gap-4) var(--gap-3) var(--gap-5);
+  }
+
+  .upload__grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'well'
+      'scrub'
+      'margin';
+    gap: var(--gap-4);
+  }
+
+  .upload__actions {
+    padding: 0 var(--gap-3);
+  }
+}
