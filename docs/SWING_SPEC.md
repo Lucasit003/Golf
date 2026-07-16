@@ -135,6 +135,77 @@ Before comparing anyone to anyone:
   through the swing.
 - **Orientation**: rotate so the hip line is a consistent reference direction.
 
+## Metric catalog
+
+The full set of swing aspects we compare against tour benchmarks, and — just as
+important — **which ones a single down-the-line video can actually produce.** Organized by
+measurability, because the honest answer to "can you measure X?" differs between tempo and
+ball compression, and the UI must never blur that line.
+
+Every benchmark below carries a source. Ranges are regions with real variance, not specs —
+render them as ranges with a caveat, never as false precision (`tour 40–50°`, not `45.0°`).
+Confidence is `good` / `moderate` / `low`, and it is a first-class part of the output (see
+the `Metric` type in the `swing-metrics` skill). Landmark indices refer to the enum in the
+Core structure section.
+
+### The organizing model
+
+Modern 3D systems (TPI / AMM) describe each of two body segments — **pelvis** and
+**thorax** — by six degrees of freedom: three translations (**sway** lateral, **thrust**
+toward/away from the ball, **lift** vertical) and three rotations (**turn** axial,
+**side bend** lateral, **forward bend** flexion). **X-factor** is the axial-turn difference
+between the two segments. That's the vocabulary; the tiers below say what we can recover
+from one camera.
+Source: TPI 3D / Advanced Motion Measurement 6-DOF pelvis–thorax model.
+
+### Tier 1 — reliable from down-the-line pose
+
+Vertical-dominant or time-based quantities. Pose estimation handles the vertical axis and
+frame timing well, so these are the trustworthy core.
+
+| Aspect | What it is | Derivation | Tour benchmark | Conf. | Source |
+| --- | --- | --- | --- | --- | --- |
+| **Tempo** | backswing : downswing time | `(top−address)/(impact−top)` frames | ≈ **3 : 1** (2.8–3.2) | good | Tour Tempo, Novosel — 21 back / 7 down @30fps |
+| **Lead knee flex** | front-knee bend through swing | angle hip 23/24 – knee 25/26 – ankle 27/28 | addr **18±12°**, top **33±8°**, impact **~25°** | moderate | Golf Swing Biomechanics systematic review, *Sports* 2022, 10(6):91 |
+| **Trail knee flex** | back-knee bend through swing | same, trail leg | addr **17±9°**, top **24±8°**, impact **~22°** | moderate | *Sports* 2022, 10(6):91 |
+| **Spine / forward bend** | trunk flexion from vertical | angle of shoulderMid−hipMid vs vertical, at address & impact; report the delta | small change; some extension into impact is normal | moderate | 2D/3D trunk kinematics, *J Appl Biomech* 2016;32(1):23 |
+| **Shoulder tilt** | trunk lateral tilt (frontal) | tilt of shoulder line 11–12 from horizontal | top **~36°**, impact **~39°** up (pros) vs ~29°/~27° (high-hcp) | moderate | GolfTEC "Swing by Numbers," *Golf Digest* |
+| **Head movement** | drift of head from address | displacement of nose 0 vs address, ÷ shoulder width; lateral & vertical separately | some drift is normal — no "keep still" spec | low | head-movement note, `swing-metrics` |
+
+### Tier 2 — measurable but depth-limited (say so in the UI)
+
+These need axial rotation in the horizontal plane, which depends on `worldLandmarks` z —
+the weak point of every single-camera system. 2D and 3D X-factor diverge by **~16°** purely
+from projecting trunk flex/side-bend onto one plane. Ship these only with a low-confidence
+label and the depth caveat, or behind a "needs 3D" gate. **Validate z on real swings before
+trusting any of them** (see Unverified).
+
+| Aspect | What it is | Tour benchmark | Conf. | Source |
+| --- | --- | --- | --- | --- |
+| **Shoulder turn** | thorax axial rotation at top | ≈ **85–95°** (commonly cited ~90°) | low | elite rotational benchmarks, Chu/Sell/Lephart, *J Sports Sci* (PMID 21844613) |
+| **Hip / pelvis turn** | pelvis axial rotation at top | ≈ **45°** | low | same |
+| **X-factor** | shoulder−hip axial separation at top | ≈ **40–50°** (high variance) | low | same; caveat *J Appl Biomech* 2016 (2D≠3D by ~16°) |
+| **Hip rotation at impact** | pelvis open to target line at impact | ≈ **35–45°** open (pros ~36°+ vs ~20° amateurs) | low | GolfTEC, *Golf Digest* |
+| **Side bend at impact** | trunk lateral flexion at impact | trail-side bend present for a RH golfer (left-side bend added into impact) | low | *J Appl Biomech* 2016;32(1):23 |
+
+The kinematic **sequence** itself — pelvis → thorax → arm → club, peaking proximal-to-distal
+— is the highest-value rotational signal, and is more about *order* than absolute degrees.
+Pros peak in that order with low variability; amateurs fire the arms early. If z is too noisy
+for absolute X-factor, the *timing* of the rotation peaks may still be recoverable and worth
+more. Source: rotational-biomechanics / kinematic-sequence literature (TPI, Cheetham).
+
+### Tier 3 — not measurable from body video (needs other instruments)
+
+Real aspects of the swing that a down-the-line camera of the *body* cannot produce. List
+them honestly as out of scope, and name what each would require — never imply we measure them.
+
+| Aspect | Why not from pose | Needs |
+| --- | --- | --- |
+| **Compression / attack angle / dynamic loft / spin loft / smash factor** | Club-and-ball impact quantities, not body positions. "Compression" ≈ low spin loft. | Launch monitor (TrackMan). Ref: driver dynamic loft ~12.8°, 6-iron ~20.2°, smash >1.48 — TrackMan |
+| **Weight / pressure distribution** | Pressure (how you press into the ground) ≠ visible weight; not recoverable from pose. Tour ≈ 75–90% on lead foot at impact. | Force / pressure plate (BodiTrak, force plates) |
+| **Lead-wrist flexion / extension (cup vs bow)** | The pose model gives a wrist *point*, not hand orientation — flat vs cupped needs the back of the hand. Flat-to-slightly-flexed at top/impact is the strong pattern. | Hand-landmark tracking or wrist sensor (HackMotion) |
+| **Clubface / shaft plane / club path** | We track the body, not the club. | Club tracking or launch monitor |
+
 ## Reference data
 
 Reference swings are **joint data only**. Never video. See `docs/DATA_AND_LEGAL.md` —
@@ -165,3 +236,12 @@ Anything here is a guess. Do not hardcode it into the app until it's sourced or 
   single-camera pose system. If z is too noisy, X-factor may need a different approach —
   or may not be measurable from one camera.
 - Minimum usable frame rate — 60fps is asserted as "marginal" above, but nobody's tested it
+- Whether MediaPipe knee/ankle landmarks are stable enough for knee-flex angles to be
+  trustworthy at impact, when the trail foot is rolling and partly occluded
+- Shoulder-tilt and side-bend benchmarks come from mixed methods (GolfTEC 3D, research
+  mocap). Confirm the definition matches what we compute before shipping a range
+- Side-bend-at-impact benchmark has no clean single figure yet — the *J Appl Biomech* 2016
+  numbers describe a 2D-vs-3D method difference, not a tour absolute. Find a tour absolute
+  before putting a number in the UI
+- Tier-2 rotational benchmarks (shoulder turn, hip turn, X-factor, hip-at-impact) all
+  inherit the monocular-z problem. None ships as a confident number until z is validated

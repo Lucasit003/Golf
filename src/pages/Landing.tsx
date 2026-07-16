@@ -16,18 +16,45 @@ import './Landing.css'
  * flag = deviation.
  */
 
-const METRICS: Metric[] = [
-  { name: 'Tempo', unit: ': 1', scaleMin: 1, scaleMax: 4, lo: 2.8, hi: 3.2, decimals: 1 },
-  { name: 'X-factor', unit: '°', scaleMin: 0, scaleMax: 70, lo: 40, hi: 50 },
-  { name: 'Hip rotation', unit: '°', scaleMin: 0, scaleMax: 70, lo: 35, hi: 45 },
+// The measured set, grouped by swing region. Ranges are published tour benchmarks
+// (sourced in docs/SWING_SPEC.md), shown before any upload as factual reference — not a
+// user's numbers. Rotational figures are depth-limited from one camera; the caveat below
+// says so rather than implying false precision.
+const METRIC_GROUPS: { group: string; items: Metric[] }[] = [
   {
-    name: 'Spine angle',
-    unit: '°',
-    scaleMin: -6,
-    scaleMax: 6,
-    lo: -2,
-    hi: 2,
-    note: 'held within tolerance of the address angle',
+    group: 'Rotation',
+    items: [
+      { name: 'Shoulder turn · top', unit: '°', scaleMin: 0, scaleMax: 120, lo: 85, hi: 95 },
+      { name: 'Hip turn · top', unit: '°', scaleMin: 0, scaleMax: 120, lo: 40, hi: 50 },
+      { name: 'X-factor · top', unit: '°', scaleMin: 0, scaleMax: 70, lo: 40, hi: 50 },
+      { name: 'Hip rotation · impact', unit: '°', scaleMin: 0, scaleMax: 70, lo: 35, hi: 45 },
+    ],
+  },
+  {
+    group: 'Tilt & bend',
+    items: [
+      { name: 'Shoulder tilt · top', unit: '°', scaleMin: 0, scaleMax: 60, lo: 33, hi: 39 },
+      {
+        name: 'Spine angle',
+        unit: '°',
+        scaleMin: -6,
+        scaleMax: 6,
+        lo: -2,
+        hi: 2,
+        note: 'held within tolerance of the address angle',
+      },
+    ],
+  },
+  {
+    group: 'Posture & base',
+    items: [
+      { name: 'Lead knee flex · top', unit: '°', scaleMin: 0, scaleMax: 60, lo: 25, hi: 41 },
+      { name: 'Trail knee flex · top', unit: '°', scaleMin: 0, scaleMax: 60, lo: 16, hi: 32 },
+    ],
+  },
+  {
+    group: 'Timing',
+    items: [{ name: 'Tempo · back : down', unit: ': 1', scaleMin: 1, scaleMax: 4, lo: 2.8, hi: 3.2, decimals: 1 }],
   },
 ]
 
@@ -153,9 +180,21 @@ export function Landing({ onStart }: { onStart: () => void }) {
             </p>
           </Reveal>
           <div className="measures__list">
-            {METRICS.map((m, i) => (
-              <MetricRow key={m.name} metric={m} index={i} />
+            {METRIC_GROUPS.map((g) => (
+              <div className="measures__group" key={g.group}>
+                <div className="measures__group-label label">{g.group}</div>
+                {g.items.map((m, i) => (
+                  <MetricRow key={m.name} metric={m} index={i} />
+                ))}
+              </div>
             ))}
+            <p className="measures__caveat">
+              Rotation (turn, X-factor) needs depth we're still proving out from a single
+              camera — those ship with a confidence flag, never false precision. And the
+              club-and-ball numbers — <span className="ink-flag">compression, attack angle,
+              spin</span> — need a launch monitor; weight and pressure need a force plate.
+              Contour measures the body, and says so instead of faking the rest.
+            </p>
           </div>
         </div>
       </section>

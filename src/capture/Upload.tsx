@@ -75,12 +75,15 @@ export function Upload({ onBack }: { onBack: () => void }) {
             </span>
           </div>
           <Readout label="Tempo" range="2.8–3.2 : 1" />
+          <Readout label="Shoulder turn" range="85–95°" />
           <Readout label="X-factor" range="40–50°" />
           <Readout label="Hip rotation" range="35–45°" />
+          <Readout label="Lead knee flex" range="25–41°" />
           <Readout label="Spine angle" range="±2° address" />
           <p className="upload__margin-note">
-            Numbers arrive once pose extraction and event detection land. Nothing here is
-            estimated — an empty readout is honest; a plausible one isn't.
+            The full set — turn, tilt, bend, knees, tempo — arrives once pose extraction and
+            event detection land. Nothing here is estimated; an empty readout is honest, a
+            plausible one isn't.
           </p>
         </aside>
 

@@ -245,6 +245,28 @@
   border-top: var(--line-active) solid var(--ink);
 }
 
+.measures__group {
+  padding-top: var(--gap-2);
+}
+
+.measures__group + .measures__group {
+  margin-top: var(--gap-3);
+}
+
+.measures__group-label {
+  color: var(--fairway);
+  padding: var(--gap-2) 0 var(--gap-1);
+}
+
+.measures__caveat {
+  margin-top: var(--gap-4);
+  padding-top: var(--gap-3);
+  border-top: var(--line-rest) solid var(--paper-edge);
+  max-width: none;
+  font-size: 0.875rem;
+  color: var(--ink-soft);
+}
+
 /* ── Reference line ───────────────────────────────────────── */
 
 .reference__grid {

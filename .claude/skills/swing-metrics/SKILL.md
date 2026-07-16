@@ -1,6 +1,6 @@
 ---
 name: swing-metrics
-description: Golf swing biomechanics math — tempo, X-factor (hip-shoulder separation), spine angle, hip rotation, head movement. Use when computing any swing measurement from pose data, defining benchmark ranges, or working on event detection. Covers the vector math, the landmark indices each metric needs, and which benchmark figures are verified vs. assumed.
+description: Golf swing biomechanics math — tempo, X-factor (hip-shoulder separation), shoulder/hip turn, spine and forward bend, shoulder tilt, side bend, lead/trail knee flexion, hip rotation at impact, head movement, and the kinematic sequence. Use when computing any swing measurement from pose data, defining benchmark ranges, or working on event detection. Covers the vector math, the landmark indices each metric needs, which benchmarks are verified vs. assumed, and which swing aspects (compression/attack angle, weight/pressure, wrist cup) can't come from body video at all.
 ---
 
 # Swing Metrics
@@ -24,13 +24,29 @@ value. There is no "reasonable default."
 
 Be honest about this. Each benchmark gets a source comment in code or it doesn't ship.
 
+The full, sourced catalog — every aspect and which tier it falls in — lives in
+`docs/SWING_SPEC.md` under **Metric catalog**. That's the canonical list; this table is the
+short version with the confidence call for the ones we compute from pose.
+
 | Metric | Commonly cited range | Confidence |
 | --- | --- | --- |
-| Tempo (back:down) | ~3:1 | **Good.** Widely replicated. Popularized by Tour Tempo (Novosel), who measured 21 frames back / 7 down at 30fps across many tour swings. |
-| X-factor at top | ~40–50° | **Weak.** Cited constantly, but methodology varies wildly between studies — different definitions, different measurement planes, 3D mocap vs. video. Treat as a rough region, not a spec. |
-| Hip rotation at impact | ~35–45° open | **Weak.** Same problem. |
-| Spine angle change, address→impact | small, some extension is normal | **Poor.** No clean consensus figure. Don't ship a range until we find one. |
-| Head movement | some lateral drift is normal | **Poor.** "Keep your head still" is folk wisdom that mocap doesn't support. |
+| Tempo (back:down) | ~3:1 (2.8–3.2) | **Good.** Widely replicated. Tour Tempo (Novosel): 21 frames back / 7 down at 30fps across many tour swings. |
+| Lead knee flex | addr ~18°, top ~33°, impact ~25° | **Moderate.** Systematic review with SDs (*Sports* 2022, 10(6):91). Vertical-plane angle, so pose handles it — verify landmark stability at impact. |
+| Trail knee flex | addr ~17°, top ~24°, impact ~22° | **Moderate.** Same source. |
+| Spine / forward bend, addr→impact | small change; some extension normal | **Moderate.** Vertical-dominant, more robust than the rotations. No crisp tour absolute yet. |
+| Shoulder tilt (frontal) | top ~36°, impact ~39° up | **Moderate.** GolfTEC "Swing by Numbers." Confirm their definition matches ours. |
+| X-factor at top | ~40–50° | **Low.** Cited constantly, but methodology varies (definition, plane, 3D vs video), and 2D≠3D by ~16°. Depends on noisy z. Rough region, not a spec. |
+| Shoulder turn / hip turn at top | ~90° / ~45° | **Low.** Axial rotation — same z problem. |
+| Hip rotation at impact | ~35–45° open | **Low.** Same problem. |
+| Side bend at impact | present, no clean tour figure | **Low.** Don't ship a number until sourced. |
+| Head movement | some lateral drift is normal | **Low.** "Keep your head still" is folk wisdom mocap doesn't support. |
+
+**Tiering (see SWING_SPEC):** vertical/timing metrics (tempo, knees, spine, tilt) are
+Tier 1 — trustworthy. Axial rotations (X-factor, turns, hip-at-impact, side bend) are
+Tier 2 — real but depth-limited; ship low-confidence or gate behind 3D. Club/ball and
+pressure metrics (compression/attack angle, weight distribution, wrist cup/bow) are
+**Tier 3 — not measurable from body video at all.** Never surface a Tier-3 aspect as
+something we measure; name the instrument it needs.
 
 **Do not invent precision.** If the literature says "roughly 40 to 50 degrees with high
 variance," the UI says a range and a caveat, not `45.0°`.
@@ -113,6 +129,40 @@ width so it's comparable across body sizes.
 
 Caveat honestly: some head movement is normal and present in tour swings. Don't imply
 otherwise.
+
+## Knee flexion
+
+Interior angle at the knee — the bend in the leg — for each side, at address, top, and
+impact.
+
+```
+// lead leg (indices are the subject's own left/right; pick the target-side leg)
+thigh = world[hip] - world[knee]      // 23/24 − 25/26
+shank = world[ankle] - world[knee]    // 27/28 − 25/26
+flex  = 180° - angleBetween(thigh, shank)   // 0 = straight leg
+```
+
+This is a **Tier-1** metric: it lives mostly in the vertical/sagittal plane, which pose
+handles well. The catch is the impact frame — the trail foot is rolling and the ankle can
+be occluded or blurred at speed. Gate on `visibility` for 25/26/27/28 and return `null`
+when the trail ankle drops out rather than reporting a jittery number.
+Benchmarks (with SDs) in `docs/SWING_SPEC.md`; source is the *Sports* 2022 systematic review.
+
+## Shoulder tilt (frontal)
+
+Lateral tilt of the shoulder line — distinct from shoulder *turn* (axial). This is the
+frontal-plane angle of the shoulder segment, at the top and at impact.
+
+```
+shoulderVec = world[12] - world[11]
+// angle of shoulderVec from horizontal in the frontal (vertical) plane
+tilt = angle between shoulderVec and the horizontal axis
+```
+
+Tier-1-ish: it's a vertical-plane angle, so more robust than the rotations. But confirm the
+benchmark definition matches ours before shipping a range — GolfTEC's "tilt" is a 3D-system
+convention and may not be the same axis. Pair it with **side bend** (trunk lateral flexion),
+which is the same idea for the spine rather than the shoulder line.
 
 ## Vector helpers
 
