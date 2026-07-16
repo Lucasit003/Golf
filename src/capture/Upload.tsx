@@ -18,7 +18,7 @@ const SPEEDS = [1, 0.5, 0.25, 0.1] as const
 // (see SWING_SPEC — phone slo-mo lies), so step by a small fixed slice.
 const STEP = 1 / 60
 
-export function Upload({ onBack }: { onBack: () => void }) {
+export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: () => void }) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const [src, setSrc] = useState<string | null>(null)
   const [current, setCurrent] = useState(0)
@@ -176,6 +176,9 @@ export function Upload({ onBack }: { onBack: () => void }) {
       <div className="upload__actions">
         <Button variant="line" onClick={onBack}>
           Back
+        </Button>
+        <Button variant="line" onClick={onCompare}>
+          Compare two swings ⇄
         </Button>
         {src ? (
           <label className="upload__replace">

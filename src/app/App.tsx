@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Landing } from '../pages/Landing'
 import { Upload } from '../capture/Upload'
+import { CompareStudio } from '../capture/CompareStudio'
+import { ScrollRule } from '../components/ScrollRule'
 import './App.css'
 
 /*
@@ -10,13 +12,14 @@ import './App.css'
  * lives below this in context; there's nothing to hold yet.
  */
 
-type View = 'landing' | 'upload'
+type View = 'landing' | 'upload' | 'compare'
 
 export function App() {
   const [view, setView] = useState<View>('landing')
 
   return (
     <div className="app">
+      {view === 'landing' ? <ScrollRule /> : null}
       <header className="masthead">
         <button
           className="masthead__mark"
@@ -29,16 +32,31 @@ export function App() {
           </span>
         </button>
         <div className="masthead__meta">
-          <span className="label">Swing survey</span>
+          <nav className="masthead__nav" aria-label="Views">
+            <button
+              className={`masthead__link${view === 'upload' ? ' is-active' : ''}`}
+              onClick={() => setView('upload')}
+            >
+              Survey
+            </button>
+            <button
+              className={`masthead__link${view === 'compare' ? ' is-active' : ''}`}
+              onClick={() => setView('compare')}
+            >
+              Compare
+            </button>
+          </nav>
           <span className="masthead__stamp data">M0</span>
         </div>
       </header>
 
       <main className="app__main">
         {view === 'landing' ? (
-          <Landing onStart={() => setView('upload')} />
+          <Landing onStart={() => setView('upload')} onCompare={() => setView('compare')} />
+        ) : view === 'compare' ? (
+          <CompareStudio onBack={() => setView('upload')} />
         ) : (
-          <Upload onBack={() => setView('landing')} />
+          <Upload onBack={() => setView('landing')} onCompare={() => setView('compare')} />
         )}
       </main>
 

@@ -5,21 +5,36 @@ advice before anything ships commercially.
 
 ---
 
-## The one rule
+## The rule (updated — video comparison allowed, with rights)
 
-**Reference swings are stored as joint coordinates. Never as video.**
+**Default to joint coordinates. Use video only when you have the rights to it.**
 
-Extract pose data, discard the footage, keep the numbers. This is the architectural
-decision the whole product rests on, and it's load-bearing for three separate reasons:
+This doc originally said "reference swings are stored as joint coordinates, never as
+video." That's relaxed: **video comparisons are allowed** — but only in the ways that are
+actually legal. Two things are true at once, and both matter:
 
-1. **Legal.** Measurements aren't the copyrighted work. Frames are.
-2. **Technical.** A skeleton can be rotated to the user's camera angle, rescaled to their
+- **Joint data stays the preferred form** for technical reasons that haven't changed (see
+  below). It's what makes a reference reusable across camera angles and body sizes.
+- **Video is allowed when the footage is yours or licensed** (see "Video comparison"). It
+  is *not* allowed for footage you don't have rights to — and no edit to this file changes
+  that, because that part is copyright and likeness law, not a project preference. Changing
+  a rule in a repo doesn't change the law underneath it.
+
+How the incumbents actually do this: GolfTEC, GEARS, TPI, and Sportsbox AI don't compare
+you to a copyrighted broadcast clip of a named pro. They compare you to **data they own or
+that isn't copyrightable** — their own captured motion data (GolfTEC's SwingTRU study
+measured tens of thousands of golfers, tour pros included), statistical benchmark ranges
+(facts, not copyrightable), or licensed footage. Own it, aggregate it, or license it —
+never scrape it. That's the whole game, and it's a solid one.
+
+Why joint data is still the default:
+
+1. **Technical.** A skeleton can be rotated to the user's camera angle, rescaled to their
    body, and time-normalized. Video can't do any of that. A face-on clip is worthless
    against a down-the-line user video.
-3. **Practical.** A swing is a few KB of joint data versus tens of MB of video.
-
-The legal reason is the one people notice. The technical reason is the one that actually
-makes the product good.
+2. **Practical.** A swing is a few KB of joint data versus tens of MB of video.
+3. **Legal, for third-party swings.** Measurements aren't the copyrighted work; frames are.
+   Your own footage and licensed footage are fine as video. Scraped footage never is.
 
 ## Where reference swings can come from
 
@@ -37,15 +52,33 @@ In order of how fast Lucas can actually get them:
 known camera position produces better reference data than a Rory clip at an unknown angle.
 The name is marketing, and it's purchasable later once there's traction.
 
-## What we don't do
+## Video comparison
 
-- **No scraping YouTube.** It breaches the ToS, and the footage belongs to the channel or
-  the tour. "Fine until you have users" is a trap, because that's exactly when it stops
+Allowed. Three modes, in order of how clean the rights are:
+
+1. **User-provided, side by side.** The user loads two clips they already have — their own
+   swing plus their own reference (a lesson clip, a buddy's swing, a swing they filmed off
+   a screen for personal use). We just play them together, synced, in slow motion. Both
+   files stay on the device; we ship nothing. This is the dual-video compare studio, and it
+   carries no rights exposure for us because we never host or distribute the footage.
+2. **Licensed reference video.** Footage we've licensed — teaching pro, mini-tour player,
+   stock — shown as a reference we're contractually allowed to display. Keep the license on
+   file; store the `license` string with the asset (see the `Reference` type in
+   `SWING_SPEC.md`, which now allows a `video` field alongside `world`).
+3. **Our own captured video.** Anything Lucas films himself, with the subject's consent.
+   We own it. This is the fastest clean source and the best data — start here.
+
+What still isn't allowed, because a doc can't waive it:
+
+- **No scraping YouTube / broadcast / social.** ToS breach, and the footage belongs to the
+  channel or the tour. "Fine until you have users" is a trap — that's exactly when it stops
   being fine.
-- **No redistributing frames** from any source, including licensed ones, unless the
-  license explicitly covers it.
-- **No named-pro comparison** without a license covering both the footage and the player's
-  likeness. Those are two separate rights held by two different parties.
+- **No redistributing frames** from any source, including licensed ones, unless the license
+  explicitly covers redistribution.
+- **No named-pro comparison** without a license covering *both* the footage and the
+  player's likeness — two separate rights, two different parties. The user comparing their
+  own clip of a pro on their own device (mode 1) is their business; us shipping that clip is
+  not the same thing and needs the license.
 
 ## Benchmarks vs. references
 
@@ -62,8 +95,11 @@ visualization upgrade, not the substance. Sequence accordingly.
 
 ## User video
 
-Never leaves the device through M4. No uploads, no backend, no storage. Say this plainly
-in the UI — people are filming themselves and it matters to them.
+Never leaves the device through M4. No uploads, no backend, no storage. This now covers
+**both** clips in a side-by-side comparison — the user's swing and whatever reference they
+load are handled entirely in the browser and are never transmitted. Say this plainly in the
+UI — people are filming themselves and it matters to them, and "your footage stays here" is
+a genuine feature, not a disclaimer.
 
 If a backend ever gets added, this becomes a privacy policy question and a real one. Don't
 add one casually.

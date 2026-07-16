@@ -208,8 +208,10 @@ them honestly as out of scope, and name what each would require — never imply 
 
 ## Reference data
 
-Reference swings are **joint data only**. Never video. See `docs/DATA_AND_LEGAL.md` —
-this is a legal constraint, not a preference.
+Joint data is still the preferred form for a reference — it's what lets us rotate to the
+user's camera, rescale to their body, and time-normalize. But **video references are now
+allowed when the rights are clean** (licensed or our own footage); see the updated
+`docs/DATA_AND_LEGAL.md`. When a reference carries video, it carries its license with it.
 
 ```ts
 type Reference = {
@@ -218,11 +220,20 @@ type Reference = {
   license: string;            // how we're allowed to use it. Required.
   fps: number;
   world: Vec3[][];            // frames × 33, already time-normalized 0–1
+  video?: {                   // optional — only when rights are cleared
+    url: string;              // local/bundled asset; never a hotlink to someone else's host
+    rights: 'owned' | 'licensed';
+  };
 };
 ```
 
-A reference without `source` and `license` populated does not enter the repo. Enforce it
-in a test if you have to.
+A reference without `source` and `license` populated does not enter the repo. A reference
+with a `video` field and `rights: 'licensed'` does not enter the repo without the license
+on file. Enforce both in a test if you have to.
+
+**User-provided comparison video is different** — it's never a `Reference`, never stored,
+never committed. The dual-video compare studio loads two clips the user already has, plays
+them together on the device, and keeps nothing. That path has no rights exposure for us.
 
 ## Unverified
 

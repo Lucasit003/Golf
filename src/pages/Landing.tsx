@@ -99,7 +99,7 @@ const STEPS = [
   },
 ]
 
-export function Landing({ onStart }: { onStart: () => void }) {
+export function Landing({ onStart, onCompare }: { onStart: () => void; onCompare: () => void }) {
   return (
     <div className="landing">
       {/* ── Hero ─────────────────────────────────────────── */}
@@ -123,8 +123,12 @@ export function Landing({ onStart }: { onStart: () => void }) {
                 Upload a swing
                 <span className="btn__tick">↑</span>
               </Button>
-              <span className="hero__local label">Runs in your browser · nothing uploaded</span>
+              <button className="hero__secondary" onClick={onCompare}>
+                or compare two swings
+                <span aria-hidden="true"> ⇄</span>
+              </button>
             </div>
+            <span className="hero__local label">Runs in your browser · nothing uploaded</span>
           </div>
 
           <div className="hero__drawing">
@@ -229,16 +233,19 @@ export function Landing({ onStart }: { onStart: () => void }) {
                 {/* reference (chalk) */}
                 <path
                   className="reference__ref"
+                  pathLength={1}
                   d="M176 392 C205 300 250 210 268 132 C282 74 268 58 240 78 C214 96 196 210 182 300 C178 336 176 372 178 392"
                 />
                 {/* user (ink) — over the top, diverging at the top */}
                 <path
                   className="reference__user"
+                  pathLength={1}
                   d="M172 392 C198 300 242 214 276 150 C300 104 292 74 258 92 C226 108 200 214 184 300 C179 336 176 372 178 392"
                 />
                 {/* divergence segment (flag) */}
                 <path
                   className="reference__diverge"
+                  pathLength={1}
                   d="M258 92 C300 104 300 128 276 150"
                 />
                 <circle className="reference__dot-ref" cx="240" cy="78" r="5" />

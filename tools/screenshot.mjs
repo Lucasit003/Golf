@@ -106,6 +106,16 @@ const SHOTS = [
     },
   },
   {
+    name: 'compare-desktop',
+    view: 'desktop',
+    fullPage: false,
+    settle: 800,
+    after: async (page) => {
+      await page.getByRole('button', { name: /^compare$/i }).click()
+      await page.waitForTimeout(600)
+    },
+  },
+  {
     name: 'upload-empty-mobile',
     view: 'mobile',
     fullPage: true,

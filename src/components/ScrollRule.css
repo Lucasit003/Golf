@@ -1,0 +1,102 @@
+/* Left-margin scroll tape. Fixed, decorative, scroll-driven. */
+.srule {
+  position: fixed;
+  left: 14px;
+  top: 0;
+  bottom: 0;
+  width: 14px;
+  z-index: 15;
+  pointer-events: none;
+}
+
+.srule__track {
+  position: absolute;
+  left: 6px;
+  top: 8vh;
+  bottom: 8vh;
+  width: 1px;
+  background: var(--ink-line);
+}
+
+.srule__ticks {
+  position: absolute;
+  left: 3px;
+  top: 8vh;
+  bottom: 8vh;
+  width: 7px;
+}
+.srule__tick {
+  position: absolute;
+  left: 0;
+  width: 7px;
+  height: 1px;
+  background: var(--ink-line);
+}
+
+/* The fill and station only animate where scroll timelines exist. */
+.srule__fill {
+  position: absolute;
+  left: 6px;
+  top: 8vh;
+  width: 1px;
+  height: 0;
+  background: var(--fairway);
+}
+
+.srule__station {
+  position: absolute;
+  left: 6px;
+  top: 8vh;
+  width: 9px;
+  height: 9px;
+  margin-left: -4px;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 2px solid var(--fairway);
+  opacity: 0;
+}
+
+@supports (animation-timeline: scroll()) {
+  .srule__fill {
+    height: 84vh; /* spans between the top/bottom insets */
+    transform-origin: top;
+    transform: scaleY(0);
+    animation: srule-grow linear both;
+    animation-timeline: scroll(root block);
+  }
+
+  .srule__station {
+    opacity: 1;
+    animation: srule-ride linear both;
+    animation-timeline: scroll(root block);
+  }
+
+  @keyframes srule-grow {
+    to {
+      transform: scaleY(1);
+    }
+  }
+
+  @keyframes srule-ride {
+    from {
+      top: 8vh;
+    }
+    to {
+      top: 92vh;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .srule__fill,
+  .srule__station {
+    animation: none;
+  }
+}
+
+/* Out of the way on narrow screens. */
+@media (max-width: 64rem) {
+  .srule {
+    display: none;
+  }
+}

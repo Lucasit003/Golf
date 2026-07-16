@@ -112,7 +112,26 @@
   margin-top: var(--gap-4);
 }
 
+.hero__secondary {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--cream);
+  font-family: var(--face-body);
+  font-size: 0.9375rem;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: color-mix(in srgb, var(--cream) 45%, transparent);
+  cursor: pointer;
+  transition: text-decoration-color 140ms linear;
+}
+.hero__secondary:hover {
+  text-decoration-color: var(--fairway-lit);
+}
+
 .hero__local {
+  display: inline-block;
+  margin-top: var(--gap-3);
   text-transform: none;
   letter-spacing: 0;
   color: color-mix(in srgb, var(--cream) 62%, var(--fairway-deep));
@@ -326,6 +345,34 @@
   stroke-width: 2.5;
   stroke-linecap: round;
   fill: none;
+}
+
+/*
+ * Scroll-linked drawing: the two swing lines trace themselves as the figure
+ * scrolls up through the viewport, then the red divergence stamps in. Tied to
+ * scroll position via a view() timeline. Enhancement only — without support the
+ * lines are simply drawn (dashoffset 0).
+ */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reference__ref,
+    .reference__user,
+    .reference__diverge {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      animation: ref-draw linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 42%;
+    }
+    .reference__diverge {
+      animation-range: cover 40% cover 60%;
+    }
+    @keyframes ref-draw {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+  }
 }
 .reference__dot-ref {
   fill: var(--paper-deep);

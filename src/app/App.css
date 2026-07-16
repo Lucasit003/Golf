@@ -52,6 +52,34 @@
   gap: var(--gap-3);
 }
 
+.masthead__nav {
+  display: flex;
+  gap: var(--gap-1);
+}
+
+.masthead__link {
+  padding: 0.3rem 0.6rem;
+  border: none;
+  background: none;
+  border-radius: var(--radius);
+  font-family: var(--face-body);
+  font-size: var(--t-label);
+  text-transform: uppercase;
+  letter-spacing: var(--track-label);
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: color 120ms linear, background-color 120ms linear;
+}
+
+.masthead__link:hover {
+  color: var(--ink);
+}
+
+.masthead__link.is-active {
+  color: var(--cream);
+  background: var(--fairway);
+}
+
 /* A stamped milestone mark — survey character. */
 .masthead__stamp {
   display: inline-grid;
