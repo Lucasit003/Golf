@@ -7,14 +7,18 @@
 /* ── Masthead ───────────────────────────────────────────── */
 
 .masthead {
+  position: sticky;
+  top: 0;
+  z-index: 20;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  max-width: var(--shell);
   width: 100%;
-  margin: 0 auto;
-  padding: var(--gap-3) var(--gap-4);
+  /* Full-bleed bar; content held to the shell via symmetric side padding. */
+  padding: var(--gap-3) max(var(--gap-4), calc((100% - var(--shell)) / 2));
   border-bottom: var(--line-rest) solid var(--paper-edge);
+  background: color-mix(in srgb, var(--paper) 82%, transparent);
+  backdrop-filter: blur(8px);
 }
 
 .masthead__mark {
@@ -38,7 +42,7 @@
 }
 
 .masthead__glyph {
-  color: var(--chalk);
+  color: var(--fairway);
   font-size: 1.1rem;
 }
 

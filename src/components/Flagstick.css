@@ -1,0 +1,65 @@
+.flagstick {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.flagstick__green {
+  fill: color-mix(in srgb, var(--fairway-deep) 55%, transparent);
+}
+
+.flagstick__hole {
+  fill: var(--fairway-deep);
+  stroke: var(--brass);
+  stroke-width: 1;
+}
+
+.flagstick__pin {
+  stroke: var(--cream);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.flagstick__ball-top {
+  fill: var(--cream);
+}
+
+.flagstick__cloth {
+  fill: var(--flag);
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: flag-wave var(--wave-duration) ease-in-out infinite;
+}
+
+.flagstick__num {
+  font-family: var(--face-data);
+  font-size: 20px;
+  font-weight: 500;
+  fill: var(--cream);
+  text-anchor: middle;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: flag-wave var(--wave-duration) ease-in-out infinite;
+}
+
+/* A slow ripple — the cloth luffing in a light breeze. */
+@keyframes flag-wave {
+  0%,
+  100% {
+    transform: skewY(0deg) scaleX(1);
+  }
+  35% {
+    transform: skewY(-2.5deg) scaleX(0.97);
+  }
+  70% {
+    transform: skewY(2deg) scaleX(1.02);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flagstick__cloth,
+  .flagstick__num {
+    animation: none;
+  }
+}

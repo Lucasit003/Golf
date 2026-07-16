@@ -52,4 +52,5 @@
   font-family: var(--face-body);
   font-size: var(--t-label);
   margin-right: 0.35em;
+  color: var(--fairway);
 }

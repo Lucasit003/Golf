@@ -35,6 +35,42 @@
   --btn-bg: color-mix(in srgb, var(--ink) 6%, transparent);
 }
 
+/* Fairway green — the brand action on paper. */
+.btn--fairway {
+  --btn-fg: var(--cream);
+  --btn-bg: var(--fairway);
+  border-color: var(--fairway);
+}
+
+.btn--fairway:hover {
+  --btn-bg: color-mix(in srgb, var(--fairway) 88%, var(--ink));
+}
+
+/* On dark green — a cream stamp. */
+.btn--cream {
+  --btn-fg: var(--fairway-deep);
+  --btn-bg: var(--cream);
+  border-color: var(--cream);
+}
+
+.btn--cream:hover {
+  --btn-bg: color-mix(in srgb, var(--cream) 88%, var(--fairway-lit));
+}
+
+/* A hair of lift on hover — the site now allows a little motion. */
+.btn {
+  transition:
+    background-color 120ms linear,
+    color 120ms linear,
+    transform 140ms var(--ease-out);
+}
+.btn:hover {
+  transform: translateY(-1px);
+}
+.btn:active {
+  transform: translateY(0);
+}
+
 /* The measuring-tick mark that trails the label — a small survey flourish. */
 .btn__tick {
   font-family: var(--face-data);

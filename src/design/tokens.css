@@ -7,20 +7,31 @@
 
 :root {
   /* ── Color ──────────────────────────────────────────────
-     Six values. That's the whole palette.
-     chalk = reference / in-range. flag = deviation. Never decorative. */
+     The survey base — paper and ink — carries the document feel.
+     chalk = reference / in-range. flag = deviation / the pin. These two stay
+     strictly semantic. The fairway family is the golf accent, used freely for
+     surface and emphasis (hero, CTA, motifs). */
   --paper: #e7e9e0; /* survey paper — grey-green, never cream */
   --paper-deep: #d5d9cc; /* insets, panels, the video well */
-  --ink: #16211c; /* text, contour lines — green-black, never #000 */
+  --cream: #f2f0e6; /* light ink on dark green — pin numerals, hero text */
+  --ink: #14211b; /* text, contour lines — green-black, never #000 */
   --ink-soft: #59645c; /* labels, captions, axis marks */
   --chalk: #2547c8; /* field-marking blue — the reference, the in-range state */
-  --flag: #b8332a; /* out-of-range, deviation, divergence */
+  --flag: #c23b30; /* out-of-range, deviation, the flag on the pin */
 
-  /* Derived, non-semantic tints of the above — for hairline rules and
-     faint contour work only. Never for state. */
+  /* Golf accent — turf greens. */
+  --fairway: #2e7d46; /* turf green — the primary golf accent */
+  --fairway-deep: #143a24; /* deep rough — dark surfaces, the hero ground */
+  --fairway-lit: #55b174; /* sunlit grass — highlights, active traces on green */
+  --sand: #ddcda6; /* bunker — a warm section ground */
+  --brass: #b08a3e; /* flag numerals, hairline premium accents. Sparingly. */
+
+  /* Derived, non-semantic tints — hairline rules and faint contour work. */
   --ink-line: color-mix(in srgb, var(--ink) 14%, transparent);
   --ink-line-soft: color-mix(in srgb, var(--ink) 7%, transparent);
   --paper-edge: color-mix(in srgb, var(--ink) 22%, transparent);
+  --fairway-line: color-mix(in srgb, var(--cream) 16%, transparent);
+  --fairway-edge: color-mix(in srgb, var(--cream) 26%, transparent);
 
   /* ── Type ───────────────────────────────────────────────
      Archivo expanded+heavy = stamped lettering, headings only.
@@ -61,10 +72,19 @@
      Everything else stays still. */
   --draw-duration: 2800ms;
   --ease-survey: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --reveal-duration: 720ms;
+  --reveal-rise: 22px;
+
+  /* Ambient loops — kept slow and quiet so they read as drift, not animation. */
+  --drift-duration: 22s;
+  --wave-duration: 3.4s;
 }
 
 @media (prefers-reduced-motion: reduce) {
   :root {
     --draw-duration: 0ms;
+    --reveal-duration: 0ms;
+    --reveal-rise: 0px;
   }
 }

@@ -1,0 +1,49 @@
+.topo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.topo__ring {
+  fill: none;
+  stroke-width: 1;
+}
+
+.topo--light .topo__ring {
+  stroke: var(--fairway-line);
+}
+.topo--light .topo__peak {
+  fill: var(--fairway-edge);
+}
+
+.topo--ink .topo__ring {
+  stroke: var(--ink-line-soft);
+}
+.topo--ink .topo__peak {
+  fill: var(--ink-line);
+}
+
+/* Slow breathing drift — a survey that's alive, not animated. */
+.topo__drift {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: topo-drift var(--drift-duration) ease-in-out infinite;
+}
+
+@keyframes topo-drift {
+  0%,
+  100% {
+    transform: scale(1) translate(0, 0);
+  }
+  50% {
+    transform: scale(1.045) translate(0, -8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .topo__drift {
+    animation: none;
+  }
+}

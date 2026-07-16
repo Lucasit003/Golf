@@ -48,13 +48,15 @@ const STATIONS: Station[] = [
 type Props = {
   /** Draw on mount (hero). When false, renders the finished trace immediately. */
   draw?: boolean
+  /** 'ink' on paper, 'cream' on dark green. */
+  tone?: 'ink' | 'cream'
   className?: string
 }
 
-export function HandTrace({ draw = false, className }: Props) {
+export function HandTrace({ draw = false, tone = 'ink', className }: Props) {
   return (
     <svg
-      className={`hand-trace${draw ? ' hand-trace--draw' : ''}${className ? ` ${className}` : ''}`}
+      className={`hand-trace hand-trace--${tone}${draw ? ' hand-trace--draw' : ''}${className ? ` ${className}` : ''}`}
       viewBox="0 0 620 720"
       role="img"
       aria-label="Contour trace of a reference golf swing — the path of the hands from address through the top of the backswing to impact."

@@ -132,7 +132,7 @@ function EmptyState({ onPick }: { onPick: (file: File | undefined) => void }) {
         <p className="empty__how">
           Film down-the-line, tripod, 240fps. Full body in frame, feet to hands.
         </p>
-        <label className="btn btn--solid empty__pick">
+        <label className="btn btn--fairway empty__pick">
           <input
             type="file"
             accept="video/*"

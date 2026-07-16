@@ -1,0 +1,91 @@
+.metric {
+  padding: var(--gap-3) 0;
+  border-top: var(--line-rest) solid var(--paper-edge);
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 620ms var(--ease-out),
+    transform 620ms var(--ease-out);
+}
+
+.metric--in {
+  opacity: 1;
+  transform: none;
+}
+
+.metric__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--gap-2);
+}
+
+.metric__name {
+  font-size: 1.0625rem;
+  font-weight: 500;
+}
+
+.metric__range {
+  font-size: 1.25rem;
+  color: var(--fairway-deep);
+  white-space: nowrap;
+}
+
+.metric__dash {
+  margin: 0 0.3em;
+  color: var(--ink-soft);
+}
+
+.metric__unit {
+  margin-left: 0.2em;
+  font-size: 0.9375rem;
+  color: var(--ink-soft);
+}
+
+/* The scale — a measuring line with the in-range window in chalk. */
+.metric__scale {
+  position: relative;
+  height: 22px;
+  margin-top: var(--gap-2);
+}
+
+.metric__track {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: var(--line-rest);
+  background: var(--paper-edge);
+}
+
+.metric__band {
+  position: absolute;
+  top: 50%;
+  height: var(--line-active);
+  background: var(--chalk);
+  transform: translateY(-50%);
+  transition: width 760ms var(--ease-out);
+}
+
+.metric__band-cap {
+  position: absolute;
+  top: 50%;
+  width: var(--line-active);
+  height: 12px;
+  background: var(--chalk);
+  transform: translate(-50%, -50%);
+}
+
+.metric__note {
+  margin-top: var(--gap-1);
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--ink-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .metric,
+  .metric__band {
+    transition: none;
+  }
+}

@@ -44,6 +44,22 @@
   fill: var(--ink-soft);
 }
 
+/* Cream tone — the trace on a dark fairway ground. */
+.hand-trace--cream .hand-trace__topo ellipse,
+.hand-trace--cream .hand-trace__frame line {
+  stroke: var(--fairway-line);
+}
+.hand-trace--cream .hand-trace__stroke {
+  stroke: var(--cream);
+}
+.hand-trace--cream .hand-trace__station circle {
+  fill: var(--fairway-deep);
+  stroke: var(--fairway-lit);
+}
+.hand-trace--cream .hand-trace__station-label {
+  fill: color-mix(in srgb, var(--cream) 78%, var(--fairway-deep));
+}
+
 /*
  * The one orchestrated moment. On the hero, the stroke draws itself once, then
  * the stations stamp in behind it. A yardage book doesn't animate — this single

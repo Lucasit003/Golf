@@ -1,0 +1,148 @@
+.hole-cta {
+  position: relative;
+  overflow: hidden;
+  background: var(--fairway-deep);
+  color: var(--cream);
+  border-radius: var(--radius);
+}
+
+.hole-cta__topo {
+  opacity: 0.6;
+}
+
+.hole-cta__inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: var(--gap-5);
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding: var(--gap-6) var(--gap-4);
+}
+
+/* ── The scene ──────────────────────────────────────────── */
+
+.hole-cta__svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.hole-cta__line {
+  stroke: var(--fairway-edge);
+  stroke-width: 1.5;
+  stroke-dasharray: 2 7;
+  stroke-linecap: round;
+}
+
+.hole-cta__hole {
+  fill: #0d2416;
+  stroke: var(--brass);
+  stroke-width: 1;
+}
+
+.hole-cta__pin {
+  stroke: var(--cream);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+.hole-cta__flag {
+  fill: var(--flag);
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: flag-wave var(--wave-duration) ease-in-out infinite;
+}
+
+/* Ball rests at the start of the line until revealed. */
+.hole-cta__roller {
+  offset-path: path('M70 235 C180 252 300 214 398 174');
+  offset-distance: 0%;
+  offset-rotate: 0deg;
+}
+
+.hole-cta__ball {
+  fill: var(--cream);
+}
+.hole-cta__dimple {
+  fill: color-mix(in srgb, var(--fairway-deep) 22%, transparent);
+}
+
+.hole-cta__sink {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* On reveal: roll the line, then drop in. */
+.is-in .hole-cta__roller {
+  animation: putt-roll 1500ms var(--ease-out) 250ms forwards;
+}
+.is-in .hole-cta__sink {
+  animation: ball-sink 520ms cubic-bezier(0.5, 0, 0.9, 0.4) 1650ms forwards;
+}
+
+@keyframes putt-roll {
+  from {
+    offset-distance: 0%;
+  }
+  to {
+    offset-distance: 100%;
+  }
+}
+
+@keyframes ball-sink {
+  from {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(7px) scale(0.28);
+    opacity: 0.85;
+  }
+}
+
+/* ── Copy ───────────────────────────────────────────────── */
+
+.hole-cta__eyebrow {
+  color: var(--fairway-lit);
+  margin-bottom: var(--gap-2);
+}
+
+.hole-cta__title {
+  color: var(--cream);
+  font-size: clamp(2rem, 4.5vw, 3rem);
+}
+
+.hole-cta__lede {
+  margin: var(--gap-3) 0 var(--gap-4);
+  max-width: 30rem;
+  color: color-mix(in srgb, var(--cream) 82%, var(--fairway-deep));
+}
+
+/* Reduced motion: ball already holed, flag still. */
+@media (prefers-reduced-motion: reduce) {
+  .hole-cta__roller {
+    offset-distance: 100%;
+    animation: none;
+  }
+  .hole-cta__sink {
+    transform: translateY(7px) scale(0.28);
+    animation: none;
+  }
+  .hole-cta__flag {
+    animation: none;
+  }
+}
+
+@media (max-width: 60rem) {
+  .hole-cta__inner {
+    grid-template-columns: 1fr;
+    gap: var(--gap-4);
+    padding: var(--gap-5) var(--gap-3);
+  }
+  .hole-cta__scene {
+    order: -1;
+    max-width: 24rem;
+  }
+}

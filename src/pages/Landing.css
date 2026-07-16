@@ -1,35 +1,93 @@
 .landing {
   width: 100%;
+}
+
+/* Shared section rhythm. Backgrounds run full-bleed; content centers to shell. */
+.section {
+  padding: var(--gap-6) var(--gap-4);
+}
+
+.section > .reveal,
+.section > ol,
+.section > div {
+  max-width: var(--shell);
+  margin-inline: auto;
+}
+
+.section__eyebrow {
+  margin-bottom: var(--gap-2);
+  color: var(--fairway);
+}
+
+.section__title {
+  font-size: clamp(1.75rem, 3.6vw, 2.6rem);
+  font-stretch: 125%;
+}
+
+.section__lede {
+  margin-top: var(--gap-3);
+  max-width: 34rem;
+  font-size: 1.0625rem;
+  color: var(--ink-soft);
+}
+
+.ink-chalk {
+  color: var(--chalk);
+  font-weight: 500;
+}
+.ink-flag {
+  color: var(--flag);
+  font-weight: 500;
+}
+
+/* ── Hero ─────────────────────────────────────────────────── */
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 100% at 82% 8%, color-mix(in srgb, var(--fairway) 32%, var(--fairway-deep)) 0%, var(--fairway-deep) 58%);
+  color: var(--cream);
+}
+
+.hero__topo {
+  opacity: 0.7;
+}
+
+.hero__inner {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: var(--gap-6);
+  align-items: center;
   max-width: var(--shell);
   margin: 0 auto;
   padding: var(--gap-6) var(--gap-4);
 }
 
-/* Asymmetric book spread: the words on the left, the drawing in the margin. */
-.landing__spread {
-  display: grid;
-  grid-template-columns: 1.05fr 0.95fr;
-  gap: var(--gap-6);
-  align-items: center;
-}
-
-.landing__eyebrow {
+.hero__eyebrow {
+  color: var(--fairway-lit);
   margin-bottom: var(--gap-3);
 }
 
-.landing__headline {
+.hero__headline {
+  color: var(--cream);
   font-size: var(--t-display);
   font-stretch: 125%;
 }
 
-.landing__lede {
-  margin-top: var(--gap-3);
-  max-width: 30rem;
-  font-size: 1.0625rem;
-  color: var(--ink-soft);
+.hero__headline-accent {
+  color: var(--fairway-lit);
 }
 
-.landing__actions {
+.hero__lede {
+  margin-top: var(--gap-3);
+  max-width: 32rem;
+  font-size: 1.0625rem;
+  color: color-mix(in srgb, var(--cream) 80%, var(--fairway-deep));
+}
+
+.hero__actions {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -37,100 +95,327 @@
   margin-top: var(--gap-4);
 }
 
-.landing__local {
+.hero__local {
   text-transform: none;
   letter-spacing: 0;
+  color: color-mix(in srgb, var(--cream) 62%, var(--fairway-deep));
 }
 
-/* The specimen list — what gets measured, and against what. */
-.landing__surveyed {
-  margin: var(--gap-5) 0 0;
-  max-width: 26rem;
-  border-top: var(--line-active) solid var(--ink);
-}
-
-.landing__surveyed-head {
-  padding: var(--gap-2) 0 var(--gap-1);
-}
-
-.landing__surveyed-row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  padding: var(--gap-2) 0;
-  border-top: var(--line-rest) solid var(--paper-edge);
-}
-
-.landing__surveyed-metric {
-  margin: 0;
-  font-size: 0.9375rem;
-}
-
-.landing__surveyed-range {
-  margin: 0;
-  color: var(--ink-soft);
-  font-size: 0.9375rem;
-}
-
-/* The drawing plate — a framed figure, like a page from the book. */
-.landing__drawing {
+/* The framed figure plate on the green. */
+.hero__drawing {
   justify-self: center;
   width: 100%;
   max-width: 30rem;
 }
 
-.landing__plate {
+.hero__plate {
   padding: var(--gap-3);
-  border: var(--line-rest) solid var(--paper-edge);
+  border: var(--line-rest) solid var(--fairway-edge);
   border-radius: var(--radius);
-  background: color-mix(in srgb, var(--paper-deep) 45%, transparent);
+  background: color-mix(in srgb, var(--fairway-deep) 55%, transparent);
+  backdrop-filter: blur(2px);
 }
 
-.landing__plate-head {
+.hero__plate-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: var(--gap-2);
+  margin-bottom: var(--gap-1);
 }
 
-.landing__plate-tag {
+.hero__plate-title {
+  color: color-mix(in srgb, var(--cream) 70%, var(--fairway-deep));
+}
+
+.hero__plate-tag {
   text-transform: none;
   letter-spacing: 0.1em;
-  color: var(--chalk);
+  color: var(--fairway-lit);
 }
 
-.landing__trace {
-  margin: var(--gap-1) 0;
+.hero__trace-wrap {
+  position: relative;
 }
 
-.landing__plate-foot {
-  margin-top: var(--gap-2);
+.hero__flag {
+  position: absolute;
+  right: 2%;
+  bottom: 4%;
+  width: 22%;
+  max-width: 92px;
+}
+
+.hero__plate-foot {
+  margin-top: var(--gap-1);
   padding-top: var(--gap-2);
-  border-top: var(--line-rest) solid var(--paper-edge);
+  border-top: var(--line-rest) solid var(--fairway-edge);
   text-transform: none;
   letter-spacing: 0;
+  color: color-mix(in srgb, var(--cream) 62%, var(--fairway-deep));
+}
+
+/* ── How it works ─────────────────────────────────────────── */
+
+.how__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--gap-4);
+  margin: var(--gap-5) auto 0;
+  padding: 0;
+  list-style: none;
+}
+
+.how__item {
+  height: 100%;
+}
+
+.how__card {
+  height: 100%;
+  padding: var(--gap-4);
+  background: var(--paper-deep);
+  border: var(--line-rest) solid var(--paper-edge);
+  border-radius: var(--radius);
+  transition:
+    transform 200ms var(--ease-out),
+    border-color 200ms var(--ease-out);
+}
+
+.how__card:hover {
+  transform: translateY(-4px);
+  border-color: var(--fairway);
+}
+
+.how__n {
+  color: var(--fairway);
+  font-size: 0.875rem;
+}
+
+.step-icon {
+  display: block;
+  width: 56px;
+  height: auto;
+  margin: var(--gap-3) 0;
+  stroke: var(--ink);
+  stroke-width: 1.5;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.step-icon rect,
+.step-icon circle {
+  fill: none;
+}
+
+.step-icon__ghost {
+  stroke: var(--chalk);
+  stroke-dasharray: 2 3;
+}
+
+.how__card-title {
+  font-size: 1.25rem;
+}
+
+.how__card-body {
+  margin-top: var(--gap-2);
+  color: var(--ink-soft);
+  font-size: 0.9375rem;
+}
+
+/* ── What it measures ─────────────────────────────────────── */
+
+.measures {
+  background: color-mix(in srgb, var(--sand) 40%, var(--paper));
+  border-block: var(--line-rest) solid var(--paper-edge);
+}
+
+.measures__grid {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: var(--gap-6);
+  align-items: start;
+}
+
+.measures__intro {
+  position: sticky;
+  top: var(--gap-4);
+}
+
+.measures__list {
+  border-top: var(--line-active) solid var(--ink);
+}
+
+/* ── Reference line ───────────────────────────────────────── */
+
+.reference__grid {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: var(--gap-6);
+  align-items: center;
+}
+
+.reference__figure {
+  padding: var(--gap-4);
+  background: var(--paper-deep);
+  border: var(--line-rest) solid var(--paper-edge);
+  border-radius: var(--radius);
+}
+
+.reference__svg {
+  display: block;
+  width: 100%;
+  max-width: 22rem;
+  margin: 0 auto;
+  height: auto;
+  overflow: visible;
+}
+
+.reference__ref {
+  stroke: var(--chalk);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  fill: none;
+}
+.reference__user {
+  stroke: var(--ink);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  fill: none;
+}
+.reference__diverge {
+  stroke: var(--flag);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  fill: none;
+}
+.reference__dot-ref {
+  fill: var(--paper-deep);
+  stroke: var(--chalk);
+  stroke-width: 1.5;
+}
+.reference__dot-user {
+  fill: var(--paper-deep);
+  stroke: var(--flag);
+  stroke-width: 1.5;
+}
+
+.reference__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-3);
+  margin-top: var(--gap-3);
+  padding-top: var(--gap-3);
+  border-top: var(--line-rest) solid var(--paper-edge);
+}
+
+.reference__key {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  font-size: 0.8125rem;
   color: var(--ink-soft);
 }
 
-/* ── Tablet / mobile ────────────────────────────────────── */
+.reference__swatch {
+  width: 18px;
+  height: 0;
+  border-top-width: 2px;
+  border-top-style: solid;
+}
+.reference__swatch--user {
+  border-color: var(--ink);
+}
+.reference__swatch--ref {
+  border-color: var(--chalk);
+}
+.reference__swatch--diverge {
+  border-color: var(--flag);
+}
+
+.reference__foot {
+  margin-top: var(--gap-3);
+  color: var(--ink-soft);
+}
+
+/* ── Privacy ──────────────────────────────────────────────── */
+
+.privacy {
+  background: var(--paper-deep);
+  border-block: var(--line-rest) solid var(--paper-edge);
+}
+
+.privacy__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-4);
+  max-width: var(--shell);
+  margin: 0 auto;
+}
+
+.privacy__mark svg {
+  width: 48px;
+  height: 48px;
+  stroke: var(--fairway);
+  stroke-width: 1.5;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.privacy__mark rect,
+.privacy__mark circle {
+  fill: none;
+}
+
+.privacy__title {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+.privacy__body {
+  margin-top: var(--gap-2);
+  color: var(--ink-soft);
+  max-width: 40rem;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
 
 @media (max-width: 60rem) {
-  .landing {
+  .section {
     padding: var(--gap-5) var(--gap-3);
   }
 
-  .landing__spread {
+  .hero__inner {
     grid-template-columns: 1fr;
     gap: var(--gap-5);
+    padding: var(--gap-5) var(--gap-3);
   }
-
-  /* Drawing leads on mobile — it's the thesis. */
-  .landing__drawing {
+  .hero__drawing {
     order: -1;
     max-width: 24rem;
   }
-
-  .landing__headline {
+  .hero__headline {
     font-size: clamp(2.25rem, 11vw, 3.5rem);
+  }
+
+  .how__grid {
+    grid-template-columns: 1fr;
+    gap: var(--gap-3);
+  }
+
+  .measures__grid,
+  .reference__grid {
+    grid-template-columns: 1fr;
+    gap: var(--gap-4);
+  }
+  .measures__intro {
+    position: static;
+  }
+  .reference__figure-col {
+    order: -1;
+  }
+
+  .privacy__inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--gap-3);
   }
 }
