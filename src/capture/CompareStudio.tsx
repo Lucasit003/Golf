@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Button } from '../design/Button'
 import { ScrubBar } from './ScrubBar'
 import { useTransportKeys } from '../lib/useTransportKeys'
+import { usePrefs } from '../app/prefs'
 import './CompareStudio.css'
 
 /*
@@ -29,7 +30,8 @@ export function CompareStudio({ onBack }: { onBack: () => void }) {
   const [durB, setDurB] = useState(0)
   const [pos, setPos] = useState(0) // shared normalized playhead, 0–1
   const [playing, setPlaying] = useState(false)
-  const [rate, setRate] = useState<number>(1)
+  const { prefs } = usePrefs()
+  const [rate, setRate] = useState<number>(prefs.defaultSpeed)
 
   useEffect(() => () => {
     if (srcA) URL.revokeObjectURL(srcA)

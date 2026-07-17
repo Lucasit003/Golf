@@ -1,0 +1,115 @@
+.settings {
+  position: relative;
+}
+
+.settings__gear {
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: var(--line-rest) solid transparent;
+  border-radius: var(--radius);
+  background: none;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: color 120ms linear, border-color 120ms linear;
+}
+.settings__gear:hover,
+.settings__gear[aria-expanded='true'] {
+  color: var(--ink);
+  border-color: var(--paper-edge);
+}
+
+.settings__panel {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  z-index: 40;
+  width: 17rem;
+  padding: var(--gap-3);
+  display: grid;
+  gap: var(--gap-3);
+  background: var(--paper);
+  border: var(--line-rest) solid var(--paper-edge);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 30px rgb(20 33 27 / 0.14);
+}
+
+.settings__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap-3);
+}
+.settings__row--stack {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--gap-2);
+}
+
+.settings__label {
+  display: grid;
+  gap: 2px;
+  font-size: 0.9375rem;
+  color: var(--ink);
+}
+.settings__hint {
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+}
+
+/* Toggle switch. */
+.switch {
+  flex: none;
+  width: 2.6rem;
+  height: 1.5rem;
+  padding: 2px;
+  border: var(--line-rest) solid var(--paper-edge);
+  border-radius: 999px;
+  background: var(--paper-deep);
+  cursor: pointer;
+  transition: background-color 140ms var(--ease-out);
+}
+.switch--on {
+  background: var(--fairway);
+  border-color: var(--fairway);
+}
+.switch__dot {
+  display: block;
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 50%;
+  background: var(--paper);
+  transform: translateX(0);
+  transition: transform 140ms var(--ease-out);
+}
+.switch--on .switch__dot {
+  transform: translateX(1.1rem);
+}
+
+.settings__speeds {
+  display: flex;
+  gap: var(--gap-1);
+}
+.settings__speed {
+  flex: 1;
+  height: 2rem;
+  border: var(--line-rest) solid var(--paper-edge);
+  border-radius: var(--radius);
+  background: var(--paper);
+  color: var(--ink-soft);
+  font-family: var(--face-data);
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: border-color 120ms linear, color 120ms linear, background-color 120ms linear;
+}
+.settings__speed:hover {
+  border-color: var(--fairway);
+  color: var(--ink);
+}
+.settings__speed.is-active {
+  background: var(--fairway);
+  border-color: var(--fairway);
+  color: var(--cream);
+}

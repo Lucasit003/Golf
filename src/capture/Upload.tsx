@@ -3,6 +3,7 @@ import { Button } from '../design/Button'
 import { Readout } from '../components/Readout'
 import { ScrubBar } from './ScrubBar'
 import { useTransportKeys } from '../lib/useTransportKeys'
+import { usePrefs } from '../app/prefs'
 import './Upload.css'
 
 /*
@@ -25,7 +26,8 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
   const [current, setCurrent] = useState(0)
   const [duration, setDuration] = useState(0)
   const [playing, setPlaying] = useState(false)
-  const [rate, setRate] = useState<number>(1)
+  const { prefs } = usePrefs()
+  const [rate, setRate] = useState<number>(prefs.defaultSpeed)
 
   // Revoke the object URL when it changes or the screen unmounts.
   useEffect(() => {

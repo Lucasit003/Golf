@@ -90,6 +90,30 @@ a {
   background: color-mix(in srgb, var(--chalk) 22%, transparent);
 }
 
+/*
+ * Manual "reduce motion" preference (Settings). Mirrors the reduced-motion
+ * media reset, plus explicitly stops the scroll-driven animations, which ignore
+ * animation-duration because their progress is bound to scroll.
+ */
+:root[data-motion-off] *,
+:root[data-motion-off] *::before,
+:root[data-motion-off] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+:root[data-motion-off] .srule {
+  display: none;
+}
+:root[data-motion-off] .reference__ref,
+:root[data-motion-off] .reference__user,
+:root[data-motion-off] .reference__diverge {
+  stroke-dasharray: none !important;
+  stroke-dashoffset: 0 !important;
+  animation: none !important;
+}
+
 /* Utility: visually hidden but available to screen readers. */
 .sr-only {
   position: absolute;

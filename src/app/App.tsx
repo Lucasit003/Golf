@@ -3,6 +3,7 @@ import { Landing } from '../pages/Landing'
 import { Upload } from '../capture/Upload'
 import { CompareStudio } from '../capture/CompareStudio'
 import { ScrollRule } from '../components/ScrollRule'
+import { Settings } from './Settings'
 import './App.css'
 
 /*
@@ -71,6 +72,7 @@ export function App() {
             </button>
           </nav>
           <span className="masthead__stamp data">M0</span>
+          <Settings />
         </div>
       </header>
 
