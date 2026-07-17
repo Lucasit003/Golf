@@ -19,6 +19,9 @@ export function App() {
 
   return (
     <div className="app">
+      <a className="skip-link" href="#main">
+        Skip to content
+      </a>
       {view === 'landing' ? <ScrollRule /> : null}
       <header className="masthead">
         <button
@@ -36,12 +39,14 @@ export function App() {
             <button
               className={`masthead__link${view === 'upload' ? ' is-active' : ''}`}
               onClick={() => setView('upload')}
+              aria-current={view === 'upload' ? 'page' : undefined}
             >
               Survey
             </button>
             <button
               className={`masthead__link${view === 'compare' ? ' is-active' : ''}`}
               onClick={() => setView('compare')}
+              aria-current={view === 'compare' ? 'page' : undefined}
             >
               Compare
             </button>
@@ -50,7 +55,7 @@ export function App() {
         </div>
       </header>
 
-      <main className="app__main">
+      <main className="app__main" id="main">
         {view === 'landing' ? (
           <Landing onStart={() => setView('upload')} onCompare={() => setView('compare')} />
         ) : view === 'compare' ? (

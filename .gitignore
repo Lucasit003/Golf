@@ -4,6 +4,10 @@ dist
 
 # Screenshot tool output
 /shots
+
+# MediaPipe wasm — copied from the npm package at build time (see tools/copy-wasm.mjs).
+# The pose *model* under public/models IS committed; the wasm is reproducible.
+/public/mediapipe
 *.local
 .env
 .env.*

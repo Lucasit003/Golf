@@ -4,6 +4,25 @@
   min-height: 100vh;
 }
 
+/* Skip link — off-screen until focused, then a stamped chip top-left. */
+.skip-link {
+  position: fixed;
+  top: var(--gap-2);
+  left: var(--gap-2);
+  z-index: 50;
+  padding: 0.5rem 0.9rem;
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  text-decoration: none;
+  transform: translateY(-160%);
+  transition: transform 140ms var(--ease-out);
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
+
 /* ── Masthead ───────────────────────────────────────────── */
 
 .masthead {
