@@ -1,5 +1,7 @@
 # Contour
 
+![CI](https://github.com/Lucasit003/Golf/actions/workflows/ci.yml/badge.svg)
+
 Golf swing analysis in the browser. Film a swing, get it surveyed — measured
 against tour benchmarks and drawn back over your own footage.
 

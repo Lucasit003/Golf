@@ -234,6 +234,32 @@ function EmptyState({ onPick }: { onPick: (file: File | undefined) => void }) {
         <p className="empty__privacy label">
           Your video never leaves this device. Everything runs in the browser.
         </p>
+
+        <details className="capture-guide">
+          <summary className="capture-guide__summary">How to film it</summary>
+          <ul className="capture-guide__list">
+            <li>
+              <span className="capture-guide__k">Angle</span> down-the-line — camera behind
+              you, on the target line, at hand height
+            </li>
+            <li>
+              <span className="capture-guide__k">Steady</span> on a tripod. Any camera
+              movement throws off every measurement
+            </li>
+            <li>
+              <span className="capture-guide__k">Frame rate</span> 240fps if your phone has
+              it; 120 works, 60 is marginal
+            </li>
+            <li>
+              <span className="capture-guide__k">Framing</span> your whole body, feet to
+              hands, with headroom at the top
+            </li>
+            <li>
+              <span className="capture-guide__k">Repeat</span> the same spot each session so
+              swings compare cleanly
+            </li>
+          </ul>
+        </details>
       </div>
     </div>
   )

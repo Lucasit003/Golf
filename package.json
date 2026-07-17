@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "description": "Golf swing analysis in the browser — measured against tour benchmarks, drawn back over your own footage. On-device.",
   "scripts": {
     "predev": "node tools/copy-wasm.mjs",
     "dev": "vite",
