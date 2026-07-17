@@ -1,5 +1,6 @@
 import { useId, useState } from 'react'
-import { scoreAgainstBand, STATE_TOKEN, STATE_LABEL, type Band } from '../lib/compare'
+import { scoreAgainstBand, STATE_TOKEN, STATE_LABEL } from '../lib/compare'
+import { BENCHMARK_BY_ID } from '../metrics/benchmarks'
 import './ComparisonExplainer.css'
 
 /*
@@ -12,11 +13,13 @@ import './ComparisonExplainer.css'
  * (M1) and the metric math (M3); this is the display those will feed.
  */
 
-// X-factor as the worked example. Band and scale come from the metric catalog.
-const BAND: Band = { lo: 40, hi: 50 }
-const SCALE = { min: 0, max: 70 }
+// X-factor as the worked example — band, scale, and unit come straight from the
+// benchmark source of truth, so this demo always matches the measured set above.
+const XF = BENCHMARK_BY_ID.xFactor
+const BAND = XF.band
+const SCALE = XF.scale
 const MARGIN = 6 // the "close" margin, widened from default for a legible demo
-const UNIT = '°'
+const UNIT = XF.unit
 
 const pct = (v: number) => ((v - SCALE.min) / (SCALE.max - SCALE.min)) * 100
 
@@ -47,7 +50,9 @@ export function ComparisonExplainer() {
           <span className="cmp__dot" style={{ background: color }} />
           {STATE_LABEL[state]}
         </div>
-        <div className="cmp__tour data">tour 40–50{UNIT}</div>
+        <div className="cmp__tour data">
+          tour {BAND.lo}–{BAND.hi}{UNIT}
+        </div>
       </div>
 
       <label className="cmp__scale" htmlFor={id}>

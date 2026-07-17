@@ -6,6 +6,7 @@ import { Reveal } from '../components/Reveal'
 import { MetricRow, type Metric } from '../components/MetricRow'
 import { ComparisonExplainer } from '../components/ComparisonExplainer'
 import { HoleCTA } from '../components/HoleCTA'
+import { benchmarksByGroup } from '../metrics/benchmarks'
 import './Landing.css'
 
 /*
@@ -17,47 +18,26 @@ import './Landing.css'
  * flag = deviation.
  */
 
-// The measured set, grouped by swing region. Ranges are published tour benchmarks
-// (sourced in docs/SWING_SPEC.md), shown before any upload as factual reference — not a
-// user's numbers. Rotational figures are depth-limited from one camera; the caveat below
-// says so rather than implying false precision.
-const METRIC_GROUPS: { group: string; items: Metric[] }[] = [
-  {
-    group: 'Rotation',
-    items: [
-      { name: 'Shoulder turn · top', unit: '°', scaleMin: 0, scaleMax: 120, lo: 85, hi: 95 },
-      { name: 'Hip turn · top', unit: '°', scaleMin: 0, scaleMax: 120, lo: 40, hi: 50 },
-      { name: 'X-factor · top', unit: '°', scaleMin: 0, scaleMax: 70, lo: 40, hi: 50 },
-      { name: 'Hip rotation · impact', unit: '°', scaleMin: 0, scaleMax: 70, lo: 35, hi: 45 },
-    ],
-  },
-  {
-    group: 'Tilt & bend',
-    items: [
-      { name: 'Shoulder tilt · top', unit: '°', scaleMin: 0, scaleMax: 60, lo: 33, hi: 39 },
-      {
-        name: 'Spine angle',
-        unit: '°',
-        scaleMin: -6,
-        scaleMax: 6,
-        lo: -2,
-        hi: 2,
-        note: 'held within tolerance of the address angle',
-      },
-    ],
-  },
-  {
-    group: 'Posture & base',
-    items: [
-      { name: 'Lead knee flex · top', unit: '°', scaleMin: 0, scaleMax: 60, lo: 25, hi: 41 },
-      { name: 'Trail knee flex · top', unit: '°', scaleMin: 0, scaleMax: 60, lo: 16, hi: 32 },
-    ],
-  },
-  {
-    group: 'Timing',
-    items: [{ name: 'Tempo · back : down', unit: ': 1', scaleMin: 1, scaleMax: 4, lo: 2.8, hi: 3.2, decimals: 1 }],
-  },
-]
+// The measured set, grouped by swing region — derived from the single benchmark
+// source of truth (src/metrics/benchmarks.ts) so the copy and the math can never
+// disagree. Ranges are published tour benchmarks (sourced there and in
+// docs/SWING_SPEC.md), shown before any upload as factual reference, not a user's
+// numbers. The caveat below flags what's depth-limited or off-limits.
+const METRIC_GROUPS: { group: string; items: Metric[] }[] = benchmarksByGroup().map((g) => ({
+  group: g.group,
+  items: g.items.map(
+    (b): Metric => ({
+      name: b.label,
+      unit: b.unit,
+      scaleMin: b.scale.min,
+      scaleMax: b.scale.max,
+      lo: b.band.lo,
+      hi: b.band.hi,
+      decimals: b.decimals,
+      note: b.note,
+    }),
+  ),
+}))
 
 const STEPS = [
   {
