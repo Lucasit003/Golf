@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Landing } from '../pages/Landing'
 import { Upload } from '../capture/Upload'
 import { CompareStudio } from '../capture/CompareStudio'
@@ -14,8 +14,27 @@ import './App.css'
 
 type View = 'landing' | 'upload' | 'compare'
 
+const TITLES: Record<View, string> = {
+  landing: 'Contour — swing survey',
+  upload: 'Survey · Contour',
+  compare: 'Compare · Contour',
+}
+
 export function App() {
   const [view, setView] = useState<View>('landing')
+  const mounted = useRef(false)
+
+  // Per-view page title, and move focus to the main region when the view
+  // changes (not on first load) so keyboard and screen-reader users land in the
+  // new content instead of back at the top.
+  useEffect(() => {
+    document.title = TITLES[view]
+    if (mounted.current) {
+      document.getElementById('main')?.focus()
+    } else {
+      mounted.current = true
+    }
+  }, [view])
 
   return (
     <div className="app">
@@ -55,7 +74,7 @@ export function App() {
         </div>
       </header>
 
-      <main className="app__main" id="main">
+      <main className="app__main" id="main" tabIndex={-1}>
         {view === 'landing' ? (
           <Landing onStart={() => setView('upload')} onCompare={() => setView('compare')} />
         ) : view === 'compare' ? (

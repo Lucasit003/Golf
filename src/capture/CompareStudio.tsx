@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Button } from '../design/Button'
 import { ScrubBar } from './ScrubBar'
+import { useTransportKeys } from '../lib/useTransportKeys'
 import './CompareStudio.css'
 
 /*
@@ -131,6 +132,8 @@ export function CompareStudio({ onBack }: { onBack: () => void }) {
   const current = (srcA ? pos * durA : pos * durB) || 0
   const duration = srcA ? durA : durB
 
+  useTransportKeys({ enabled: hasAny, onToggle: toggle, onStep: step })
+
   return (
     <section className="compare" aria-label="Compare two swings">
       <div className="compare__head">
@@ -193,6 +196,11 @@ export function CompareStudio({ onBack }: { onBack: () => void }) {
         </div>
 
         <ScrubBar progress={pos} current={current} duration={duration} onSeek={seek} disabled={!hasAny} />
+        {hasAny ? (
+          <p className="transport__hint label">
+            <kbd>space</kbd> play · <kbd>←</kbd> <kbd>→</kbd> step a frame
+          </p>
+        ) : null}
       </div>
 
       <p className="compare__note">

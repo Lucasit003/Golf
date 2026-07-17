@@ -115,6 +115,11 @@
   flex: 1;
 }
 
+/* Programmatic focus target on view change — no visible outline. */
+.app__main:focus {
+  outline: none;
+}
+
 /* ── Colophon ───────────────────────────────────────────── */
 
 .colophon {

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Button } from '../design/Button'
 import { Readout } from '../components/Readout'
 import { ScrubBar } from './ScrubBar'
+import { useTransportKeys } from '../lib/useTransportKeys'
 import './Upload.css'
 
 /*
@@ -67,6 +68,8 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
   }
 
   const progress = duration > 0 ? current / duration : 0
+
+  useTransportKeys({ enabled: !!src, onToggle: togglePlay, onStep: step })
 
   return (
     <section className="upload" aria-label="Swing survey">
@@ -170,6 +173,11 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
             onSeek={seek}
             disabled={!src}
           />
+          {src ? (
+            <p className="transport__hint label">
+              <kbd>space</kbd> play · <kbd>←</kbd> <kbd>→</kbd> step a frame
+            </p>
+          ) : null}
         </div>
       </div>
 
