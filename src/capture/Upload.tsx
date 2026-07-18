@@ -401,7 +401,7 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
       </div>
 
       <div className="upload__actions">
-        <Button variant="line" onClick={onBack}>
+        <Button variant="line" onClick={onBack} disabled={busy}>
           Back
         </Button>
         {src && extraction.status !== 'extracting' ? (
@@ -425,10 +425,10 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
             Export data ↓
           </Button>
         ) : null}
-        <Button variant="line" onClick={onCompare}>
+        <Button variant="line" onClick={onCompare} disabled={busy}>
           Compare two swings ⇄
         </Button>
-        {src ? (
+        {src && !busy ? (
           <label className="upload__replace">
             <input
               type="file"

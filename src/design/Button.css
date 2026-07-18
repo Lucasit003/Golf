@@ -18,6 +18,12 @@
   transition: background-color 120ms linear, color 120ms linear;
 }
 
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .btn:hover {
   --btn-bg: color-mix(in srgb, var(--ink) 88%, var(--paper));
 }
