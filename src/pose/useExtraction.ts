@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { PoseLandmarker } from '@mediapipe/tasks-vision'
 import type { Swing } from './types'
 import { createPoseLandmarker } from './landmarker'
@@ -24,6 +24,14 @@ export type ExtractionState =
 export function useExtraction() {
   const [state, setState] = useState<ExtractionState>({ status: 'idle' })
   const landmarkerRef = useRef<PoseLandmarker | null>(null)
+
+  // Free the WASM-backed landmarker when the screen unmounts.
+  useEffect(() => {
+    return () => {
+      landmarkerRef.current?.close()
+      landmarkerRef.current = null
+    }
+  }, [])
 
   const reset = useCallback(() => setState({ status: 'idle' }), [])
 

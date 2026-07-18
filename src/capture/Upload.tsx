@@ -407,7 +407,15 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
         {src && extraction.status !== 'extracting' ? (
           <Button
             variant="fairway"
-            onClick={() => videoRef.current && void runExtraction(videoRef.current)}
+            onClick={() => {
+              const v = videoRef.current
+              if (!v) return
+              // extraction plays the clip at 1× and mutes it; restore the user's
+              // chosen speed afterward.
+              void runExtraction(v).then(() => {
+                v.playbackRate = rate
+              })
+            }}
           >
             {extraction.status === 'done' ? 'Re-track' : 'Track the swing'}
           </Button>
