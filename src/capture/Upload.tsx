@@ -8,6 +8,7 @@ import { useExtraction } from '../pose/useExtraction'
 import { drawSkeleton, type Ctx2D } from '../pose/skeleton'
 import { downloadSwing } from '../pose/exportSwing'
 import { detectEvents } from '../metrics/events'
+import { tempoRatio, compareState } from '../metrics'
 import type { Swing, SwingEvents } from '../pose/types'
 import './Upload.css'
 
@@ -149,6 +150,17 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
         }))
       : []
 
+  // Tempo is the one number we can show honestly here: it's just the ratio of
+  // backswing to downswing FRAMES, computed from the events the user can see and
+  // correct. No depth, no geometry, no unvalidated assumption — pure counting.
+  const tempoVal = events ? tempoRatio(events) : null
+  const tempoState =
+    tempoVal != null
+      ? compareState('tempo', tempoVal) === 'in'
+        ? 'in-range'
+        : 'out-of-range'
+      : undefined
+
   function jumpToEvent(key: keyof SwingEvents) {
     if (!events) return
     setSelectedEvent(key)
@@ -244,16 +256,23 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
             </div>
           ) : null}
 
-          <Readout label="Tempo" range="2.8–3.2 : 1" />
+          <Readout
+            label="Tempo"
+            range="2.8–3.2 : 1"
+            value={tempoVal != null ? tempoVal.toFixed(1) : undefined}
+            unit=": 1"
+            state={tempoState}
+          />
           <Readout label="Shoulder turn" range="85–95°" />
           <Readout label="X-factor" range="40–50°" />
           <Readout label="Hip rotation" range="35–45°" />
           <Readout label="Lead knee flex" range="25–41°" />
           <Readout label="Spine angle" range="±2° address" />
           <p className="upload__margin-note">
-            The skeleton tracks now. The measured numbers stay empty until event detection
-            is verified against real swings — we won't show a value we can't stand behind.
-            An empty readout is honest, a
+            Tempo is live — it's just backswing ÷ downswing frames, so it's honest the
+            moment the events are right (verify them below). The angle metrics stay empty
+            until the geometry is validated on real swings; we won't show a value we can't
+            stand behind. An empty readout is honest, a
             plausible one isn't.
           </p>
         </aside>
