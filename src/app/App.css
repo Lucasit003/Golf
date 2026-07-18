@@ -113,6 +113,8 @@
 
 .app__main {
   flex: 1;
+  /* Keep content clear of the sticky masthead if ever scrolled into view. */
+  scroll-margin-top: 5rem;
 }
 
 /* Programmatic focus target on view change — no visible outline. */

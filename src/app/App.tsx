@@ -31,7 +31,11 @@ export function App() {
   useEffect(() => {
     document.title = TITLES[view]
     if (mounted.current) {
-      document.getElementById('main')?.focus()
+      // Start the new view at its top, and focus the main region WITHOUT
+      // scrolling — a plain focus() would scroll main under the sticky masthead
+      // and clip the heading.
+      window.scrollTo(0, 0)
+      document.getElementById('main')?.focus({ preventScroll: true })
     } else {
       mounted.current = true
     }
