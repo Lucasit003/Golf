@@ -141,6 +141,7 @@
 @media (max-width: 48rem) {
   .masthead {
     padding: var(--gap-3);
+    gap: var(--gap-2);
   }
 
   .colophon {
@@ -148,5 +149,28 @@
     align-items: flex-start;
     gap: var(--gap-1);
     padding: var(--gap-3);
+  }
+}
+
+/* Tighten the masthead on phones so nothing clips off the edge. */
+@media (max-width: 30rem) {
+  .masthead {
+    padding-inline: var(--gap-2);
+  }
+  .masthead__wordmark {
+    font-size: 1.05rem;
+  }
+  .masthead__glyph,
+  .masthead__stamp {
+    display: none;
+  }
+  .masthead__meta {
+    gap: var(--gap-2);
+  }
+  .masthead__nav {
+    gap: 0;
+  }
+  .masthead__link {
+    padding-inline: 0.4rem;
   }
 }
