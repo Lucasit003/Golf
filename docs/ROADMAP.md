@@ -3,7 +3,14 @@
 One milestone at a time. A milestone is done when its exit test passes — not when the
 code looks finished.
 
-**Current milestone: M0**
+**Current milestone: M1 (built, awaiting its exit test)**
+
+M0 shipped: the shell, the design system, upload + slow-mo + compare, the tested pure
+engine (vectors, geometry, tempo, benchmarks, comparison scoring, event detection). M1 is
+wired — "Track the swing" runs real pose extraction and draws the skeleton with a
+confidence read. Its exit test (does the skeleton track a real body through the downswing?)
+needs Lucas's footage and hasn't been run yet. Until it passes, no measured number ships —
+the metric math and event detection are tested but unvalidated on real swings.
 
 ---
 
