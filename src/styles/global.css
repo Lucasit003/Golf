@@ -52,11 +52,13 @@ h3 {
   letter-spacing: var(--track-display);
   line-height: 1.02;
   color: var(--ink);
+  text-wrap: balance;
 }
 
 p {
   margin: 0;
   max-width: var(--measure);
+  text-wrap: pretty;
 }
 
 a {

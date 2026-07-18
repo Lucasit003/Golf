@@ -209,7 +209,12 @@ export function Landing({ onStart, onCompare }: { onStart: () => void; onCompare
         <div className="reference__grid">
           <Reveal className="reference__figure-col">
             <div className="reference__figure">
-              <svg viewBox="0 0 360 420" fill="none" className="reference__svg" aria-hidden="true">
+              <TopoField tone="ink" className="reference__topo" />
+              <div className="reference__plate-head">
+                <span className="label reference__plate-title">Fig. 2 — your line vs the tour</span>
+                <span className="label data reference__plate-tag">M4</span>
+              </div>
+              <svg viewBox="56 24 360 388" fill="none" className="reference__svg" aria-hidden="true">
                 {/* reference (chalk) */}
                 <path
                   className="reference__ref"
@@ -255,20 +260,21 @@ export function Landing({ onStart, onCompare }: { onStart: () => void; onCompare
       {/* ── Private by design ────────────────────────────── */}
       <section className="section privacy">
         <Reveal className="privacy__inner">
-          <div className="privacy__mark" aria-hidden="true">
-            <svg viewBox="0 0 48 48" fill="none">
-              <rect x="10" y="20" width="28" height="20" rx="2" />
-              <path d="M16 20 V15 a8 8 0 0 1 16 0 V20" />
-              <circle cx="24" cy="30" r="3" />
+          <div className="privacy__seal" aria-hidden="true">
+            <svg viewBox="0 0 96 96" fill="none">
+              <circle cx="48" cy="48" r="45" className="privacy__seal-ring" />
+              <circle cx="48" cy="48" r="38" className="privacy__seal-ring privacy__seal-ring--inner" />
+              <rect x="36" y="46" width="24" height="18" rx="2" className="privacy__seal-lock" />
+              <path d="M41 46 V41 a7 7 0 0 1 14 0 V46" className="privacy__seal-lock" />
+              <circle cx="48" cy="55" r="2.6" className="privacy__seal-lock" />
             </svg>
           </div>
-          <div>
-            <h2 className="privacy__title">Your footage never leaves your device.</h2>
-            <p className="privacy__body">
-              Pose extraction, measurement, and the overlay all run in your browser. No
-              upload, no server, no account. It's a real privacy feature — so we say so.
-            </p>
-          </div>
+          <p className="section__eyebrow label privacy__eyebrow">On-device · client-side</p>
+          <h2 className="privacy__title">Your footage never leaves your device.</h2>
+          <p className="privacy__body">
+            Pose extraction, measurement, and the overlay all run in your browser. No
+            upload, no server, no account. It's a real privacy feature — so we say so.
+          </p>
         </Reveal>
       </section>
 
