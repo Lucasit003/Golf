@@ -3,7 +3,7 @@ import type { PoseLandmarker } from '@mediapipe/tasks-vision'
 import type { Swing } from './types'
 import { createPoseLandmarker } from './landmarker'
 import { extractSwing } from './extract'
-import { POSE_JOINTS } from './skeleton'
+import { overallConfidence } from './confidence'
 
 /*
  * Runs pose extraction on a loaded video and reports honest state: idle →
@@ -52,19 +52,10 @@ export function useExtraction() {
         return
       }
 
-      // Coverage: fraction of the walked frames that produced a pose is implicit
-      // in extract (frames without a pose are dropped), so approximate coverage
-      // from how densely frames landed vs. the video length is out of scope here;
-      // report joint visibility, the signal that actually matters for measurement.
-      let sum = 0
-      let count = 0
-      for (const f of tracked) {
-        for (const j of POSE_JOINTS) {
-          sum += f.visibility[j] ?? 0
-          count++
-        }
-      }
-      const confidence = count ? sum / count : 0
+      // Confidence is the mean visibility of the joints we measure — the signal
+      // that actually matters. Coverage (frames with a pose) is implicit: extract
+      // drops poseless frames, so a tracked swing has full coverage by definition.
+      const confidence = overallConfidence(swing)
       const coverage = tracked.length ? 1 : 0
 
       setState({ status: 'done', swing, confidence, coverage })

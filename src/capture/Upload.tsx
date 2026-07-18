@@ -10,6 +10,7 @@ import { downloadSwing } from '../pose/exportSwing'
 import { detectEvents } from '../metrics/events'
 import { tempoRatio, compareState } from '../metrics'
 import type { Swing, SwingEvents } from '../pose/types'
+import { ConfidenceTrack } from './ConfidenceTrack'
 import './Upload.css'
 
 /*
@@ -367,6 +368,8 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
               </div>
             </div>
           ) : null}
+
+          {swing ? <ConfidenceTrack swing={swing} durationMs={duration * 1000} /> : null}
         </div>
       </div>
 

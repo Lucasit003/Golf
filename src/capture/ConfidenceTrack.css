@@ -1,0 +1,33 @@
+.conf-track {
+  margin-top: var(--gap-3);
+}
+
+.conf-track__head {
+  margin-bottom: var(--gap-1);
+}
+
+.conf-track__svg {
+  display: block;
+  width: 100%;
+  height: 34px;
+  overflow: visible;
+}
+
+.conf-track__usable {
+  stroke: var(--paper-edge);
+  stroke-width: 0.5;
+  stroke-dasharray: 1 1.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.conf-track__area {
+  fill: color-mix(in srgb, var(--fairway) 14%, transparent);
+}
+
+.conf-track__line {
+  fill: none;
+  stroke: var(--fairway);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
