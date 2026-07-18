@@ -40,6 +40,100 @@
   cursor: pointer;
 }
 
+/* Skeleton overlay — letterboxed identically to the video so it aligns. */
+.upload__overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+/* Extraction progress, over the well. */
+.track-status {
+  position: absolute;
+  inset: auto 0 0 0;
+  display: grid;
+  gap: var(--gap-1);
+  padding: var(--gap-3);
+  background: color-mix(in srgb, var(--ink) 80%, transparent);
+  color: var(--paper);
+}
+.track-status__label {
+  color: var(--paper);
+}
+.track-status__bar {
+  height: 4px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--paper) 25%, transparent);
+  overflow: hidden;
+}
+.track-status__bar span {
+  display: block;
+  height: 100%;
+  background: var(--fairway-lit);
+  transition: width 120ms linear;
+}
+.track-status__note {
+  color: color-mix(in srgb, var(--paper) 70%, transparent);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.track-fail {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: var(--gap-1);
+  padding: var(--gap-4);
+  text-align: center;
+  background: color-mix(in srgb, var(--paper-deep) 92%, transparent);
+}
+.track-fail__title {
+  font-weight: 500;
+  color: var(--flag);
+}
+.track-fail__msg {
+  max-width: 26rem;
+  margin: 0 auto;
+  font-size: 0.875rem;
+  color: var(--ink-soft);
+}
+
+/* Confidence readout in the margin. */
+.track-confidence {
+  padding: var(--gap-3) 0;
+  border-bottom: var(--line-rest) solid var(--paper-edge);
+}
+.track-confidence__val {
+  font-size: 2rem;
+  font-weight: 500;
+  line-height: 1;
+  margin-top: var(--gap-1);
+}
+.track-confidence__val--in {
+  color: var(--fairway);
+}
+.track-confidence__val--near {
+  color: var(--near);
+}
+.track-confidence__val--far {
+  color: var(--flag);
+}
+.track-confidence__pct {
+  font-size: 1rem;
+  color: var(--ink-soft);
+  margin-left: 0.1em;
+}
+.track-confidence__note {
+  margin-top: var(--gap-1);
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--ink-soft);
+}
+
 .upload__margin {
   grid-area: margin;
 }

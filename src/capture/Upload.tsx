@@ -4,14 +4,21 @@ import { Readout } from '../components/Readout'
 import { ScrubBar } from './ScrubBar'
 import { useTransportKeys } from '../lib/useTransportKeys'
 import { usePrefs } from '../app/prefs'
+import { useExtraction } from '../pose/useExtraction'
+import { drawSkeleton, type Ctx2D } from '../pose/skeleton'
+import type { Swing } from '../pose/types'
 import './Upload.css'
 
 /*
  * The survey table. A swing goes in the well on the left; the caddie's margin of
- * readouts sits on the right; the measuring stick runs underneath. This is the
- * M0 shell — it plays a file back and scrubs it. No pose, no numbers yet. The
- * readouts sit in their awaiting state and the empty state teaches the capture
- * setup, because bad footage is the number one cause of bad output.
+ * readouts sits on the right; the measuring stick runs underneath. Loading a clip
+ * plays and scrubs it; "Track the swing" runs pose extraction (M1) and draws the
+ * skeleton over the video with a confidence read.
+ *
+ * The measured numbers deliberately stay in their awaiting state: event detection
+ * and the metrics are written and tested, but unvalidated against real swings, so
+ * showing a value here would be a plausible-looking guess — exactly what the
+ * project forbids. Skeleton + confidence are honest; numbers wait for M2's exit test.
  */
 
 // Playback speeds for studying a swing. Full speed down to a crawl.
@@ -22,12 +29,15 @@ const STEP = 1 / 60
 
 export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: () => void }) {
   const videoRef = useRef<HTMLVideoElement>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
   const [src, setSrc] = useState<string | null>(null)
   const [current, setCurrent] = useState(0)
   const [duration, setDuration] = useState(0)
   const [playing, setPlaying] = useState(false)
   const { prefs } = usePrefs()
   const [rate, setRate] = useState<number>(prefs.defaultSpeed)
+  const { state: extraction, run: runExtraction, reset: resetExtraction } = useExtraction()
+  const swing = extraction.status === 'done' ? extraction.swing : null
 
   // Revoke the object URL when it changes or the screen unmounts.
   useEffect(() => {
@@ -35,6 +45,31 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
       if (src) URL.revokeObjectURL(src)
     }
   }, [src])
+
+  // Draw the skeleton for the frame nearest the current time, whenever the
+  // playhead moves or a new extraction lands. Colors come from the live theme.
+  useEffect(() => {
+    const canvas = canvasRef.current
+    const video = videoRef.current
+    if (!canvas || !video) return
+    const ctx = canvas.getContext('2d') as Ctx2D | null
+    if (!ctx) return
+    if (!swing) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      return
+    }
+    canvas.width = video.videoWidth || 1
+    canvas.height = video.videoHeight || 1
+    const frame = nearestFrame(swing, current * 1000)
+    const css = getComputedStyle(document.documentElement)
+    drawSkeleton(ctx, frame.landmarks, frame.visibility, canvas.width, canvas.height, {
+      line: css.getPropertyValue('--chalk').trim() || '#2547c8',
+      joint: css.getPropertyValue('--cream').trim() || '#f2f0e6',
+      lineWidth: Math.max(2, canvas.width / 320),
+      jointRadius: Math.max(3, canvas.width / 200),
+      minVisibility: 0.4,
+    })
+  }, [current, swing])
 
   // Keep the element's playback rate in sync with the chosen speed.
   useEffect(() => {
@@ -47,6 +82,7 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
     setSrc(URL.createObjectURL(file))
     setCurrent(0)
     setDuration(0)
+    resetExtraction()
   }
 
   function seek(fraction: number) {
@@ -70,30 +106,56 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
   }
 
   const progress = duration > 0 ? current / duration : 0
+  const busy = extraction.status === 'extracting'
+  const canTransport = !!src && !busy
 
-  useTransportKeys({ enabled: !!src, onToggle: togglePlay, onStep: step })
+  useTransportKeys({ enabled: canTransport, onToggle: togglePlay, onStep: step })
 
   return (
     <section className="upload" aria-label="Swing survey">
       <div className="upload__grid">
-        {/* The drawing — video well. */}
+        {/* The drawing — video well, with the skeleton overlay. */}
         <div className="upload__well">
           {src ? (
-            <video
-              ref={videoRef}
-              className="upload__video"
-              src={src}
-              playsInline
-              controls={false}
-              onLoadedMetadata={(e) => {
-                setDuration(e.currentTarget.duration)
-                e.currentTarget.playbackRate = rate
-              }}
-              onTimeUpdate={(e) => setCurrent(e.currentTarget.currentTime)}
-              onPlay={() => setPlaying(true)}
-              onPause={() => setPlaying(false)}
-              onClick={togglePlay}
-            />
+            <>
+              <video
+                ref={videoRef}
+                className="upload__video"
+                src={src}
+                playsInline
+                controls={false}
+                onLoadedMetadata={(e) => {
+                  setDuration(e.currentTarget.duration)
+                  e.currentTarget.playbackRate = rate
+                }}
+                onTimeUpdate={(e) => setCurrent(e.currentTarget.currentTime)}
+                onPlay={() => setPlaying(true)}
+                onPause={() => setPlaying(false)}
+                onClick={togglePlay}
+              />
+              <canvas ref={canvasRef} className="upload__overlay" aria-hidden="true" />
+
+              {extraction.status === 'extracting' ? (
+                <div className="track-status" role="status">
+                  <div className="track-status__label label">
+                    Tracking the body · {Math.round(extraction.progress * 100)}%
+                  </div>
+                  <div className="track-status__bar">
+                    <span style={{ width: `${extraction.progress * 100}%` }} />
+                  </div>
+                  <div className="track-status__note label">
+                    Playing through once to read every frame. This is a one-time pass.
+                  </div>
+                </div>
+              ) : null}
+
+              {extraction.status === 'failed' ? (
+                <div className="track-fail" role="alert">
+                  <p className="track-fail__title">Couldn't track this clip.</p>
+                  <p className="track-fail__msg">{extraction.message}</p>
+                </div>
+              ) : null}
+            </>
           ) : (
             <EmptyState onPick={pickFile} />
           )}
@@ -104,9 +166,31 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
           <div className="upload__margin-head">
             <span className="label">survey</span>
             <span className="label upload__margin-status">
-              {src ? 'not yet measured' : 'no swing'}
+              {extraction.status === 'done'
+                ? `${swing?.frames.length ?? 0} frames tracked`
+                : extraction.status === 'extracting'
+                  ? 'tracking…'
+                  : src
+                    ? 'not yet measured'
+                    : 'no swing'}
             </span>
           </div>
+
+          {extraction.status === 'done' ? (
+            <div className="track-confidence">
+              <div className="label">Tracking confidence</div>
+              <div className={`track-confidence__val data track-confidence__val--${confidenceBand(extraction.confidence)}`}>
+                {Math.round(extraction.confidence * 100)}
+                <span className="track-confidence__pct">%</span>
+              </div>
+              <div className="label track-confidence__note">
+                {extraction.confidence >= 0.7
+                  ? 'Solid — the joints are clearly visible.'
+                  : 'Low — measurements from this clip would be unreliable. Re-film brighter, fuller in frame.'}
+              </div>
+            </div>
+          ) : null}
+
           <Readout label="Tempo" range="2.8–3.2 : 1" />
           <Readout label="Shoulder turn" range="85–95°" />
           <Readout label="X-factor" range="40–50°" />
@@ -114,20 +198,21 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
           <Readout label="Lead knee flex" range="25–41°" />
           <Readout label="Spine angle" range="±2° address" />
           <p className="upload__margin-note">
-            The full set — turn, tilt, bend, knees, tempo — arrives once pose extraction and
-            event detection land. Nothing here is estimated; an empty readout is honest, a
+            The skeleton tracks now. The measured numbers stay empty until event detection
+            is verified against real swings — we won't show a value we can't stand behind.
+            An empty readout is honest, a
             plausible one isn't.
           </p>
         </aside>
 
         {/* The measuring stick, with its transport. */}
         <div className="upload__scrub">
-          <div className={`transport${src ? '' : ' transport--disabled'}`}>
+          <div className={`transport${canTransport ? '' : ' transport--disabled'}`}>
             <div className="transport__group">
               <button
                 className="transport__btn"
                 onClick={() => step(-1)}
-                disabled={!src}
+                disabled={!canTransport}
                 aria-label="Step back one frame"
                 title="Step back"
               >
@@ -136,7 +221,7 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
               <button
                 className="transport__btn transport__btn--play"
                 onClick={togglePlay}
-                disabled={!src}
+                disabled={!canTransport}
                 aria-label={playing ? 'Pause' : 'Play'}
               >
                 {playing ? '❚❚' : '▶'}
@@ -144,7 +229,7 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
               <button
                 className="transport__btn"
                 onClick={() => step(1)}
-                disabled={!src}
+                disabled={!canTransport}
                 aria-label="Step forward one frame"
                 title="Step forward"
               >
@@ -159,7 +244,7 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
                   key={s}
                   className={`transport__speed${rate === s ? ' is-active' : ''}`}
                   onClick={() => setRate(s)}
-                  disabled={!src}
+                  disabled={!canTransport}
                   aria-pressed={rate === s}
                 >
                   {s === 1 ? '1×' : `${s}×`}
@@ -173,7 +258,7 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
             current={current}
             duration={duration}
             onSeek={seek}
-            disabled={!src}
+            disabled={!canTransport}
           />
           {src ? (
             <p className="transport__hint label">
@@ -187,6 +272,14 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
         <Button variant="line" onClick={onBack}>
           Back
         </Button>
+        {src && extraction.status !== 'extracting' ? (
+          <Button
+            variant="fairway"
+            onClick={() => videoRef.current && void runExtraction(videoRef.current)}
+          >
+            {extraction.status === 'done' ? 'Re-track' : 'Track the swing'}
+          </Button>
+        ) : null}
         <Button variant="line" onClick={onCompare}>
           Compare two swings ⇄
         </Button>
@@ -203,6 +296,28 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
       </div>
     </section>
   )
+}
+
+/** The stored frame whose timestamp is closest to `timeMs`. */
+function nearestFrame(swing: Swing, timeMs: number) {
+  const frames = swing.frames
+  let lo = 0
+  let hi = frames.length - 1
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1
+    if (frames[mid].timeMs < timeMs) lo = mid + 1
+    else hi = mid
+  }
+  const cand = frames[lo]
+  const prev = frames[lo - 1]
+  if (prev && Math.abs(prev.timeMs - timeMs) < Math.abs(cand.timeMs - timeMs)) return prev
+  return cand
+}
+
+function confidenceBand(c: number): 'in' | 'near' | 'far' {
+  if (c >= 0.7) return 'in'
+  if (c >= 0.5) return 'near'
+  return 'far'
 }
 
 function EmptyState({ onPick }: { onPick: (file: File | undefined) => void }) {
