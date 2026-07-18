@@ -124,3 +124,29 @@ export function drawSkeleton(
   }
   return drawn
 }
+
+/**
+ * Draw a normalized polyline (0–1 points) onto a `w`×`h` canvas — used for the
+ * hand trace over the tracked swing. Returns the number of segments drawn.
+ */
+export function drawPolyline(
+  ctx: Ctx2D,
+  points: Pt[],
+  w: number,
+  h: number,
+  color: string,
+  width: number,
+): number {
+  if (points.length < 2) return 0
+  ctx.strokeStyle = color
+  ctx.lineWidth = width
+  ctx.lineCap = 'round'
+  ctx.lineJoin = 'round'
+  ctx.beginPath()
+  points.forEach((p, i) => {
+    if (i === 0) ctx.moveTo(p.x * w, p.y * h)
+    else ctx.lineTo(p.x * w, p.y * h)
+  })
+  ctx.stroke()
+  return points.length - 1
+}

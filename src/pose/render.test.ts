@@ -3,6 +3,7 @@ import type { PoseFrame, Vec3 } from './types'
 import { Landmark, LANDMARK_COUNT } from './landmarks'
 import {
   drawSkeleton,
+  drawPolyline,
   POSE_CONNECTIONS,
   POSE_JOINTS,
   DEFAULT_SKELETON_STYLE,
@@ -75,6 +76,22 @@ describe('drawSkeleton', () => {
 
   it('uses the default style constants', () => {
     expect(DEFAULT_SKELETON_STYLE.minVisibility).toBeGreaterThan(0)
+  })
+})
+
+describe('drawPolyline', () => {
+  it('moves once and lines to the rest, scaled to the canvas', () => {
+    const ctx = stubCtx()
+    const n = drawPolyline(ctx, [{ x: 0, y: 0 }, { x: 0.5, y: 0.5 }, { x: 1, y: 1 }], 200, 100, '#000', 2)
+    expect(n).toBe(2)
+    expect(ctx._c.moveTo).toBe(1)
+    expect(ctx._c.lineTo).toBe(2)
+    expect(ctx._c.stroke).toBe(1)
+  })
+  it('draws nothing for fewer than two points', () => {
+    const ctx = stubCtx()
+    expect(drawPolyline(ctx, [{ x: 0, y: 0 }], 100, 100, '#000', 2)).toBe(0)
+    expect(ctx._c.stroke).toBe(0)
   })
 })
 

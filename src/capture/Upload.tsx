@@ -5,7 +5,8 @@ import { ScrubBar, type ScrubStation } from './ScrubBar'
 import { useTransportKeys } from '../lib/useTransportKeys'
 import { usePrefs } from '../app/prefs'
 import { useExtraction } from '../pose/useExtraction'
-import { drawSkeleton, type Ctx2D } from '../pose/skeleton'
+import { drawSkeleton, drawPolyline, type Ctx2D } from '../pose/skeleton'
+import { handTracePoints } from '../pose/trace'
 import { downloadSwing } from '../pose/exportSwing'
 import { detectEvents } from '../metrics/events'
 import { tempoRatio, compareState } from '../metrics'
@@ -47,6 +48,7 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
   // becomes a fixture that validates the detector (SWING_SPEC / M2).
   const [events, setEvents] = useState<SwingEvents | null>(null)
   const [selectedEvent, setSelectedEvent] = useState<keyof SwingEvents | null>(null)
+  const [overlay, setOverlay] = useState<'skeleton' | 'trace' | 'off'>('skeleton')
 
   // When a fresh extraction lands, run first-pass detection on it.
   useEffect(() => {
@@ -73,22 +75,32 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
     if (!canvas || !video) return
     const ctx = canvas.getContext('2d') as Ctx2D | null
     if (!ctx) return
-    if (!swing) {
+    if (!swing || overlay === 'off') {
       ctx.clearRect(0, 0, canvas.width, canvas.height)
       return
     }
     canvas.width = video.videoWidth || 1
     canvas.height = video.videoHeight || 1
-    const frame = nearestFrame(swing, current * 1000)
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
     const css = getComputedStyle(document.documentElement)
-    drawSkeleton(ctx, frame.landmarks, frame.visibility, canvas.width, canvas.height, {
-      line: css.getPropertyValue('--chalk').trim() || '#2547c8',
-      joint: css.getPropertyValue('--cream').trim() || '#f2f0e6',
-      lineWidth: Math.max(2, canvas.width / 320),
-      jointRadius: Math.max(3, canvas.width / 200),
-      minVisibility: 0.4,
-    })
-  }, [current, swing])
+    const chalk = css.getPropertyValue('--chalk').trim() || '#2547c8'
+    const cream = css.getPropertyValue('--cream').trim() || '#f2f0e6'
+
+    if (overlay === 'trace') {
+      // The signature hand trace, drawn from the real swing.
+      const pts = handTracePoints(swing.frames)
+      drawPolyline(ctx, pts, canvas.width, canvas.height, chalk, Math.max(2, canvas.width / 260))
+    } else {
+      const frame = nearestFrame(swing, current * 1000)
+      drawSkeleton(ctx, frame.landmarks, frame.visibility, canvas.width, canvas.height, {
+        line: chalk,
+        joint: cream,
+        lineWidth: Math.max(2, canvas.width / 320),
+        jointRadius: Math.max(3, canvas.width / 200),
+        minVisibility: 0.4,
+      })
+    }
+  }, [current, swing, overlay])
 
   // Keep the element's playback rate in sync with the chosen speed.
   useEffect(() => {
@@ -219,6 +231,21 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
                 <div className="track-fail" role="alert">
                   <p className="track-fail__title">Couldn't track this clip.</p>
                   <p className="track-fail__msg">{extraction.message}</p>
+                </div>
+              ) : null}
+
+              {swing ? (
+                <div className="overlay-toggle" role="group" aria-label="Overlay">
+                  {(['skeleton', 'trace', 'off'] as const).map((m) => (
+                    <button
+                      key={m}
+                      className={`overlay-toggle__btn${overlay === m ? ' is-active' : ''}`}
+                      onClick={() => setOverlay(m)}
+                      aria-pressed={overlay === m}
+                    >
+                      {m}
+                    </button>
+                  ))}
                 </div>
               ) : null}
             </>
