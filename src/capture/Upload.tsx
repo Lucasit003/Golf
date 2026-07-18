@@ -6,6 +6,7 @@ import { useTransportKeys } from '../lib/useTransportKeys'
 import { usePrefs } from '../app/prefs'
 import { useExtraction } from '../pose/useExtraction'
 import { drawSkeleton, type Ctx2D } from '../pose/skeleton'
+import { downloadSwing } from '../pose/exportSwing'
 import type { Swing } from '../pose/types'
 import './Upload.css'
 
@@ -278,6 +279,11 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
             onClick={() => videoRef.current && void runExtraction(videoRef.current)}
           >
             {extraction.status === 'done' ? 'Re-track' : 'Track the swing'}
+          </Button>
+        ) : null}
+        {swing ? (
+          <Button variant="line" onClick={() => downloadSwing(swing)}>
+            Export data ↓
           </Button>
         ) : null}
         <Button variant="line" onClick={onCompare}>
