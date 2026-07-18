@@ -40,28 +40,57 @@
       href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@115..125,600..700&family=Public+Sans:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
+
+    <!-- Splash styles + no-flash theme. Both run before first paint so neither
+         the splash nor the app flashes the wrong theme. -->
+    <style>
+      .app-splash {
+        position: fixed;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        background: #e7e9e0;
+        color: #14211b;
+        font-family: 'Archivo', system-ui, sans-serif;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+        font-size: 1.25rem;
+      }
+      .app-splash span {
+        opacity: 0.55;
+      }
+      @media (prefers-color-scheme: dark) {
+        .app-splash {
+          background: #141d18;
+          color: #e7e9e0;
+        }
+      }
+      :root[data-theme='dark'] .app-splash {
+        background: #141d18;
+        color: #e7e9e0;
+      }
+      :root[data-theme='light'] .app-splash {
+        background: #e7e9e0;
+        color: #14211b;
+      }
+    </style>
+    <script>
+      // Apply a forced light/dark theme before render so there's no theme flash.
+      // 'system' leaves the attribute off and lets the media query decide.
+      try {
+        var p = JSON.parse(localStorage.getItem('contour.prefs') || '{}')
+        if (p.theme === 'dark' || p.theme === 'light') {
+          document.documentElement.setAttribute('data-theme', p.theme)
+        }
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root">
       <!-- Pre-hydration splash: paints instantly so slow connections never flash
            a blank screen. React replaces it on mount. -->
-      <div
-        style="
-          position: fixed;
-          inset: 0;
-          display: grid;
-          place-items: center;
-          background: #e7e9e0;
-          font-family: 'Archivo', system-ui, sans-serif;
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 0.02em;
-          font-size: 1.25rem;
-          color: #14211b;
-        "
-      >
-        <span style="opacity: 0.55">Contour</span>
-      </div>
+      <div class="app-splash"><span>Contour</span></div>
     </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

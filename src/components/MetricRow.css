@@ -27,7 +27,7 @@
 
 .metric__range {
   font-size: 1.25rem;
-  color: var(--fairway-deep);
+  color: var(--ink);
   white-space: nowrap;
 }
 

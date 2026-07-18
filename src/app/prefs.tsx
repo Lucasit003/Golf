@@ -10,12 +10,15 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
  * - defaultSpeed: the playback speed the video tools open at.
  */
 
+export type Theme = 'system' | 'light' | 'dark'
+
 export type Prefs = {
   reduceMotion: boolean
   defaultSpeed: number
+  theme: Theme
 }
 
-const DEFAULTS: Prefs = { reduceMotion: false, defaultSpeed: 1 }
+const DEFAULTS: Prefs = { reduceMotion: false, defaultSpeed: 1, theme: 'system' }
 const KEY = 'contour.prefs'
 
 function load(): Prefs {
@@ -41,6 +44,10 @@ export function PrefsProvider({ children }: { children: ReactNode }) {
       /* private mode / storage full — preferences just won't persist */
     }
     document.documentElement.toggleAttribute('data-motion-off', prefs.reduceMotion)
+    // theme: 'system' follows the OS (no attribute); light/dark force it.
+    const root = document.documentElement
+    if (prefs.theme === 'system') root.removeAttribute('data-theme')
+    else root.setAttribute('data-theme', prefs.theme)
   }, [prefs])
 
   const setPrefs = (patch: Partial<Prefs>) => setState((p) => ({ ...p, ...patch }))

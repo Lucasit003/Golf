@@ -9,6 +9,11 @@ import './Settings.css'
  */
 
 const SPEEDS = [1, 0.5, 0.25, 0.1]
+const THEMES: { id: 'system' | 'light' | 'dark'; label: string }[] = [
+  { id: 'system', label: 'Auto' },
+  { id: 'light', label: 'Day' },
+  { id: 'dark', label: 'Night' },
+]
 
 export function Settings() {
   const { prefs, setPrefs } = usePrefs()
@@ -50,6 +55,25 @@ export function Settings() {
 
       {open ? (
         <div className="settings__panel" role="dialog" aria-label="Settings">
+          <div className="settings__row settings__row--stack">
+            <span className="settings__label">
+              Theme
+              <span className="settings__hint">Day, night, or follow your device</span>
+            </span>
+            <div className="settings__speeds" role="group" aria-label="Theme">
+              {THEMES.map((t) => (
+                <button
+                  key={t.id}
+                  className={`settings__speed${prefs.theme === t.id ? ' is-active' : ''}`}
+                  onClick={() => setPrefs({ theme: t.id })}
+                  aria-pressed={prefs.theme === t.id}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div className="settings__row">
             <label className="settings__label" htmlFor="reduce-motion">
               Reduce motion

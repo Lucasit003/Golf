@@ -89,3 +89,41 @@
     --reveal-rise: 0px;
   }
 }
+
+/*
+ * Night survey — the dark theme. Only the base colors are redefined; the derived
+ * tints (ink-line, paper-edge, …) reference --ink/--cream and adapt on their own,
+ * and the fairway greens stay so the hero and CTA read the same at night.
+ *
+ * Designed, not inverted: paper becomes a deep green-charcoal, ink becomes the
+ * old paper, and chalk/flag/near are lifted for legibility on a dark ground. The
+ * `dark-tokens` values live in one place and are applied for system-dark (unless
+ * the user forced light) and for an explicit dark toggle.
+ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --paper: #141d18;
+    --paper-deep: #1c2820;
+    --ink: #e7e9e0;
+    --ink-soft: #8f9a92;
+    --chalk: #7d9bff;
+    --flag: #e26a5d;
+    --near: #d3a24e;
+    --fairway: #4ca96a;
+    --sand: #2b2519;
+    --brass: #c79a4a;
+  }
+}
+
+:root[data-theme='dark'] {
+  --paper: #141d18;
+  --paper-deep: #1c2820;
+  --ink: #e7e9e0;
+  --ink-soft: #8f9a92;
+  --chalk: #7d9bff;
+  --flag: #e26a5d;
+  --near: #d3a24e;
+  --fairway: #4ca96a;
+  --sand: #2b2519;
+  --brass: #c79a4a;
+}
