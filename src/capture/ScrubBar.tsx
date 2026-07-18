@@ -9,6 +9,8 @@ import './ScrubBar.css'
  * the only one we can honestly report.
  */
 
+export type ScrubStation = { id: string; label: string; fraction: number }
+
 type Props = {
   /** 0..1 position of the playhead. */
   progress: number
@@ -17,6 +19,8 @@ type Props = {
   duration: number
   onSeek: (fraction: number) => void
   disabled?: boolean
+  /** Labeled event stations (address / top / impact) marked on the ruler. */
+  stations?: ScrubStation[]
 }
 
 function timecode(t: number): string {
@@ -24,7 +28,7 @@ function timecode(t: number): string {
   return t.toFixed(2)
 }
 
-export function ScrubBar({ progress, current, duration, onSeek, disabled }: Props) {
+export function ScrubBar({ progress, current, duration, onSeek, disabled, stations = [] }: Props) {
   const id = useId()
   // A tick every tenth of the track — the ruler's graduations.
   const ticks = Array.from({ length: 11 }, (_, i) => i / 10)
@@ -48,6 +52,16 @@ export function ScrubBar({ progress, current, duration, onSeek, disabled }: Prop
               className={`scrub__tick${t === 0 || t === 1 || t === 0.5 ? ' scrub__tick--major' : ''}`}
               style={{ left: `${t * 100}%` }}
             />
+          ))}
+          {stations.map((s) => (
+            <span
+              key={s.id}
+              className="scrub__event"
+              style={{ left: `${s.fraction * 100}%` }}
+            >
+              <span className="scrub__event-tick" />
+              <span className="scrub__event-label">{s.label}</span>
+            </span>
           ))}
           <span className="scrub__fill" style={{ width: `${progress * 100}%` }} />
           <span className="scrub__station" style={{ left: `${progress * 100}%` }} />

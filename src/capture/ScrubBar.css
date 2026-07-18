@@ -60,6 +60,35 @@
   background: var(--ink);
 }
 
+/* Detected event stations — address / top / impact marked on the ruler. */
+.scrub__event {
+  position: absolute;
+  bottom: 0;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.scrub__event-tick {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: var(--line-active);
+  height: 22px;
+  background: var(--chalk);
+}
+.scrub__event-label {
+  position: absolute;
+  bottom: 26px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--face-body);
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--chalk);
+  white-space: nowrap;
+}
+
 /* The playhead station — a stamped ring riding the ruler. */
 .scrub__station {
   position: absolute;

@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import { Button } from '../design/Button'
 import { Readout } from '../components/Readout'
-import { ScrubBar } from './ScrubBar'
+import { ScrubBar, type ScrubStation } from './ScrubBar'
 import { useTransportKeys } from '../lib/useTransportKeys'
 import { usePrefs } from '../app/prefs'
 import { useExtraction } from '../pose/useExtraction'
 import { drawSkeleton, type Ctx2D } from '../pose/skeleton'
 import { downloadSwing } from '../pose/exportSwing'
-import type { Swing } from '../pose/types'
+import { detectEvents } from '../metrics/events'
+import type { Swing, SwingEvents } from '../pose/types'
 import './Upload.css'
 
 /*
@@ -39,6 +40,21 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
   const [rate, setRate] = useState<number>(prefs.defaultSpeed)
   const { state: extraction, run: runExtraction, reset: resetExtraction } = useExtraction()
   const swing = extraction.status === 'done' ? extraction.swing : null
+  // Detected events, editable by the user. These are UNVERIFIED — the whole
+  // point of the UI is to scrub to each and correct it, which is how a swing
+  // becomes a fixture that validates the detector (SWING_SPEC / M2).
+  const [events, setEvents] = useState<SwingEvents | null>(null)
+  const [selectedEvent, setSelectedEvent] = useState<keyof SwingEvents | null>(null)
+
+  // When a fresh extraction lands, run first-pass detection on it.
+  useEffect(() => {
+    if (extraction.status === 'done') {
+      setEvents(detectEvents(extraction.swing.frames))
+      setSelectedEvent(null)
+    } else {
+      setEvents(null)
+    }
+  }, [extraction])
 
   // Revoke the object URL when it changes or the screen unmounts.
   useEffect(() => {
@@ -109,6 +125,42 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
   const progress = duration > 0 ? current / duration : 0
   const busy = extraction.status === 'extracting'
   const canTransport = !!src && !busy
+
+  // Event frame index → scrub fraction, via the frame's real timestamp.
+  function eventFraction(frameIndex: number): number {
+    if (!swing || duration <= 0) return 0
+    const f = swing.frames[frameIndex]
+    if (!f) return 0
+    return Math.min(1, Math.max(0, f.timeMs / (duration * 1000)))
+  }
+
+  const EVENT_ORDER: { key: keyof SwingEvents; label: string }[] = [
+    { key: 'address', label: 'Address' },
+    { key: 'top', label: 'Top' },
+    { key: 'impact', label: 'Impact' },
+  ]
+
+  const stations: ScrubStation[] =
+    events && swing
+      ? EVENT_ORDER.map(({ key, label }) => ({
+          id: key,
+          label,
+          fraction: eventFraction(events[key]),
+        }))
+      : []
+
+  function jumpToEvent(key: keyof SwingEvents) {
+    if (!events) return
+    setSelectedEvent(key)
+    seek(eventFraction(events[key]))
+  }
+
+  // Correction: move the selected event to the frame nearest the playhead.
+  function setEventHere() {
+    if (!events || !swing || !selectedEvent) return
+    const idx = nearestFrameIndex(swing, current * 1000)
+    setEvents({ ...events, [selectedEvent]: idx })
+  }
 
   useTransportKeys({ enabled: canTransport, onToggle: togglePlay, onStep: step })
 
@@ -260,11 +312,41 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
             duration={duration}
             onSeek={seek}
             disabled={!canTransport}
+            stations={stations}
           />
           {src ? (
             <p className="transport__hint label">
               <kbd>space</kbd> play · <kbd>←</kbd> <kbd>→</kbd> step a frame
             </p>
+          ) : null}
+
+          {events && swing ? (
+            <div className="events">
+              <div className="events__head">
+                <span className="label">Detected events · verify</span>
+                <span className="label events__note">jump, scrub to the true frame, correct</span>
+              </div>
+              <div className="events__row">
+                {EVENT_ORDER.map(({ key, label }) => (
+                  <button
+                    key={key}
+                    className={`events__chip${selectedEvent === key ? ' is-selected' : ''}`}
+                    onClick={() => jumpToEvent(key)}
+                  >
+                    <span className="events__chip-label">{label}</span>
+                    <span className="events__chip-frame data">f{events[key]}</span>
+                  </button>
+                ))}
+                <button
+                  className="events__correct"
+                  onClick={setEventHere}
+                  disabled={!selectedEvent}
+                  title={selectedEvent ? `Set ${selectedEvent} to the current frame` : 'Select an event first'}
+                >
+                  Set {selectedEvent ?? '…'} to here
+                </button>
+              </div>
+            </div>
           ) : null}
         </div>
       </div>
@@ -282,7 +364,7 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
           </Button>
         ) : null}
         {swing ? (
-          <Button variant="line" onClick={() => downloadSwing(swing)}>
+          <Button variant="line" onClick={() => downloadSwing({ ...swing, events })}>
             Export data ↓
           </Button>
         ) : null}
@@ -304,8 +386,8 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
   )
 }
 
-/** The stored frame whose timestamp is closest to `timeMs`. */
-function nearestFrame(swing: Swing, timeMs: number) {
+/** Index of the stored frame whose timestamp is closest to `timeMs`. */
+function nearestFrameIndex(swing: Swing, timeMs: number): number {
   const frames = swing.frames
   let lo = 0
   let hi = frames.length - 1
@@ -314,10 +396,15 @@ function nearestFrame(swing: Swing, timeMs: number) {
     if (frames[mid].timeMs < timeMs) lo = mid + 1
     else hi = mid
   }
-  const cand = frames[lo]
-  const prev = frames[lo - 1]
-  if (prev && Math.abs(prev.timeMs - timeMs) < Math.abs(cand.timeMs - timeMs)) return prev
-  return cand
+  if (lo > 0 && Math.abs(frames[lo - 1].timeMs - timeMs) < Math.abs(frames[lo].timeMs - timeMs)) {
+    return lo - 1
+  }
+  return lo
+}
+
+/** The stored frame whose timestamp is closest to `timeMs`. */
+function nearestFrame(swing: Swing, timeMs: number) {
+  return swing.frames[nearestFrameIndex(swing, timeMs)]
 }
 
 function confidenceBand(c: number): 'in' | 'near' | 'far' {
