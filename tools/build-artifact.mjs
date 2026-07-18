@@ -51,7 +51,11 @@ async function embedFonts() {
 
 function readAsset(ext) {
   const dir = join(dist, 'assets')
-  const file = readdirSync(dir).find((f) => f.endsWith(ext))
+  const files = readdirSync(dir).filter((f) => f.endsWith(ext))
+  // Prefer the app entry chunk (index-*). Lazy chunks like the MediaPipe bundle
+  // aren't inlined — the preview boots and works; only "Track" (which needs the
+  // model anyway, unavailable on the artifact host) is a no-op here.
+  const file = files.find((f) => f.startsWith('index-')) ?? files[0]
   if (!file) throw new Error(`no ${ext} asset in dist/assets`)
   return readFileSync(join(dir, file), 'utf8')
 }
