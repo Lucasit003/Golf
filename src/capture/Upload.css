@@ -282,6 +282,13 @@
   color: var(--ink-soft);
 }
 
+/* No physical keyboard on touch devices — the hint is just noise there. */
+@media (pointer: coarse), (max-width: 40rem) {
+  .transport__hint {
+    display: none;
+  }
+}
+
 /* Detected-events correction panel. */
 .events {
   margin-top: var(--gap-3);
@@ -372,7 +379,8 @@
 .upload__actions {
   display: flex;
   align-items: center;
-  gap: var(--gap-3);
+  flex-wrap: wrap;
+  gap: var(--gap-2);
   max-width: var(--shell);
   margin: var(--gap-5) auto 0;
   padding: 0 var(--gap-4);
