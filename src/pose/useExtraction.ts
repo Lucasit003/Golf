@@ -43,10 +43,23 @@ export function useExtraction() {
       }
       video.currentTime = 0
 
-      const swing = await extractSwing(video, landmarkerRef.current, {
-        onProgress: (p) =>
-          setState({ status: 'extracting', progress: p.duration ? p.seconds / p.duration : 0 }),
-      })
+      // Watchdog: extraction plays the clip at ~1×, so a stalled decode or a clip
+      // that never fires "ended" would hang the UI forever. Abort after a generous
+      // multiple of the clip length so a stall fails cleanly instead.
+      const controller = new AbortController()
+      const budgetMs = Math.max(30_000, (video.duration || 0) * 1000 * 4)
+      const watchdog = setTimeout(() => controller.abort(), budgetMs)
+
+      let swing
+      try {
+        swing = await extractSwing(video, landmarkerRef.current, {
+          signal: controller.signal,
+          onProgress: (p) =>
+            setState({ status: 'extracting', progress: p.duration ? p.seconds / p.duration : 0 }),
+        })
+      } finally {
+        clearTimeout(watchdog)
+      }
       video.pause()
       video.currentTime = 0
 
@@ -68,9 +81,14 @@ export function useExtraction() {
 
       setState({ status: 'done', swing, confidence, coverage })
     } catch (err) {
+      const aborted = err instanceof DOMException && err.name === 'AbortError'
       setState({
         status: 'failed',
-        message: err instanceof Error ? err.message : 'Pose tracking failed unexpectedly.',
+        message: aborted
+          ? 'Tracking took too long and was stopped — try a shorter clip, or one that plays cleanly.'
+          : err instanceof Error
+            ? err.message
+            : 'Pose tracking failed unexpectedly.',
       })
     }
   }, [])
