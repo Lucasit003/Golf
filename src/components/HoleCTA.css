@@ -6,10 +6,6 @@
   border-radius: var(--radius);
 }
 
-.hole-cta__topo {
-  opacity: 0.6;
-}
-
 .hole-cta__inner {
   position: relative;
   display: grid;
@@ -21,7 +17,8 @@
   padding: var(--gap-6) var(--gap-4);
 }
 
-/* ── The scene ──────────────────────────────────────────── */
+/* ── The scene: a ball rolls in from the left, up to the hole's near
+   edge, then tips over and drops into the cup. Side-on view. ──────── */
 
 .hole-cta__svg {
   width: 100%;
@@ -29,40 +26,16 @@
   overflow: visible;
 }
 
-.hole-cta__line {
-  stroke: var(--fairway-edge);
-  stroke-width: 1.5;
-  stroke-dasharray: 2 7;
-  stroke-linecap: round;
-}
-
-/* The cup — an opening with depth. */
-.hole-cta__cupwall {
-  fill: none;
-  stroke: color-mix(in srgb, var(--cream) 34%, transparent);
-  stroke-width: 1.6;
-  stroke-linecap: round;
-}
-.hole-cta__rimback {
-  fill: none;
-  stroke: color-mix(in srgb, var(--brass) 70%, transparent);
-  stroke-width: 1;
-  stroke-linecap: round;
-}
-/* The near lip, filled to match the green so it swallows the ball. */
-.hole-cta__lip {
-  fill: var(--fairway-deep);
-}
-.hole-cta__rimfront {
-  fill: none;
-  stroke: color-mix(in srgb, var(--brass) 88%, transparent);
-  stroke-width: 1.4;
-  stroke-linecap: round;
+/* The white cup liner, just inside the rim. */
+.hole-cta__liner {
+  stroke: #f4f2e8;
+  stroke-width: 2.4;
+  stroke-opacity: 0.92;
 }
 
 .hole-cta__pin {
   stroke: var(--cream);
-  stroke-width: 2.5;
+  stroke-width: 2.6;
   stroke-linecap: round;
 }
 
@@ -71,14 +44,6 @@
   transform-box: fill-box;
   transform-origin: left center;
   animation: flag-wave var(--wave-duration) ease-in-out infinite;
-}
-
-/* Ball rests at the start of the line until revealed. It stops on the surface
-   just in front of the cup. */
-.hole-cta__roller {
-  offset-path: path('M70 238 C180 255 300 218 398 188');
-  offset-distance: 0%;
-  offset-rotate: 0deg;
 }
 
 .hole-cta__ball {
@@ -90,56 +55,68 @@
 /* A soft contact shadow so the ball reads as sitting on the green. */
 .hole-cta__ballshadow {
   fill: #08160d;
-  opacity: 0.45;
+  opacity: 0.4;
 }
 
-.hole-cta__sink {
+/* The near lip is filled with the ground gradient (inline) so the ball
+   passes behind it and disappears into the cup — no mound. */
+
+/* ── The motion ─────────────────────────────────────────────────────
+   The roller carries the ball in from the left and decelerates at the
+   hole's near edge. Once it arrives, the inner drop group tips it over
+   the edge and eases it down into the cup, where it fades out. ────── */
+
+.hole-cta__roller {
+  transform: translateX(-300px);
+}
+.is-in .hole-cta__roller {
+  animation: hc-roll 1500ms cubic-bezier(0.25, 0.85, 0.4, 1) 300ms forwards;
+}
+@keyframes hc-roll {
+  to {
+    transform: translateX(0);
+  }
+}
+
+.hole-cta__drop {
   transform-box: fill-box;
   transform-origin: center;
 }
-
-/* On reveal: the ball rolls in and decelerates (ease-out), hangs at the lip a
-   beat, then gravity takes it — the drop only starts once it has arrived. */
-.is-in .hole-cta__roller {
-  /* Rolls up to the lip and settles decisively. */
-  animation: putt-roll 1350ms cubic-bezier(0.25, 0.85, 0.4, 1) 250ms forwards;
+.is-in .hole-cta__drop {
+  animation: hc-drop 860ms cubic-bezier(0.45, 0, 0.7, 0.6) 1900ms forwards;
 }
-.is-in .hole-cta__sink {
-  /* Rests on the surface a beat, then rolls up into the cup. */
-  animation: ball-sink 480ms cubic-bezier(0.45, 0, 0.7, 0.5) 1800ms forwards;
-}
-
-@keyframes putt-roll {
-  from {
-    offset-distance: 0%;
-  }
-  to {
-    offset-distance: 100%;
-  }
-}
-
-@keyframes ball-sink {
-  /* The ball rolls UP into the cup (toward the hole), never down — so it can't
-     read as sinking through the grass. It slips behind the near rim and fades
-     into the dark. */
+@keyframes hc-drop {
   0% {
-    transform: translate(0, 0) scale(1);
+    transform: translate(0, 0) rotate(0) scale(1);
     opacity: 1;
   }
-  45% {
-    transform: translate(0, -8px) scale(0.82);
+  /* tips over the near edge it's resting on */
+  24% {
+    transform: translate(7px, 4px) rotate(42deg) scale(1);
+    opacity: 1;
+  }
+  /* then eases down into the cup, over the liner — a slower fall */
+  60% {
+    transform: translate(15px, 16px) rotate(96deg) scale(0.86);
     opacity: 1;
   }
   100% {
-    transform: translate(0, -15px) scale(0.14);
+    transform: translate(20px, 33px) rotate(130deg) scale(0.42);
     opacity: 0;
   }
 }
 
-/* ── Celebration: it drops, the cup throws confetti ──────── */
+.is-in .hole-cta__ballshadow {
+  animation: hc-shadowfade 400ms linear 2000ms forwards;
+}
+@keyframes hc-shadowfade {
+  to {
+    opacity: 0;
+  }
+}
 
-/* Timing: putt-roll ends ~1750ms, the ball sinks and vanishes by ~2210ms, then
-   the cup throws its party — burst and confetti fire once the ball is gone. */
+/* ── Celebration: once the ball is gone, the cup throws confetti ──── */
+
 .hole-cta__burst {
   fill: none;
   stroke: var(--fairway-lit);
@@ -149,16 +126,16 @@
   transform-origin: center;
 }
 .is-in .hole-cta__burst {
-  animation: cup-burst 620ms var(--ease-out) 2340ms forwards;
+  animation: hc-burst 600ms var(--ease-out) 2780ms forwards;
 }
-@keyframes cup-burst {
+@keyframes hc-burst {
   0% {
     opacity: 0.9;
     transform: scale(0.3);
   }
   100% {
     opacity: 0;
-    transform: scale(3.4);
+    transform: scale(3.2);
   }
 }
 
@@ -169,9 +146,9 @@
   transform-origin: center;
 }
 .is-in .hole-cta__piece {
-  animation: confetti-fly 1000ms cubic-bezier(0.22, 0.7, 0.3, 1) 2400ms forwards;
+  animation: hc-fly 1000ms cubic-bezier(0.22, 0.7, 0.3, 1) 2820ms forwards;
 }
-@keyframes confetti-fly {
+@keyframes hc-fly {
   0% {
     opacity: 0;
     transform: translate(0, 0) scale(0.4) rotate(0deg);
@@ -186,7 +163,7 @@
   100% {
     opacity: 0;
     /* carry sideways a touch further and let gravity pull it back down */
-    transform: translate(calc(var(--dx) * 1.15), calc(var(--dy) + 58px)) scale(0.9)
+    transform: translate(calc(var(--dx) * 1.1), calc(var(--dy) + 55px)) scale(0.9)
       rotate(calc(var(--rot) * 1.5));
   }
 }
@@ -209,15 +186,17 @@
   color: color-mix(in srgb, var(--cream) 82%, var(--fairway-deep));
 }
 
-/* Reduced motion: ball already holed, flag still. */
+/* Reduced motion: the ball rests at the hole's near edge, holed the quiet
+   way — no roll, no drop, no confetti, flag still. */
 @media (prefers-reduced-motion: reduce) {
   .hole-cta__roller {
-    offset-distance: 100%;
+    transform: translateX(0);
     animation: none;
   }
-  .hole-cta__sink {
-    transform: translate(0, -15px) scale(0.14);
-    opacity: 0;
+  .hole-cta__drop {
+    animation: none;
+  }
+  .hole-cta__ballshadow {
     animation: none;
   }
   .hole-cta__flag {
