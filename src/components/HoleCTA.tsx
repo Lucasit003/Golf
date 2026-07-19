@@ -41,10 +41,10 @@ export function HoleCTA({ onStart }: { onStart: () => void }) {
       <div className={`hole-cta__inner${shown ? ' is-in' : ''}`}>
         <div className="hole-cta__scene" aria-hidden="true">
           <svg viewBox="0 0 520 300" fill="none" className="hole-cta__svg">
-            {/* The read — the putt line. */}
+            {/* The read — the putt line, up to the ball's spot on the surface. */}
             <path
               className="hole-cta__line"
-              d="M70 235 C180 252 300 214 402 176"
+              d="M70 238 C180 255 300 218 398 188"
             />
 
             {/* The cup, with depth — a shaded interior, a lit far wall, a back rim. */}
@@ -70,9 +70,11 @@ export function HoleCTA({ onStart }: { onStart: () => void }) {
               d="M404 64 C424 60 436 72 452 67 C447 79 447 85 452 97 C436 92 424 103 404 99 Z"
             />
 
-            {/* The ball: a roller that follows the line, holding a sinking ball. */}
+            {/* The ball: a roller that follows the line. It carries a shadow so it
+                sits ON the grass, then rolls up into the cup. */}
             <g className="hole-cta__roller">
               <g className="hole-cta__sink">
+                <ellipse className="hole-cta__ballshadow" cx="0" cy="9" rx="8.5" ry="2.6" />
                 <circle className="hole-cta__ball" r="10" />
                 <circle className="hole-cta__dimple" cx="-3" cy="-3" r="1.1" />
                 <circle className="hole-cta__dimple" cx="2" cy="-2" r="1.1" />
@@ -81,12 +83,7 @@ export function HoleCTA({ onStart }: { onStart: () => void }) {
               </g>
             </g>
 
-            {/* The front lip — the near grass rim that swallows the ball as it drops.
-                Drawn after the ball so it occludes it on the way down. */}
-            <path
-              className="hole-cta__lip"
-              d="M387 172 C392 178.5 416 178.5 421 172 L421 200 L387 200 Z"
-            />
+            {/* The near rim, drawn on top so the ball passes behind it into the cup. */}
             <path className="hole-cta__rimfront" d="M387 172 C392 178.5 416 178.5 421 172" />
 
             {/* Celebration: a shock ring and confetti fired from the cup as it drops. */}

@@ -73,9 +73,10 @@
   animation: flag-wave var(--wave-duration) ease-in-out infinite;
 }
 
-/* Ball rests at the start of the line until revealed. */
+/* Ball rests at the start of the line until revealed. It stops on the surface
+   just in front of the cup. */
 .hole-cta__roller {
-  offset-path: path('M70 235 C180 252 300 214 402 176');
+  offset-path: path('M70 238 C180 255 300 218 398 188');
   offset-distance: 0%;
   offset-rotate: 0deg;
 }
@@ -86,6 +87,11 @@
 .hole-cta__dimple {
   fill: color-mix(in srgb, var(--fairway-deep) 22%, transparent);
 }
+/* A soft contact shadow so the ball reads as sitting on the green. */
+.hole-cta__ballshadow {
+  fill: #08160d;
+  opacity: 0.45;
+}
 
 .hole-cta__sink {
   transform-box: fill-box;
@@ -95,13 +101,12 @@
 /* On reveal: the ball rolls in and decelerates (ease-out), hangs at the lip a
    beat, then gravity takes it — the drop only starts once it has arrived. */
 .is-in .hole-cta__roller {
-  /* Rolls in and settles decisively — a gentler deceleration than before so it
-     doesn't crawl the last few inches. */
+  /* Rolls up to the lip and settles decisively. */
   animation: putt-roll 1350ms cubic-bezier(0.25, 0.85, 0.4, 1) 250ms forwards;
 }
 .is-in .hole-cta__sink {
-  /* Fires ~120ms after it arrives — settles, then drops into the cup. */
-  animation: ball-sink 430ms cubic-bezier(0.4, 0, 0.7, 0.5) 1720ms forwards;
+  /* Rests on the surface a beat, then rolls up into the cup. */
+  animation: ball-sink 480ms cubic-bezier(0.45, 0, 0.7, 0.5) 1800ms forwards;
 }
 
 @keyframes putt-roll {
@@ -114,19 +119,19 @@
 }
 
 @keyframes ball-sink {
-  /* No downward slide — in a top-down view that reads as sinking through the
-     grass. The ball shrinks and fades straight into the cup where it stops, so
-     it disappears INTO the hole. */
+  /* The ball rolls UP into the cup (toward the hole), never down — so it can't
+     read as sinking through the grass. It slips behind the near rim and fades
+     into the dark. */
   0% {
-    transform: scale(1);
+    transform: translate(0, 0) scale(1);
     opacity: 1;
   }
   45% {
-    transform: scale(0.68);
+    transform: translate(0, -8px) scale(0.82);
     opacity: 1;
   }
   100% {
-    transform: scale(0.04);
+    transform: translate(0, -15px) scale(0.14);
     opacity: 0;
   }
 }
@@ -144,7 +149,7 @@
   transform-origin: center;
 }
 .is-in .hole-cta__burst {
-  animation: cup-burst 620ms var(--ease-out) 2200ms forwards;
+  animation: cup-burst 620ms var(--ease-out) 2340ms forwards;
 }
 @keyframes cup-burst {
   0% {
@@ -164,7 +169,7 @@
   transform-origin: center;
 }
 .is-in .hole-cta__piece {
-  animation: confetti-fly 1000ms cubic-bezier(0.22, 0.7, 0.3, 1) 2260ms forwards;
+  animation: confetti-fly 1000ms cubic-bezier(0.22, 0.7, 0.3, 1) 2400ms forwards;
 }
 @keyframes confetti-fly {
   0% {
@@ -211,7 +216,7 @@
     animation: none;
   }
   .hole-cta__sink {
-    transform: scale(0.04);
+    transform: translate(0, -15px) scale(0.14);
     opacity: 0;
     animation: none;
   }
