@@ -485,7 +485,8 @@ function EmptyState({ onPick }: { onPick: (file: File | undefined) => void }) {
       <div className="empty__body">
         <h2 className="empty__title">Upload a swing</h2>
         <p className="empty__how">
-          Film down-the-line, tripod, 240fps. Full body in frame, feet to hands.
+          Film it on your phone — down-the-line from behind, plus a face-on side view.
+          Full body in frame, feet to hands.
         </p>
         <label className="btn btn--fairway empty__pick">
           <input
@@ -504,12 +505,14 @@ function EmptyState({ onPick }: { onPick: (file: File | undefined) => void }) {
           <summary className="capture-guide__summary">How to film it</summary>
           <ul className="capture-guide__list">
             <li>
-              <span className="capture-guide__k">Angle</span> down-the-line — camera behind
-              you, on the target line, at hand height
+              <span className="capture-guide__k">Angles</span> film two — down-the-line
+              (behind you, on the target line, at hand height) and face-on (side-on,
+              square to your chest). Each shows faults the other hides
             </li>
             <li>
-              <span className="capture-guide__k">Steady</span> on a tripod. Any camera
-              movement throws off every measurement
+              <span className="capture-guide__k">Steady</span> prop your phone against
+              something solid — a bag, a bench, a rail. Any camera movement throws off
+              every measurement
             </li>
             <li>
               <span className="capture-guide__k">Frame rate</span> 240fps if your phone has

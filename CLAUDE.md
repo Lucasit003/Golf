@@ -1,4 +1,4 @@
-# Contour
+# Setji's Swings
 
 Golf swing analysis in the browser. A user films their swing, we extract pose data,
 measure it, and compare it against tour biomechanical benchmarks — with a reference

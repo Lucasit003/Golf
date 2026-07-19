@@ -16,9 +16,9 @@ import './App.css'
 type View = 'landing' | 'upload' | 'compare'
 
 const TITLES: Record<View, string> = {
-  landing: 'Contour — swing survey',
-  upload: 'Survey · Contour',
-  compare: 'Compare · Contour',
+  landing: "Setji's Swings — swing survey",
+  upload: "Survey · Setji's Swings",
+  compare: "Compare · Setji's Swings",
 }
 
 export function App() {
@@ -51,7 +51,7 @@ export function App() {
         <button
           className="masthead__mark"
           onClick={() => setView('landing')}
-          aria-label="Setji's Swing — home"
+          aria-label="Setji's Swings — home"
         >
           <img
             className="masthead__logo"
@@ -63,7 +63,7 @@ export function App() {
           />
           <span className="masthead__wordmark">
             <span className="masthead__wordmark-set">Setji's</span>{' '}
-            <span className="masthead__wordmark-swing">Swing</span>
+            <span className="masthead__wordmark-swing">Swings</span>
           </span>
         </button>
         <div className="masthead__meta">
@@ -99,7 +99,7 @@ export function App() {
       </main>
 
       <footer className="colophon">
-        <span className="label">Contour · a swing, surveyed</span>
+        <span className="label">Setji's Swings · a swing, surveyed</span>
         <span className="label colophon__note">
           Client-side · your footage stays on your device
         </span>

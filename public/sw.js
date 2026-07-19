@@ -1,12 +1,12 @@
 /*
- * Contour service worker — makes the app usable offline once it's been opened.
+ * Setji's Swings service worker — makes the app usable offline once it's been opened.
  *
  * Conservative on purpose: navigations are network-first (so a new build is
  * always picked up when online), and same-origin static assets are cache-first
  * with a runtime cache (so the shell, fonts we host, the pose model, and the
  * wasm keep working with no connection). Cross-origin requests are left alone.
  */
-const CACHE = 'contour-v1'
+const CACHE = 'setjis-swings-v1'
 
 self.addEventListener('install', () => self.skipWaiting())
 

@@ -43,7 +43,7 @@ const STEPS = [
   {
     n: '01',
     title: 'Film',
-    body: 'Down-the-line, tripod, 240fps. Full body in frame, feet to hands.',
+    body: 'On your phone — down-the-line and face-on. Full body in frame, feet to hands.',
     icon: (
       <>
         <rect x="10" y="16" width="30" height="22" rx="2" />
@@ -94,7 +94,7 @@ export function Landing({ onStart, onCompare }: { onStart: () => void; onCompare
               Get it <span className="hero__headline-accent">surveyed.</span>
             </h1>
             <p className="hero__lede">
-              Contour tracks your body through the swing, measures it against tour
+              Setji's Swings tracks your body through the swing, measures it against tour
               benchmarks, and draws the reference over your own footage — so the
               difference is a line you can see, not a note you have to trust.
             </p>
@@ -178,7 +178,7 @@ export function Landing({ onStart, onCompare }: { onStart: () => void; onCompare
               camera — those ship with a confidence flag, never false precision. And the
               club-and-ball numbers — <span className="ink-flag">compression, attack angle,
               spin</span> — need a launch monitor; weight and pressure need a force plate.
-              Contour measures the body, and says so instead of faking the rest.
+              Setji's Swings measures the body, and says so instead of faking the rest.
             </p>
           </div>
         </div>
@@ -247,7 +247,7 @@ export function Landing({ onStart, onCompare }: { onStart: () => void; onCompare
             <p className="section__eyebrow label">What makes it different</p>
             <h2 className="section__title">The reference line.</h2>
             <p className="section__lede">
-              Other apps hand you a number. Contour draws the tour move as a ghost over
+              Other apps hand you a number. Setji's Swings draws the tour move as a ghost over
               your own — time-matched, scaled to your build, turned to your camera. Where
               your hands leave the reference at the top, the line goes red. You see the
               gap instead of reading about it.

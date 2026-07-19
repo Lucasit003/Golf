@@ -1,4 +1,4 @@
-# Contour
+# Setji's Swings
 
 ![CI](https://github.com/Lucasit003/Golf/actions/workflows/ci.yml/badge.svg)
 
