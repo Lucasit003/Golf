@@ -32,6 +32,47 @@ const SPEEDS = [1, 0.5, 0.25, 0.1] as const
 // (see SWING_SPEC — phone slo-mo lies), so step by a small fixed slice.
 const STEP = 1 / 60
 
+// Two camera angles, each surveyed on its own. A phone can only film one at a
+// time, so you upload and track each; the app keeps both.
+type Angle = 'down_the_line' | 'face_on'
+
+const ANGLE_TABS: { v: Angle; label: string; hint: string }[] = [
+  {
+    v: 'down_the_line',
+    label: 'Down-the-line',
+    hint: 'Camera behind you, on the target line — reads posture, spine angle and plane.',
+  },
+  {
+    v: 'face_on',
+    label: 'Face-on',
+    hint: 'Camera square to your chest — reads turn, sway, tilt and lead-leg support.',
+  },
+]
+
+// Which readouts each angle can honestly speak to. Tempo is angle-independent
+// (pure frame counting) so it shows on both.
+const ANGLE_READOUTS: Record<Angle, { label: string; range: string }[]> = {
+  down_the_line: [
+    { label: 'Spine angle', range: '±2° address' },
+    { label: 'Shoulder turn', range: '85–95°' },
+  ],
+  face_on: [
+    { label: 'Hip rotation', range: '35–45°' },
+    { label: 'X-factor', range: '40–50°' },
+    { label: 'Shoulder tilt', range: '33–39°' },
+    { label: 'Lead knee flex', range: '25–41°' },
+  ],
+}
+
+// A saved clip for one angle: the file, its object URL, corrected events, and
+// the tracked result so switching angles doesn't lose the survey.
+type ClipSnap = {
+  file: File
+  src: string
+  events: SwingEvents | null
+  result: { swing: Swing; confidence: number; coverage: number } | null
+}
+
 export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: () => void }) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -41,8 +82,20 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
   const [playing, setPlaying] = useState(false)
   const { prefs } = usePrefs()
   const [rate, setRate] = useState<number>(prefs.defaultSpeed)
-  const { state: extraction, run: runExtraction, reset: resetExtraction } = useExtraction()
+  const { state: extraction, run: runExtraction, reset: resetExtraction, hydrate } = useExtraction()
   const swing = extraction.status === 'done' ? extraction.swing : null
+  // Which angle we're surveying, and the saved clip for each.
+  const [angle, setAngle] = useState<Angle>('down_the_line')
+  const [clips, setClips] = useState<Record<Angle, ClipSnap | null>>({
+    down_the_line: null,
+    face_on: null,
+  })
+  // Set true right before restoring a cached result, so the auto-detect effect
+  // keeps the corrected events instead of re-detecting.
+  const restoringRef = useRef(false)
+  // Every object URL we create, revoked together on unmount (a clip may be held
+  // by an inactive angle, so we can't revoke eagerly on src change).
+  const urlsRef = useRef<Set<string>>(new Set())
   // Detected events, editable by the user. These are UNVERIFIED — the whole
   // point of the UI is to scrub to each and correct it, which is how a swing
   // becomes a fixture that validates the detector (SWING_SPEC / M2).
@@ -50,22 +103,29 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
   const [selectedEvent, setSelectedEvent] = useState<keyof SwingEvents | null>(null)
   const [overlay, setOverlay] = useState<'skeleton' | 'trace' | 'off'>('skeleton')
 
-  // When a fresh extraction lands, run first-pass detection on it.
+  // When a fresh extraction lands, run first-pass detection on it. When we're
+  // restoring a saved clip, keep its already-corrected events instead.
   useEffect(() => {
     if (extraction.status === 'done') {
+      if (restoringRef.current) {
+        restoringRef.current = false
+        return
+      }
       setEvents(detectEvents(extraction.swing.frames))
       setSelectedEvent(null)
-    } else {
+    } else if (!restoringRef.current) {
       setEvents(null)
     }
   }, [extraction])
 
-  // Revoke the object URL when it changes or the screen unmounts.
+  // Revoke every object URL we made when the screen unmounts.
   useEffect(() => {
+    const urls = urlsRef.current
     return () => {
-      if (src) URL.revokeObjectURL(src)
+      urls.forEach((u) => URL.revokeObjectURL(u))
+      urls.clear()
     }
-  }, [src])
+  }, [])
 
   // Draw the skeleton for the frame nearest the current time, whenever the
   // playhead moves or a new extraction lands. Colors come from the live theme.
@@ -109,11 +169,65 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
 
   function pickFile(file: File | undefined) {
     if (!file) return
-    if (src) URL.revokeObjectURL(src)
-    setSrc(URL.createObjectURL(file))
+    const url = URL.createObjectURL(file)
+    urlsRef.current.add(url)
+    restoringRef.current = false
+    setSrc(url)
     setCurrent(0)
     setDuration(0)
     resetExtraction()
+    setEvents(null)
+    setSelectedEvent(null)
+    setClips((prev) => ({ ...prev, [angle]: { file, src: url, events: null, result: null } }))
+  }
+
+  // Swap to the other angle, saving the current one's clip + survey so nothing
+  // is lost, and restoring the target angle's if it's been filmed.
+  function switchAngle(next: Angle) {
+    if (next === angle || busy) return
+    setClips((prev) => {
+      const cur = prev[angle]
+      if (!src || !cur) return prev
+      return {
+        ...prev,
+        [angle]: {
+          file: cur.file,
+          src,
+          events,
+          result:
+            extraction.status === 'done'
+              ? {
+                  swing: extraction.swing,
+                  confidence: extraction.confidence,
+                  coverage: extraction.coverage,
+                }
+              : null,
+        },
+      }
+    })
+
+    const snap = clips[next]
+    setAngle(next)
+    setCurrent(0)
+    setDuration(0)
+    setSelectedEvent(null)
+    setOverlay('skeleton')
+    if (snap) {
+      setSrc(snap.src)
+      setEvents(snap.events)
+      if (snap.result) {
+        restoringRef.current = true
+        hydrate(snap.result.swing, snap.result.confidence, snap.result.coverage)
+      } else {
+        restoringRef.current = false
+        resetExtraction()
+      }
+    } else {
+      setSrc(null)
+      setEvents(null)
+      restoringRef.current = false
+      resetExtraction()
+    }
   }
 
   function seek(fraction: number) {
@@ -256,6 +370,24 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
 
         {/* The margin — readouts. */}
         <aside className="upload__margin" aria-label="Measurements">
+          <div className="angle-tabs" role="group" aria-label="Camera angle">
+            {ANGLE_TABS.map((t) => (
+              <button
+                key={t.v}
+                className={`angle-tabs__btn${angle === t.v ? ' is-active' : ''}`}
+                onClick={() => switchAngle(t.v)}
+                disabled={busy}
+                aria-pressed={angle === t.v}
+              >
+                {t.label}
+                {clips[t.v]?.result ? (
+                  <span className="angle-tabs__dot" aria-hidden="true" title="surveyed" />
+                ) : null}
+              </button>
+            ))}
+          </div>
+          <p className="angle-tabs__hint label">{ANGLE_TABS.find((t) => t.v === angle)!.hint}</p>
+
           <div className="upload__margin-head">
             <span className="label">survey</span>
             <span className="label upload__margin-status">
@@ -291,17 +423,16 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
             unit=": 1"
             state={tempoState}
           />
-          <Readout label="Shoulder turn" range="85–95°" />
-          <Readout label="X-factor" range="40–50°" />
-          <Readout label="Hip rotation" range="35–45°" />
-          <Readout label="Lead knee flex" range="25–41°" />
-          <Readout label="Spine angle" range="±2° address" />
+          {ANGLE_READOUTS[angle].map((r) => (
+            <Readout key={r.label} label={r.label} range={r.range} />
+          ))}
           <p className="upload__margin-note">
-            Tempo is live — it's just backswing ÷ downswing frames, so it's honest the
+            These are the measurements a{' '}
+            {angle === 'down_the_line' ? 'down-the-line' : 'face-on'} camera can actually
+            see. Tempo is live — it's just backswing ÷ downswing frames, so it's honest the
             moment the events are right (verify them below). The angle metrics stay empty
             until the geometry is validated on real swings; we won't show a value we can't
-            stand behind. An empty readout is honest, a
-            plausible one isn't.
+            stand behind. An empty readout is honest, a plausible one isn't.
           </p>
         </aside>
 

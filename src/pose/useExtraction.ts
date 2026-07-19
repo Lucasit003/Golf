@@ -35,6 +35,14 @@ export function useExtraction() {
 
   const reset = useCallback(() => setState({ status: 'idle' }), [])
 
+  // Restore a previously-computed result — used when switching between the
+  // down-the-line and face-on clips so each angle keeps its survey.
+  const hydrate = useCallback(
+    (swing: Swing, confidence: number, coverage: number) =>
+      setState({ status: 'done', swing, confidence, coverage }),
+    [],
+  )
+
   const run = useCallback(async (video: HTMLVideoElement) => {
     try {
       setState({ status: 'extracting', progress: 0 })
@@ -93,5 +101,5 @@ export function useExtraction() {
     }
   }, [])
 
-  return { state, run, reset }
+  return { state, run, reset, hydrate }
 }
