@@ -102,6 +102,60 @@
   }
 }
 
+/* ── Celebration: it drops, the cup throws confetti ──────── */
+
+/* Timing: putt-roll ends ~1750ms, sink lands ~2170ms — burst fires with the drop. */
+.hole-cta__burst {
+  fill: none;
+  stroke: var(--fairway-lit);
+  stroke-width: 2;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.is-in .hole-cta__burst {
+  animation: cup-burst 620ms var(--ease-out) 2080ms forwards;
+}
+@keyframes cup-burst {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.3);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(3.4);
+  }
+}
+
+.hole-cta__piece {
+  fill: var(--c);
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.is-in .hole-cta__piece {
+  animation: confetti-fly 1000ms cubic-bezier(0.22, 0.7, 0.3, 1) 2120ms forwards;
+}
+@keyframes confetti-fly {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.4) rotate(0deg);
+  }
+  16% {
+    opacity: 1;
+  }
+  55% {
+    opacity: 1;
+    transform: translate(var(--dx), var(--dy)) scale(1) rotate(var(--rot));
+  }
+  100% {
+    opacity: 0;
+    /* carry sideways a touch further and let gravity pull it back down */
+    transform: translate(calc(var(--dx) * 1.15), calc(var(--dy) + 58px)) scale(0.9)
+      rotate(calc(var(--rot) * 1.5));
+  }
+}
+
 /* ── Copy ───────────────────────────────────────────────── */
 
 .hole-cta__eyebrow {
@@ -132,6 +186,11 @@
   }
   .hole-cta__flag {
     animation: none;
+  }
+  .hole-cta__burst,
+  .hole-cta__piece {
+    animation: none;
+    opacity: 0;
   }
 }
 

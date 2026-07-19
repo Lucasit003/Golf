@@ -1,6 +1,6 @@
 {
-  "name": "Contour — swing survey",
-  "short_name": "Contour",
+  "name": "Setji's Swing — swing survey",
+  "short_name": "Setji's Swing",
   "description": "Film a golf swing, get it surveyed. Measured against tour benchmarks, drawn back over your own footage. Runs on your device.",
   "start_url": "/",
   "display": "standalone",
@@ -8,7 +8,7 @@
   "background_color": "#e7e9e0",
   "theme_color": "#143a24",
   "icons": [
-    { "src": "/favicon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any" },
+    { "src": "/favicon-64.png", "type": "image/png", "sizes": "64x64", "purpose": "any" },
     { "src": "/icon-192.png", "type": "image/png", "sizes": "192x192", "purpose": "any" },
     { "src": "/icon-512.png", "type": "image/png", "sizes": "512x512", "purpose": "any" },
     { "src": "/icon-512.png", "type": "image/png", "sizes": "512x512", "purpose": "maskable" }

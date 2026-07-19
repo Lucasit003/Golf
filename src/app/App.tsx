@@ -51,12 +51,17 @@ export function App() {
         <button
           className="masthead__mark"
           onClick={() => setView('landing')}
-          aria-label="Contour — home"
+          aria-label="Setji's Swing — home"
         >
-          <span className="masthead__wordmark">Contour</span>
-          <span className="masthead__glyph data" aria-hidden="true">
-            ⌇
-          </span>
+          <img
+            className="masthead__logo"
+            src="/brand/logo-mark.png"
+            alt=""
+            width="46"
+            height="37"
+            aria-hidden="true"
+          />
+          <span className="masthead__wordmark">Setji's Swing</span>
         </button>
         <div className="masthead__meta">
           <nav className="masthead__nav" aria-label="Views">

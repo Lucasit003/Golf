@@ -42,13 +42,20 @@
 
 .masthead__mark {
   display: inline-flex;
-  align-items: baseline;
+  align-items: center;
   gap: var(--gap-2);
   padding: 0;
   border: none;
   background: none;
   cursor: pointer;
   color: var(--ink);
+}
+
+/* The Setji's Swing mark — golfer + swing trace. Held small in the corner. */
+.masthead__logo {
+  height: 2.2rem;
+  width: auto;
+  display: block;
 }
 
 .masthead__wordmark {
@@ -58,6 +65,7 @@
   text-transform: uppercase;
   letter-spacing: 0.02em;
   font-size: 1.25rem;
+  white-space: nowrap;
 }
 
 .masthead__glyph {
@@ -159,8 +167,12 @@
   .masthead {
     padding-inline: var(--gap-2);
   }
+  /* On phones the mark carries the brand on its own — drop the wordmark text. */
   .masthead__wordmark {
-    font-size: 1.05rem;
+    display: none;
+  }
+  .masthead__logo {
+    height: 2.4rem;
   }
   .masthead__glyph,
   .masthead__stamp {
