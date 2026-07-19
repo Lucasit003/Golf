@@ -1,11 +1,14 @@
 # Setji's Swings
 
+**▶︎ Open the app: https://golf-two-beta.vercel.app**
+
 ![CI](https://github.com/Lucasit003/Golf/actions/workflows/ci.yml/badge.svg)
 
 Golf swing analysis in the browser. Film a swing, get it surveyed — measured
 against tour benchmarks and drawn back over your own footage.
 
-Working name. Runs entirely on-device; your video never leaves the browser.
+The analysis runs entirely on-device — your footage stays in the browser.
+Sharing a swing to the community library is a separate, opt-in choice.
 
 ## Run it
 
