@@ -7,6 +7,12 @@
  *
  * These are facts (published ranges), not copyrighted references — safe to show
  * before any upload. See DATA_AND_LEGAL: benchmark vs. reference.
+ *
+ * Verified against current sources 2026-07. All values held up: tempo 3:1
+ * (Tour Tempo / Yale); shoulder turn ~90°, pelvis ~45°, X-factor ~45° at top
+ * (TPI / 3D norms); hip open ~36°+ and shoulder tilt ~36° at impact/top (GolfTEC
+ * SwingTRU, 90M swings); lead/trail knee flex 33±8° / 24±8° at top (Sports 2022
+ * systematic review). Re-check when the underlying studies are superseded.
  */
 
 export type BenchmarkId =
@@ -46,7 +52,7 @@ export const BENCHMARKS: Benchmark[] = [
     group: 'Timing',
     confidence: 'good',
     decimals: 1,
-    source: 'Tour Tempo (Novosel) — 21 frames back / 7 down @30fps',
+    source: 'Tour Tempo (Novosel) — 21 frames back / 7 down @30fps ≈ 3:1; Yale tempo study concurs',
   },
   {
     id: 'shoulderTurn',
@@ -56,7 +62,7 @@ export const BENCHMARKS: Benchmark[] = [
     scale: { min: 0, max: 120 },
     group: 'Rotation',
     confidence: 'low',
-    source: 'Chu/Sell/Lephart elite benchmarks, J Sports Sci (PMID 21844613)',
+    source: 'TPI / 3D norms — pros ≈90° shoulders at top; Chu/Sell/Lephart (PMID 21844613)',
     note: 'axial rotation — depth-limited from one camera',
   },
   {
@@ -67,7 +73,7 @@ export const BENCHMARKS: Benchmark[] = [
     scale: { min: 0, max: 120 },
     group: 'Rotation',
     confidence: 'low',
-    source: 'Chu/Sell/Lephart, J Sports Sci (PMID 21844613)',
+    source: 'TPI / 3D norms — pros ≈45° pelvis at top; Chu/Sell/Lephart (PMID 21844613)',
     note: 'axial rotation — depth-limited from one camera',
   },
   {
@@ -78,7 +84,7 @@ export const BENCHMARKS: Benchmark[] = [
     scale: { min: 0, max: 70 },
     group: 'Rotation',
     confidence: 'low',
-    source: 'elite benchmarks; caveat J Appl Biomech 2016 (2D≠3D by ~16°)',
+    source: 'TPI — shoulder−pelvis separation ≈45° at top (~50° stretch in transition); caveat J Appl Biomech 2016 (2D≠3D by ~16°)',
     note: 'high variance; depends on noisy monocular z',
   },
   {
@@ -89,7 +95,7 @@ export const BENCHMARKS: Benchmark[] = [
     scale: { min: 0, max: 70 },
     group: 'Rotation',
     confidence: 'low',
-    source: 'GolfTEC "Swing by Numbers," Golf Digest',
+    source: 'GolfTEC SwingTRU (90M+ swings) — better players ≥36° hips open at impact',
     note: 'open to target; depth-limited',
   },
   {
@@ -100,7 +106,7 @@ export const BENCHMARKS: Benchmark[] = [
     scale: { min: 0, max: 60 },
     group: 'Tilt & bend',
     confidence: 'moderate',
-    source: 'GolfTEC "Swing by Numbers," Golf Digest',
+    source: 'GolfTEC SwingTRU (90M+ swings) — better players ≈36° shoulder tilt at top',
   },
   {
     id: 'spineAngle',
@@ -121,7 +127,7 @@ export const BENCHMARKS: Benchmark[] = [
     scale: { min: 0, max: 60 },
     group: 'Posture & base',
     confidence: 'moderate',
-    source: 'Golf Swing Biomechanics systematic review, Sports 2022, 10(6):91',
+    source: 'Golf Swing Biomechanics systematic review, Sports 2022, 10(6):91 — lead knee ≈33±8° flexion at top',
   },
   {
     id: 'trailKneeFlex',
@@ -131,7 +137,7 @@ export const BENCHMARKS: Benchmark[] = [
     scale: { min: 0, max: 60 },
     group: 'Posture & base',
     confidence: 'moderate',
-    source: 'Sports 2022, 10(6):91',
+    source: 'Sports 2022, 10(6):91 — trail knee ≈24±8° flexion at top',
   },
 ]
 
