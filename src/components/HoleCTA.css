@@ -95,10 +95,13 @@
 /* On reveal: the ball rolls in and decelerates (ease-out), hangs at the lip a
    beat, then gravity takes it — the drop only starts once it has arrived. */
 .is-in .hole-cta__roller {
-  animation: putt-roll 1550ms var(--ease-out) 250ms forwards;
+  /* Rolls in and settles decisively — a gentler deceleration than before so it
+     doesn't crawl the last few inches. */
+  animation: putt-roll 1350ms cubic-bezier(0.25, 0.85, 0.4, 1) 250ms forwards;
 }
 .is-in .hole-cta__sink {
-  animation: ball-sink 600ms cubic-bezier(0.42, 0, 0.7, 0.35) 1900ms forwards;
+  /* Fires ~120ms after it arrives — a short teeter, then it drops in. */
+  animation: ball-sink 520ms cubic-bezier(0.4, 0, 0.75, 0.45) 1720ms forwards;
 }
 
 @keyframes putt-roll {
@@ -115,15 +118,20 @@
     transform: translate(0, 0) scale(1);
     opacity: 1;
   }
-  /* Teeters on the lip — a small tip before it goes. */
-  25% {
-    transform: translate(0, 2px) scale(0.92);
+  /* Teeters on the lip. */
+  28% {
+    transform: translate(0, 3px) scale(0.94);
     opacity: 1;
   }
-  /* Gravity: drops behind the near rim into the cup — a short travel so it never
-     slides past the hole, and it fades into the dark so nothing shows below. */
+  /* Drops down into the cup — stays full-bodied as the near rim swallows it, so
+     it reads as falling in rather than shrinking away. */
+  72% {
+    transform: translate(0, 11px) scale(0.55);
+    opacity: 1;
+  }
+  /* Gone into the dark. Fades only at the very end, fully behind the rim. */
   100% {
-    transform: translate(0, 10px) scale(0.16);
+    transform: translate(0, 15px) scale(0.3);
     opacity: 0;
   }
 }
@@ -141,7 +149,7 @@
   transform-origin: center;
 }
 .is-in .hole-cta__burst {
-  animation: cup-burst 620ms var(--ease-out) 2560ms forwards;
+  animation: cup-burst 620ms var(--ease-out) 2300ms forwards;
 }
 @keyframes cup-burst {
   0% {
@@ -161,7 +169,7 @@
   transform-origin: center;
 }
 .is-in .hole-cta__piece {
-  animation: confetti-fly 1000ms cubic-bezier(0.22, 0.7, 0.3, 1) 2600ms forwards;
+  animation: confetti-fly 1000ms cubic-bezier(0.22, 0.7, 0.3, 1) 2340ms forwards;
 }
 @keyframes confetti-fly {
   0% {
@@ -208,7 +216,7 @@
     animation: none;
   }
   .hole-cta__sink {
-    transform: translate(0, 10px) scale(0.16);
+    transform: translate(0, 15px) scale(0.3);
     opacity: 0;
     animation: none;
   }
