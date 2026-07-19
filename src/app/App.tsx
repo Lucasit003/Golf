@@ -61,7 +61,10 @@ export function App() {
             height="37"
             aria-hidden="true"
           />
-          <span className="masthead__wordmark">Setji's Swing</span>
+          <span className="masthead__wordmark">
+            <span className="masthead__wordmark-set">Setji's</span>{' '}
+            <span className="masthead__wordmark-swing">Swing</span>
+          </span>
         </button>
         <div className="masthead__meta">
           <nav className="masthead__nav" aria-label="Views">

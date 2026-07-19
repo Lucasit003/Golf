@@ -35,9 +35,10 @@
   width: 100%;
   /* Full-bleed bar; content held to the shell via symmetric side padding. */
   padding: var(--gap-3) max(var(--gap-4), calc((100% - var(--shell)) / 2));
-  border-bottom: var(--line-rest) solid var(--paper-edge);
-  background: color-mix(in srgb, var(--paper) 82%, transparent);
-  backdrop-filter: blur(8px);
+  /* A fixed dark brand bar — the logo's own world, in both themes. Lets the
+     swing-trace mark and the silver/lime wordmark read the way the logo does. */
+  border-bottom: var(--line-rest) solid rgba(147, 182, 69, 0.3);
+  background: linear-gradient(180deg, #0f1913 0%, #15221a 100%);
 }
 
 .masthead__mark {
@@ -66,6 +67,17 @@
   letter-spacing: 0.02em;
   font-size: 1.25rem;
   white-space: nowrap;
+}
+
+/* Match the logo lettering: SETJI'S in brushed silver, SWING in lime. */
+.masthead__wordmark-set {
+  background: linear-gradient(176deg, #ffffff 0%, #e7e7e7 48%, #a9b0a7 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.masthead__wordmark-swing {
+  color: #93b645;
 }
 
 .masthead__glyph {
@@ -98,13 +110,17 @@
   transition: color 120ms linear, background-color 120ms linear;
 }
 
+.masthead__link {
+  color: rgba(242, 240, 230, 0.64);
+}
+
 .masthead__link:hover {
-  color: var(--ink);
+  color: var(--cream);
 }
 
 .masthead__link.is-active {
-  color: var(--cream);
-  background: var(--fairway);
+  color: #12200c;
+  background: #93b645;
 }
 
 /* A stamped milestone mark — survey character. */
@@ -113,10 +129,18 @@
   place-items: center;
   min-width: 2.25rem;
   padding: 0.15rem 0.4rem;
-  border: var(--line-rest) solid var(--paper-edge);
+  border: var(--line-rest) solid rgba(242, 240, 230, 0.22);
   border-radius: var(--radius);
   font-size: 0.8125rem;
-  color: var(--ink-soft);
+  color: rgba(242, 240, 230, 0.68);
+}
+
+/* Settings gear inherits currentColor — keep it legible on the dark bar. */
+.masthead .settings__gear {
+  color: rgba(242, 240, 230, 0.72);
+}
+.masthead .settings__gear:hover {
+  color: var(--cream);
 }
 
 .app__main {
@@ -167,24 +191,29 @@
   .masthead {
     padding-inline: var(--gap-2);
   }
-  /* On phones the mark carries the brand on its own — drop the wordmark text. */
+  .masthead {
+    padding-inline: var(--gap-1);
+  }
+  .masthead__mark {
+    gap: var(--gap-1);
+  }
   .masthead__wordmark {
-    display: none;
+    font-size: 0.74rem;
   }
   .masthead__logo {
-    height: 2.4rem;
+    height: 1.9rem;
   }
   .masthead__glyph,
   .masthead__stamp {
     display: none;
   }
   .masthead__meta {
-    gap: var(--gap-2);
+    gap: var(--gap-1);
   }
   .masthead__nav {
     gap: 0;
   }
   .masthead__link {
-    padding-inline: 0.4rem;
+    padding-inline: 0.3rem;
   }
 }
