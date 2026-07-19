@@ -1,8 +1,14 @@
-import { useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { Landing } from '../pages/Landing'
 import { Upload } from '../capture/Upload'
 import { CompareStudio } from '../capture/CompareStudio'
 import { ScrollRule } from '../components/ScrollRule'
+
+// The library pulls in the Supabase client; load it only when opened so the
+// landing and survey stay light.
+const Community = lazy(() =>
+  import('../community/Community').then((m) => ({ default: m.Community })),
+)
 import { Settings } from './Settings'
 import './App.css'
 
@@ -13,12 +19,13 @@ import './App.css'
  * lives below this in context; there's nothing to hold yet.
  */
 
-type View = 'landing' | 'upload' | 'compare'
+type View = 'landing' | 'upload' | 'compare' | 'library'
 
 const TITLES: Record<View, string> = {
   landing: "Setji's Swings — swing survey",
   upload: "Survey · Setji's Swings",
   compare: "Compare · Setji's Swings",
+  library: "Library · Setji's Swings",
 }
 
 export function App() {
@@ -82,6 +89,13 @@ export function App() {
             >
               Compare
             </button>
+            <button
+              className={`masthead__link${view === 'library' ? ' is-active' : ''}`}
+              onClick={() => setView('library')}
+              aria-current={view === 'library' ? 'page' : undefined}
+            >
+              Library
+            </button>
           </nav>
           <span className="masthead__stamp data">M0</span>
           <Settings />
@@ -93,6 +107,10 @@ export function App() {
           <Landing onStart={() => setView('upload')} onCompare={() => setView('compare')} />
         ) : view === 'compare' ? (
           <CompareStudio onBack={() => setView('upload')} />
+        ) : view === 'library' ? (
+          <Suspense fallback={<p className="app__loading label">Loading the library…</p>}>
+            <Community onBack={() => setView('landing')} />
+          </Suspense>
         ) : (
           <Upload onBack={() => setView('landing')} onCompare={() => setView('compare')} />
         )}
@@ -101,7 +119,7 @@ export function App() {
       <footer className="colophon">
         <span className="label">Setji's Swings · a swing, surveyed</span>
         <span className="label colophon__note">
-          Client-side · your footage stays on your device
+          Client-side · analysis runs on your device
         </span>
       </footer>
     </div>

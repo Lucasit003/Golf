@@ -270,10 +270,11 @@ export function Landing({ onStart, onCompare }: { onStart: () => void; onCompare
             </svg>
           </div>
           <p className="section__eyebrow label privacy__eyebrow">On-device · client-side</p>
-          <h2 className="privacy__title">Your footage never leaves your device.</h2>
+          <h2 className="privacy__title">The analysis never leaves your device.</h2>
           <p className="privacy__body">
-            Pose extraction, measurement, and the overlay all run in your browser. No
-            upload, no server, no account. It's a real privacy feature — so we say so.
+            Pose extraction, measurement, and the overlay all run in your browser — no
+            upload, no account. The one exception is the community library, where sharing
+            a swing is a deliberate, opt-in choice. Everything else stays on your device.
           </p>
         </Reveal>
       </section>

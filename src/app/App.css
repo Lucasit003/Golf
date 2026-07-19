@@ -143,6 +143,14 @@
   color: var(--cream);
 }
 
+.app__loading {
+  display: block;
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding: var(--gap-5) var(--gap-4);
+  color: var(--ink-soft);
+}
+
 .app__main {
   flex: 1;
   /* Keep content clear of the sticky masthead if ever scrolled into view. */
