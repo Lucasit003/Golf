@@ -44,7 +44,7 @@ export function HoleCTA({ onStart }: { onStart: () => void }) {
             {/* The read — the putt line. */}
             <path
               className="hole-cta__line"
-              d="M70 235 C180 252 300 214 398 174"
+              d="M70 235 C180 252 300 214 402 176"
             />
 
             {/* The cup, with depth — a shaded interior, a lit far wall, a back rim. */}
