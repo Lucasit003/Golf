@@ -22,3 +22,6 @@ dist
 
 # TypeScript incremental build info
 *.tsbuildinfo
+
+# Generated self-contained artifact build
+contour-artifact.html
