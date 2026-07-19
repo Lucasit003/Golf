@@ -116,12 +116,26 @@ start until there's a real answer on where that data comes from.
 
 ---
 
+## Shipped alongside the milestones
+
+Additive features that don't sit on the M0–M4 pipeline but are live:
+
+- **Two-angle capture** — a swing can carry both a down-the-line and a face-on clip,
+  toggled in the survey, each with its own pose cache. Started life parked (below); the
+  extra angle earns enough detail to be worth it.
+- **Community swing library** — an opt-in, moderation-gated gallery backed by Supabase.
+  This is the *only* thing that ever leaves the device, and only when someone explicitly
+  shares with consent. Analysis itself stays entirely on-device — the "no backend for the
+  survey" principle below still holds.
+
+---
+
 ## Parked
 
 Things we noticed but are not building. Add to this list instead of building ahead.
 
 - Club selection recommendations
 - Shot dispersion tracking
-- Multi-angle capture (face-on + down-the-line together)
 - Native app wrapper
-- Accounts / cloud storage — M0–M4 are entirely local, no backend
+- Accounts — the community library is share-only; there are no user accounts, and the
+  on-device survey (M0–M4) never touches a backend
