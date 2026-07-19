@@ -13,7 +13,7 @@ const swing: Swing = {
 describe('swingToJSON', () => {
   it('produces a versioned, stable payload', () => {
     const json = JSON.parse(swingToJSON(swing, () => '2026-01-01T00:00:00.000Z'))
-    expect(json.format).toBe('contour.swing')
+    expect(json.format).toBe('setjis.swing')
     expect(json.version).toBe(1)
     expect(json.createdAt).toBe('2026-01-01T00:00:00.000Z')
     expect(json.fps).toBe(240)

@@ -13,7 +13,7 @@ import type { Swing } from './types'
  */
 
 export type SwingExport = {
-  format: 'contour.swing'
+  format: 'setjis.swing'
   version: 1
   createdAt: string
   fps: number
@@ -25,7 +25,7 @@ export type SwingExport = {
 /** Serialize a swing to a stable, versioned JSON string. Pure — easy to test. */
 export function swingToJSON(swing: Swing, now: () => string = () => new Date().toISOString()): string {
   const payload: SwingExport = {
-    format: 'contour.swing',
+    format: 'setjis.swing',
     version: 1,
     createdAt: now(),
     fps: swing.fps,

@@ -19,7 +19,7 @@ export type Prefs = {
 }
 
 const DEFAULTS: Prefs = { reduceMotion: false, defaultSpeed: 1, theme: 'system' }
-const KEY = 'contour.prefs'
+const KEY = 'setjis.prefs'
 
 function load(): Prefs {
   if (typeof localStorage === 'undefined') return DEFAULTS
