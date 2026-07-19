@@ -113,14 +113,18 @@
 @keyframes ball-sink {
   0% {
     transform: translate(0, 0) scale(1);
+    opacity: 1;
   }
-  /* Teeters on the lip — a small tip forward before it goes. */
-  22% {
-    transform: translate(0, 2px) scale(0.95);
+  /* Teeters on the lip — a small tip before it goes. */
+  25% {
+    transform: translate(0, 2px) scale(0.92);
+    opacity: 1;
   }
-  /* Gravity: accelerates straight down into the cup; the front lip occludes it. */
+  /* Gravity: drops behind the near rim into the cup — a short travel so it never
+     slides past the hole, and it fades into the dark so nothing shows below. */
   100% {
-    transform: translate(0, 18px) scale(0.3);
+    transform: translate(0, 10px) scale(0.16);
+    opacity: 0;
   }
 }
 
@@ -204,7 +208,8 @@
     animation: none;
   }
   .hole-cta__sink {
-    transform: translate(6px, 16px) scale(0.28);
+    transform: translate(0, 10px) scale(0.16);
+    opacity: 0;
     animation: none;
   }
   .hole-cta__flag {
