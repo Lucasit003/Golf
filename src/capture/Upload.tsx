@@ -307,7 +307,7 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
     <section className="upload" aria-label="Swing survey">
       <div className="upload__grid">
         {/* The drawing — video well, with the skeleton overlay. */}
-        <div className="upload__well">
+        <div className={`upload__well${src ? '' : ' upload__well--empty'}`}>
           {src ? (
             <>
               <video
@@ -437,7 +437,7 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
         </aside>
 
         {/* The measuring stick, with its transport. */}
-        <div className="upload__scrub">
+        <div className={`upload__scrub${src ? '' : ' upload__scrub--empty'}`}>
           <div className={`transport${canTransport ? '' : ' transport--disabled'}`}>
             <div className="transport__group">
               <button

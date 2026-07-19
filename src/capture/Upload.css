@@ -30,6 +30,18 @@
   overflow: hidden;
 }
 
+/* Empty state: let the well grow to fit the prompt instead of clipping it. */
+.upload__well--empty {
+  aspect-ratio: auto;
+}
+
+/* Before a clip is loaded, hide the disabled transport + scrub — no need to
+   show playback controls with nothing to play. */
+.upload__scrub--empty .transport,
+.upload__scrub--empty .scrub {
+  display: none;
+}
+
 .upload__video {
   position: absolute;
   inset: 0;
@@ -459,11 +471,11 @@
 /* ── Empty state ────────────────────────────────────────── */
 
 .empty {
-  position: absolute;
-  inset: 0;
+  position: relative;
   display: grid;
   place-items: center;
-  padding: var(--gap-4);
+  padding: var(--gap-5) var(--gap-4);
+  min-height: 20rem;
 }
 
 /* A framing reticle — the camera-alignment mark of a capture setup. */
