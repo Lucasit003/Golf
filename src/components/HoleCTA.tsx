@@ -47,11 +47,24 @@ export function HoleCTA({ onStart }: { onStart: () => void }) {
               d="M70 235 C180 252 300 214 398 174"
             />
 
-            {/* The hole. */}
-            <ellipse className="hole-cta__hole" cx="404" cy="172" rx="16" ry="6" />
+            {/* The cup, with depth — a shaded interior, a lit far wall, a back rim. */}
+            <defs>
+              <linearGradient id="cupDepth" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stopColor="#31603f" />
+                <stop offset="0.45" stopColor="#0c2013" />
+                <stop offset="1" stopColor="#030906" />
+              </linearGradient>
+            </defs>
+            <g className="hole-cta__cup">
+              <ellipse cx="404" cy="172" rx="16.5" ry="6.4" fill="url(#cupDepth)" />
+              {/* far inner wall catching light — the cup liner */}
+              <path className="hole-cta__cupwall" d="M390 170 C395 166 413 166 418 170" />
+              {/* back rim */}
+              <path className="hole-cta__rimback" d="M388 172 C388 167.5 420 167.5 420 172" />
+            </g>
 
-            {/* The pin. */}
-            <line className="hole-cta__pin" x1="404" y1="60" x2="404" y2="172" />
+            {/* The pin, tucked into the cup. */}
+            <line className="hole-cta__pin" x1="404" y1="60" x2="404" y2="170" />
             <path
               className="hole-cta__flag"
               d="M404 64 C424 60 436 72 452 67 C447 79 447 85 452 97 C436 92 424 103 404 99 Z"
@@ -67,6 +80,14 @@ export function HoleCTA({ onStart }: { onStart: () => void }) {
                 <circle className="hole-cta__dimple" cx="4" cy="3" r="1.1" />
               </g>
             </g>
+
+            {/* The front lip — the near grass rim that swallows the ball as it drops.
+                Drawn after the ball so it occludes it on the way down. */}
+            <path
+              className="hole-cta__lip"
+              d="M387 172 C392 178.5 416 178.5 421 172 L421 200 L387 200 Z"
+            />
+            <path className="hole-cta__rimfront" d="M387 172 C392 178.5 416 178.5 421 172" />
 
             {/* Celebration: a shock ring and confetti fired from the cup as it drops. */}
             <circle className="hole-cta__burst" cx="404" cy="172" r="7" />
