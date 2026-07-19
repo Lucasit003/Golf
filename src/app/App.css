@@ -123,7 +123,8 @@
   background: #93b645;
 }
 
-/* A stamped milestone mark — survey character. */
+/* A stamped hole mark — the finishing hole, echoing the flag in the hero.
+   Survey character, not a live figure. */
 .masthead__stamp {
   display: inline-grid;
   place-items: center;

@@ -97,7 +97,7 @@ export function App() {
               Library
             </button>
           </nav>
-          <span className="masthead__stamp data">M0</span>
+          <span className="masthead__stamp data" aria-hidden="true">18</span>
           <Settings />
         </div>
       </header>
