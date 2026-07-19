@@ -205,11 +205,14 @@
   .masthead__mark {
     gap: var(--gap-1);
   }
+  /* Three nav items + the mark won't fit a phone alongside the wordmark, so the
+     mark carries the brand here; the SETJI'S SWINGS wordmark returns on wider
+     screens. This also kills the horizontal overflow that made scrolling wobble. */
   .masthead__wordmark {
-    font-size: 0.74rem;
+    display: none;
   }
   .masthead__logo {
-    height: 1.9rem;
+    height: 2rem;
   }
   .masthead__glyph,
   .masthead__stamp {
