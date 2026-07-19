@@ -100,8 +100,8 @@
   animation: putt-roll 1350ms cubic-bezier(0.25, 0.85, 0.4, 1) 250ms forwards;
 }
 .is-in .hole-cta__sink {
-  /* Fires ~120ms after it arrives — a short teeter, then it drops in. */
-  animation: ball-sink 520ms cubic-bezier(0.4, 0, 0.75, 0.45) 1720ms forwards;
+  /* Fires ~120ms after it arrives — settles, then drops into the cup. */
+  animation: ball-sink 430ms cubic-bezier(0.4, 0, 0.7, 0.5) 1720ms forwards;
 }
 
 @keyframes putt-roll {
@@ -114,24 +114,19 @@
 }
 
 @keyframes ball-sink {
+  /* No downward slide — in a top-down view that reads as sinking through the
+     grass. The ball shrinks and fades straight into the cup where it stops, so
+     it disappears INTO the hole. */
   0% {
-    transform: translate(0, 0) scale(1);
+    transform: scale(1);
     opacity: 1;
   }
-  /* Teeters on the lip. */
-  28% {
-    transform: translate(0, 3px) scale(0.94);
+  45% {
+    transform: scale(0.68);
     opacity: 1;
   }
-  /* Drops down into the cup — stays full-bodied as the near rim swallows it, so
-     it reads as falling in rather than shrinking away. */
-  72% {
-    transform: translate(0, 11px) scale(0.55);
-    opacity: 1;
-  }
-  /* Gone into the dark. Fades only at the very end, fully behind the rim. */
   100% {
-    transform: translate(0, 15px) scale(0.3);
+    transform: scale(0.04);
     opacity: 0;
   }
 }
@@ -149,7 +144,7 @@
   transform-origin: center;
 }
 .is-in .hole-cta__burst {
-  animation: cup-burst 620ms var(--ease-out) 2300ms forwards;
+  animation: cup-burst 620ms var(--ease-out) 2200ms forwards;
 }
 @keyframes cup-burst {
   0% {
@@ -169,7 +164,7 @@
   transform-origin: center;
 }
 .is-in .hole-cta__piece {
-  animation: confetti-fly 1000ms cubic-bezier(0.22, 0.7, 0.3, 1) 2340ms forwards;
+  animation: confetti-fly 1000ms cubic-bezier(0.22, 0.7, 0.3, 1) 2260ms forwards;
 }
 @keyframes confetti-fly {
   0% {
@@ -216,7 +211,7 @@
     animation: none;
   }
   .hole-cta__sink {
-    transform: translate(0, 15px) scale(0.3);
+    transform: scale(0.04);
     opacity: 0;
     animation: none;
   }
