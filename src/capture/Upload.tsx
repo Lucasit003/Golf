@@ -4,6 +4,7 @@ import { Readout } from '../components/Readout'
 import { ScrubBar, type ScrubStation } from './ScrubBar'
 import { useTransportKeys } from '../lib/useTransportKeys'
 import { usePrefs } from '../app/prefs'
+import { useLocker } from '../locker/store'
 import { useExtraction } from '../pose/useExtraction'
 import { drawSkeleton, drawPolyline, type Ctx2D } from '../pose/skeleton'
 import { handTracePoints } from '../pose/trace'
@@ -81,6 +82,7 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
   const [duration, setDuration] = useState(0)
   const [playing, setPlaying] = useState(false)
   const { prefs } = usePrefs()
+  const { earnKey } = useLocker()
   const [rate, setRate] = useState<number>(prefs.defaultSpeed)
   const { state: extraction, run: runExtraction, reset: resetExtraction, hydrate } = useExtraction()
   const swing = extraction.status === 'done' ? extraction.swing : null
@@ -179,6 +181,9 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
     setEvents(null)
     setSelectedEvent(null)
     setClips((prev) => ({ ...prev, [angle]: { file, src: url, events: null, result: null } }))
+    // Filming a swing earns a locker key — the one reward tied to actually
+    // using the survey. Cosmetic only; it never touches a measurement.
+    earnKey()
   }
 
   // Swap to the other angle, saving the current one's clip + survey so nothing

@@ -123,17 +123,37 @@
   background: #93b645;
 }
 
-/* A stamped hole mark — the finishing hole, echoing the flag in the hero.
-   Survey character, not a live figure. */
-.masthead__stamp {
-  display: inline-grid;
-  place-items: center;
-  min-width: 2.25rem;
-  padding: 0.15rem 0.4rem;
-  border: var(--line-rest) solid rgba(242, 240, 230, 0.22);
-  border-radius: var(--radius);
+/* The locker chip — your crest and key count, a profile corner. Opens the
+   locker. Sits on the dark masthead, so it reads in cream. */
+.masthead__locker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.2rem 0.55rem 0.2rem 0.35rem;
+  background: rgba(242, 240, 230, 0.06);
+  border: var(--line-rest) solid rgba(242, 240, 230, 0.18);
+  border-radius: 999px;
+  color: rgba(242, 240, 230, 0.82);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.masthead__locker:hover,
+.masthead__locker.is-active {
+  background: rgba(242, 240, 230, 0.12);
+  border-color: rgba(242, 240, 230, 0.4);
+}
+.masthead__locker-crest {
+  width: 18px;
+  height: 20px;
+  display: block;
+}
+.masthead__locker-keys {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
   font-size: 0.8125rem;
-  color: rgba(242, 240, 230, 0.68);
+  font-weight: 600;
+  color: var(--cream);
 }
 
 /* Settings gear inherits currentColor — keep it legible on the dark bar. */
@@ -215,8 +235,15 @@
   .masthead__logo {
     height: 2rem;
   }
-  .masthead__glyph,
-  .masthead__stamp {
+  .masthead__glyph {
+    display: none;
+  }
+  /* The chip keeps just the key count on phones; the crest returns on wider
+     screens. Keeps the header from overflowing the viewport. */
+  .masthead__locker {
+    padding: 0.15rem 0.5rem;
+  }
+  .masthead__locker-crest {
     display: none;
   }
   .masthead__meta {

@@ -3,12 +3,16 @@ import { Landing } from '../pages/Landing'
 import { Upload } from '../capture/Upload'
 import { CompareStudio, type ReferenceSeed } from '../capture/CompareStudio'
 import { ScrollRule } from '../components/ScrollRule'
+import { useLocker } from '../locker/store'
+import { Crest } from '../locker/Avatar'
 
 // The library pulls in the Supabase client; load it only when opened so the
-// landing and survey stay light.
+// landing and survey stay light. The locker is small but self-contained, so it
+// splits out too.
 const Community = lazy(() =>
   import('../community/Community').then((m) => ({ default: m.Community })),
 )
+const Locker = lazy(() => import('../locker/Locker').then((m) => ({ default: m.Locker })))
 import { Settings } from './Settings'
 import './App.css'
 
@@ -19,13 +23,14 @@ import './App.css'
  * lives below this in context; there's nothing to hold yet.
  */
 
-type View = 'landing' | 'upload' | 'compare' | 'library'
+type View = 'landing' | 'upload' | 'compare' | 'library' | 'locker'
 
 const TITLES: Record<View, string> = {
   landing: "Setji's Swings — swing survey",
   upload: "Survey · Setji's Swings",
   compare: "Compare · Setji's Swings",
   library: "Library · Setji's Swings",
+  locker: "Locker · Setji's Swings",
 }
 
 export function App() {
@@ -106,7 +111,7 @@ export function App() {
               Library
             </button>
           </nav>
-          <span className="masthead__stamp data" aria-hidden="true">18</span>
+          <LockerChip active={view === 'locker'} onOpen={() => setView('locker')} />
           <Settings />
         </div>
       </header>
@@ -123,6 +128,10 @@ export function App() {
               onCompareWith={(ref) => goCompare(ref)}
             />
           </Suspense>
+        ) : view === 'locker' ? (
+          <Suspense fallback={<p className="app__loading label">Loading the locker…</p>}>
+            <Locker onFilm={() => setView('upload')} />
+          </Suspense>
         ) : (
           <Upload onBack={() => setView('landing')} onCompare={() => goCompare()} />
         )}
@@ -135,5 +144,28 @@ export function App() {
         </span>
       </footer>
     </div>
+  )
+}
+
+/*
+ * The locker entry: your crest and key count in the masthead, the way a profile
+ * chip sits in the corner of an app. Tapping it opens the locker. Kept out of
+ * the main nav so the survey stays the front door.
+ */
+function LockerChip({ active, onOpen }: { active: boolean; onOpen: () => void }) {
+  const { state } = useLocker()
+  return (
+    <button
+      className={`masthead__locker${active ? ' is-active' : ''}`}
+      onClick={onOpen}
+      aria-label={`Your locker — ${state.keys} keys`}
+      aria-current={active ? 'page' : undefined}
+    >
+      <Crest equip={state.equip} className="masthead__locker-crest" />
+      <span className="masthead__locker-keys data">
+        <span aria-hidden="true">🔑</span>
+        {state.keys}
+      </span>
+    </button>
   )
 }
