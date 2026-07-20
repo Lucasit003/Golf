@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { Landing } from '../pages/Landing'
 import { Upload } from '../capture/Upload'
-import { CompareStudio } from '../capture/CompareStudio'
+import { CompareStudio, type ReferenceSeed } from '../capture/CompareStudio'
 import { ScrollRule } from '../components/ScrollRule'
 
 // The library pulls in the Supabase client; load it only when opened so the
@@ -30,7 +30,16 @@ const TITLES: Record<View, string> = {
 
 export function App() {
   const [view, setView] = useState<View>('landing')
+  // A reference clip carried into the compare studio (e.g. from the library).
+  const [compareRef, setCompareRef] = useState<ReferenceSeed | null>(null)
   const mounted = useRef(false)
+
+  // Enter the compare studio, optionally seeded with a reference swing. Opening
+  // it any other way (nav, landing) clears a stale seed.
+  function goCompare(ref: ReferenceSeed | null = null) {
+    setCompareRef(ref)
+    setView('compare')
+  }
 
   // Per-view page title, and move focus to the main region when the view
   // changes (not on first load) so keyboard and screen-reader users land in the
@@ -84,7 +93,7 @@ export function App() {
             </button>
             <button
               className={`masthead__link${view === 'compare' ? ' is-active' : ''}`}
-              onClick={() => setView('compare')}
+              onClick={() => goCompare()}
               aria-current={view === 'compare' ? 'page' : undefined}
             >
               Compare
@@ -104,15 +113,18 @@ export function App() {
 
       <main className="app__main" id="main" tabIndex={-1}>
         {view === 'landing' ? (
-          <Landing onStart={() => setView('upload')} onCompare={() => setView('compare')} />
+          <Landing onStart={() => setView('upload')} onCompare={() => goCompare()} />
         ) : view === 'compare' ? (
-          <CompareStudio onBack={() => setView('upload')} />
+          <CompareStudio onBack={() => setView('upload')} initialReference={compareRef} />
         ) : view === 'library' ? (
           <Suspense fallback={<p className="app__loading label">Loading the library…</p>}>
-            <Community onBack={() => setView('landing')} />
+            <Community
+              onBack={() => setView('landing')}
+              onCompareWith={(ref) => goCompare(ref)}
+            />
           </Suspense>
         ) : (
-          <Upload onBack={() => setView('landing')} onCompare={() => setView('compare')} />
+          <Upload onBack={() => setView('landing')} onCompare={() => goCompare()} />
         )}
       </main>
 

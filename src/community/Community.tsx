@@ -28,7 +28,13 @@ const SKILLS: { v: SkillLevel; label: string }[] = [
   { v: 'pro', label: 'Pro' },
 ]
 
-export function Community({ onBack }: { onBack: () => void }) {
+export function Community({
+  onBack,
+  onCompareWith,
+}: {
+  onBack: () => void
+  onCompareWith?: (ref: { url: string; label: string }) => void
+}) {
   const [swings, setSwings] = useState<SwingCard[]>([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
@@ -79,7 +85,7 @@ export function Community({ onBack }: { onBack: () => void }) {
         ) : (
           <ul className="swing-grid">
             {swings.map((s) => (
-              <SwingTile key={s.id} swing={s} />
+              <SwingTile key={s.id} swing={s} onCompareWith={onCompareWith} />
             ))}
           </ul>
         )}
@@ -94,9 +100,17 @@ export function Community({ onBack }: { onBack: () => void }) {
   )
 }
 
-function SwingTile({ swing }: { swing: SwingCard }) {
+function SwingTile({
+  swing,
+  onCompareWith,
+}: {
+  swing: SwingCard
+  onCompareWith?: (ref: { url: string; label: string }) => void
+}) {
   const angle = ANGLES.find((a) => a.v === swing.angle)?.label ?? swing.angle
   const skill = SKILLS.find((s) => s.v === swing.skill_level)?.label
+  // A short label for the compare well: caption if any, else the angle + level.
+  const refLabel = swing.caption?.trim() || [angle, skill].filter(Boolean).join(' · ')
   return (
     <li className="swing-tile">
       <div className="swing-tile__video">
@@ -113,6 +127,14 @@ function SwingTile({ swing }: { swing: SwingCard }) {
         {swing.tempo ? <span className="swing-tile__tag data">{swing.tempo.toFixed(1)}:1</span> : null}
       </div>
       {swing.caption ? <p className="swing-tile__caption">{swing.caption}</p> : null}
+      {onCompareWith && swing.videoUrl ? (
+        <button
+          className="swing-tile__compare"
+          onClick={() => onCompareWith({ url: swing.videoUrl as string, label: refLabel })}
+        >
+          Compare with mine <span aria-hidden="true">⇄</span>
+        </button>
+      ) : null}
     </li>
   )
 }

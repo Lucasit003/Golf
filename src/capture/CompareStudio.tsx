@@ -14,18 +14,34 @@ import './CompareStudio.css'
  * shared, normalized playhead; the other follows it proportionally, so address
  * lines up with address and impact with impact even when the swings are different
  * lengths. Frame-step and ½/¼/0.1× speeds let you study the two together.
+ *
+ * The reference well can also be seeded from the community library: opening
+ * Compare from a shared swing streams that clip (a short-lived signed URL) into
+ * well B, so you can hold your move against a better one. Your own swing still
+ * never leaves the device.
  */
 
 const SPEEDS = [1, 0.5, 0.25, 0.1] as const
 const STEP = 1 / 60
 
-export function CompareStudio({ onBack }: { onBack: () => void }) {
+/** A reference clip seeded from outside — currently a community-library swing. */
+export type ReferenceSeed = { url: string; label: string }
+
+export function CompareStudio({
+  onBack,
+  initialReference,
+}: {
+  onBack: () => void
+  initialReference?: ReferenceSeed | null
+}) {
   const vA = useRef<HTMLVideoElement>(null)
   const vB = useRef<HTMLVideoElement>(null)
   const raf = useRef<number>(0)
 
   const [srcA, setSrcA] = useState<string | null>(null)
-  const [srcB, setSrcB] = useState<string | null>(null)
+  // Well B can be seeded from the library; that URL is remote, not an object URL.
+  const [srcB, setSrcB] = useState<string | null>(initialReference?.url ?? null)
+  const [refLabel, setRefLabel] = useState<string | null>(initialReference?.label ?? null)
   const [durA, setDurA] = useState(0)
   const [durB, setDurB] = useState(0)
   const [pos, setPos] = useState(0) // shared normalized playhead, 0–1
@@ -34,8 +50,8 @@ export function CompareStudio({ onBack }: { onBack: () => void }) {
   const [rate, setRate] = useState<number>(prefs.defaultSpeed)
 
   useEffect(() => () => {
-    if (srcA) URL.revokeObjectURL(srcA)
-    if (srcB) URL.revokeObjectURL(srcB)
+    revokeIfLocal(srcA)
+    revokeIfLocal(srcB)
     if (raf.current) cancelAnimationFrame(raf.current)
   }, [srcA, srcB])
 
@@ -61,13 +77,14 @@ export function CompareStudio({ onBack }: { onBack: () => void }) {
     if (!file) return
     const url = URL.createObjectURL(file)
     if (which === 'a') {
-      if (srcA) URL.revokeObjectURL(srcA)
+      revokeIfLocal(srcA)
       setSrcA(url)
       setDurA(0)
     } else {
-      if (srcB) URL.revokeObjectURL(srcB)
+      revokeIfLocal(srcB)
       setSrcB(url)
       setDurB(0)
+      setRefLabel(null) // a hand-picked file replaces the library reference
     }
     setPos(0)
   }
@@ -159,6 +176,7 @@ export function CompareStudio({ onBack }: { onBack: () => void }) {
         />
         <Well
           label="Reference"
+          sublabel={refLabel}
           videoRef={vB}
           src={srcB}
           onPick={(f) => pick('b', f)}
@@ -206,16 +224,22 @@ export function CompareStudio({ onBack }: { onBack: () => void }) {
       </div>
 
       <p className="compare__note">
-        Both clips stay on your device — nothing is uploaded. Load your swing and a reference
-        you have the rights to (your own footage or a licensed clip). The reference follows
-        your playhead, so address lines up with address.
+        Your swing stays on your device — nothing is uploaded. Load it next to a reference:
+        your own footage, a licensed clip, or a swing from the community library. The reference
+        follows your playhead, so address lines up with address.
       </p>
     </section>
   )
 }
 
+/** Revoke only object URLs; library references are plain remote URLs. */
+function revokeIfLocal(url: string | null) {
+  if (url && url.startsWith('blob:')) URL.revokeObjectURL(url)
+}
+
 function Well({
   label,
+  sublabel,
   videoRef,
   src,
   onPick,
@@ -223,6 +247,7 @@ function Well({
   onClickVideo,
 }: {
   label: string
+  sublabel?: string | null
   videoRef: React.RefObject<HTMLVideoElement>
   src: string | null
   onPick: (f: File | undefined) => void
@@ -232,7 +257,10 @@ function Well({
   return (
     <div className="compare__well">
       <div className="compare__well-head">
-        <span className="label">{label}</span>
+        <span className="label">
+          {label}
+          {sublabel ? <span className="compare__well-from"> · {sublabel}</span> : null}
+        </span>
         {src ? (
           <label className="compare__swap">
             <input type="file" accept="video/*" onChange={(e) => onPick(e.target.files?.[0])} />

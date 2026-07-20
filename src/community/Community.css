@@ -238,6 +238,29 @@
   font-size: 0.9rem;
   line-height: 1.4;
 }
+/* Pull a shared swing into the compare studio as the reference. */
+.swing-tile__compare {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.6rem;
+  background: none;
+  border: var(--line-rest) solid var(--fairway);
+  border-radius: var(--radius);
+  color: var(--fairway);
+  font-family: var(--face-body);
+  font-size: var(--t-label);
+  text-transform: uppercase;
+  letter-spacing: var(--track-label);
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+.swing-tile__compare:hover {
+  background: var(--fairway);
+  color: var(--cream);
+}
 
 .community__actions {
   display: flex;

@@ -45,6 +45,13 @@
   border-bottom: var(--line-active) solid var(--ink);
 }
 
+/* When the reference is seeded from the library, name it after "Reference". */
+.compare__well-from {
+  color: var(--ink-soft);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
 .compare__swap {
   position: relative;
   font-size: var(--t-label);
