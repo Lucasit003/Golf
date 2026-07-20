@@ -304,11 +304,6 @@
   background: var(--fairway);
   color: var(--cream);
 }
-.locker__dupe {
-  color: color-mix(in srgb, var(--cream) 70%, transparent);
-  margin: var(--gap-2) 0 var(--gap-3);
-}
-
 .locker__confetti {
   position: absolute;
   inset: 0;
