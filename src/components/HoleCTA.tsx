@@ -46,12 +46,11 @@ export function HoleCTA({ onStart }: { onStart: () => void }) {
           <svg viewBox="0 0 520 250" fill="none" className="hole-cta__svg">
             <defs>
               <linearGradient id="hc-ground" gradientUnits="userSpaceOnUse" x1="0" y1="70" x2="0" y2="250">
-                {/* rises from the panel colour at the horizon (no hard edge)
-                    through a sunlit crest around the hole, then deepens */}
-                <stop offset="0" stopColor="#10291b" />
-                <stop offset="0.22" stopColor="#1f4f34" />
-                <stop offset="0.5" stopColor="#2f6b41" />
-                <stop offset="1" stopColor="#123320" />
+                {/* soft daylight: gently lit toward the horizon, easing darker
+                    into the foreground — no bright band across the middle */}
+                <stop offset="0" stopColor="#245a3c" />
+                <stop offset="0.55" stopColor="#1a4831" />
+                <stop offset="1" stopColor="#113320" />
               </linearGradient>
               <radialGradient id="hc-depth" cx="0.5" cy="0.32" r="0.85">
                 <stop offset="0" stopColor="#123020" />
@@ -112,6 +111,9 @@ export function HoleCTA({ onStart }: { onStart: () => void }) {
                     filter="url(#hc-softshadow)"
                   />
                   <circle className="hole-cta__ball" r="10.5" style={{ fill: ballColor }} />
+                  {/* a soft top-left sheen so the ball reads as a lit sphere,
+                      whatever colour it's wearing */}
+                  <ellipse cx="-3.5" cy="-4" rx="3.6" ry="2.7" fill="rgba(255,255,255,0.45)" />
                   <circle className="hole-cta__dimple" cx="-3.5" cy="-3" r="1.2" />
                   <circle className="hole-cta__dimple" cx="2.5" cy="-2" r="1.2" />
                   <circle className="hole-cta__dimple" cx="0" cy="2.5" r="1.2" />
