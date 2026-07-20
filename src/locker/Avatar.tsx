@@ -46,11 +46,12 @@ export function Golfer({ equip, className }: { equip: Equip; className?: string 
       <line x1="60" y1="83" x2="60" y2="104" stroke="rgba(0,0,0,.12)" strokeWidth="1.4" />
       <circle cx="60" cy="90" r="1.1" fill="rgba(0,0,0,.2)" />
       <circle cx="60" cy="97" r="1.1" fill="rgba(0,0,0,.2)" />
-      {/* arms, slightly bent, with hands */}
-      <path d="M40 82 Q33 90 35 104 L40 104 Q40 92 44 84 Z" fill={shirt} />
-      <path d="M78 82 Q85 90 84 102 L79 102 Q79 92 74 84 Z" fill={shirt} />
-      <rect x="33" y="102" width="9" height="12" rx="4.5" fill={SKIN} />
-      <rect x="79" y="100" width="9" height="12" rx="4.5" fill={SKIN} />
+      {/* arms: sleeves hanging from the shoulders, overlapping the torso so
+          they read as attached, each ending in a hand */}
+      <rect x="35" y="80" width="11" height="27" rx="5.5" fill={shirt} />
+      <rect x="74" y="80" width="11" height="26" rx="5.5" fill={shirt} />
+      <rect x="36" y="104" width="9" height="11" rx="4.5" fill={SKIN} />
+      <rect x="79" y="101" width="9" height="11" rx="4.5" fill={SKIN} />
       {/* head + ears */}
       <circle cx="60" cy="57" r="16.5" fill={SKIN} />
       <circle cx="44.5" cy="57" r="2.5" fill={SKIN} />
