@@ -55,11 +55,11 @@ export function Golfer({ equip, className }: { equip: Equip; className?: string 
       <circle cx="60" cy="57" r="16.5" fill={SKIN} />
       <circle cx="44.5" cy="57" r="2.5" fill={SKIN} />
       <circle cx="75.5" cy="57" r="2.5" fill={SKIN} />
-      {/* cap: rounded dome + a short peak angled toward the viewer */}
-      <path d="M44 54 Q45 37 60 37 Q75 37 76 54 Z" fill={cap} />
-      <path d="M47 54 Q59 52 72 55 Q71 60 60 60.5 Q49 60 47 54 Z" fill={cap} />
-      <path d="M49 55 Q59 55 70 56 Q69 58 60 58.2 Q51 58 49 55 Z" fill="rgba(0,0,0,.12)" />
-      <circle cx="60" cy="40" r="2" fill="rgba(0,0,0,.16)" />
+      {/* cap: a rounded dome and a short, shallow peak — worn straight */}
+      <path d="M45 53 Q46 38 60 38 Q74 38 75 53 Z" fill={cap} />
+      <path d="M48 53 L72 53 Q71 57 60 57.4 Q49 57 48 53 Z" fill={cap} />
+      <path d="M48 53 L72 53 Q71 54.6 60 54.8 Q49 54.6 48 53 Z" fill="rgba(0,0,0,.1)" />
+      <circle cx="60" cy="40" r="1.8" fill="rgba(0,0,0,.16)" />
       {/* ball at the feet */}
       <circle cx="30" cy="157" r="5" fill={ball} />
       <circle cx="28" cy="155" r="1.3" fill="rgba(255,255,255,.6)" />
