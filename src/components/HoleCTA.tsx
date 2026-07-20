@@ -38,8 +38,12 @@ export function HoleCTA({ onStart }: { onStart: () => void }) {
         <div className="hole-cta__scene" aria-hidden="true">
           <svg viewBox="0 0 520 250" fill="none" className="hole-cta__svg">
             <defs>
-              <linearGradient id="hc-ground" gradientUnits="userSpaceOnUse" x1="0" y1="118" x2="0" y2="250">
-                <stop offset="0" stopColor="#2f6b41" />
+              <linearGradient id="hc-ground" gradientUnits="userSpaceOnUse" x1="0" y1="70" x2="0" y2="250">
+                {/* rises from the panel colour at the horizon (no hard edge)
+                    through a sunlit crest around the hole, then deepens */}
+                <stop offset="0" stopColor="#10291b" />
+                <stop offset="0.22" stopColor="#1f4f34" />
+                <stop offset="0.5" stopColor="#2f6b41" />
                 <stop offset="1" stopColor="#123320" />
               </linearGradient>
               <radialGradient id="hc-depth" cx="0.5" cy="0.32" r="0.85">
@@ -54,10 +58,20 @@ export function HoleCTA({ onStart }: { onStart: () => void }) {
               <filter id="hc-softshadow" x="-80%" y="-80%" width="260%" height="260%">
                 <feGaussianBlur stdDeviation="2" />
               </filter>
+              {/* Fades the field's edges into the panel so the green has no
+                  rectangular border on any layout — solid around the hole. */}
+              <radialGradient id="hc-fieldfade" cx="0.52" cy="0.52" r="0.72">
+                <stop offset="0" stopColor="#fff" />
+                <stop offset="0.62" stopColor="#fff" />
+                <stop offset="1" stopColor="#000" />
+              </radialGradient>
+              <mask id="hc-fieldmask">
+                <rect x="0" y="70" width="520" height="180" fill="url(#hc-fieldfade)" />
+              </mask>
             </defs>
 
-            {/* the green, receding to a horizon */}
-            <rect x="0" y="118" width="520" height="132" fill="url(#hc-ground)" />
+            {/* the green, rising from a soft horizon that melts into the panel */}
+            <rect x="0" y="70" width="520" height="180" fill="url(#hc-ground)" mask="url(#hc-fieldmask)" />
 
             {/* the hole, cut flush into the surface */}
             <ellipse cx="368" cy="150" rx="22" ry="7.5" fill="url(#hc-depth)" />

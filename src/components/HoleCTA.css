@@ -1,7 +1,11 @@
 .hole-cta {
   position: relative;
   overflow: hidden;
-  background: var(--fairway-deep);
+  /* A green field, not a dark box: the panel reads as one continuous green so
+     the scene's ground melts into it rather than floating as a bright rect.
+     The top matches the scene's horizon colour; the lower half stays deep
+     enough to keep the cream copy legible. */
+  background: linear-gradient(180deg, #10291b 0%, #143a24 46%, #17432b 100%);
   color: var(--cream);
   border-radius: var(--radius);
 }
@@ -217,6 +221,10 @@
   }
   .hole-cta__scene {
     order: -1;
-    max-width: 24rem;
+    /* Bleed the field to the panel edges so the green fills the width and
+       reads as the ground, not a centred card. Clipped by the panel's
+       overflow:hidden. */
+    margin-inline: calc(-1 * var(--gap-3));
+    margin-top: calc(-1 * var(--gap-5));
   }
 }
