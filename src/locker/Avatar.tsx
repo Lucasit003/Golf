@@ -27,9 +27,13 @@ export function Golfer({ equip, className }: { equip: Equip; className?: string 
       <line x1="84" y1="108" x2="106" y2="150" stroke="#3a2f22" strokeWidth="3.6" strokeLinecap="round" />
       <line x1="84" y1="108" x2="106" y2="150" stroke={club} strokeWidth="2" strokeLinecap="round" />
       <path d="M103 150 L115 150 L113 156 L104 156 Z" fill={club} />
-      {/* shoes */}
-      <ellipse cx="49" cy="161" rx="11" ry="5.5" fill={SHOE} />
-      <ellipse cx="71" cy="161" rx="11" ry="5.5" fill={SHOE} />
+      {/* shoes — white golf sneakers with a dark sole and a lace hint */}
+      <path d="M37 163 Q36 166 40 166 L56 166 Q59 166 58 162 Z" fill={SHOE} />
+      <path d="M38 163 Q37 154 47 154 Q55 154.5 56 161 L56 163 Z" fill="#eceadf" />
+      <path d="M47 157 l6 1.4 M47 159.4 l6 1.4" stroke="rgba(0,0,0,.15)" strokeWidth="1" fill="none" />
+      <path d="M83 163 Q84 166 80 166 L64 166 Q61 166 62 162 Z" fill={SHOE} />
+      <path d="M82 163 Q83 154 73 154 Q65 154.5 64 161 L64 163 Z" fill="#eceadf" />
+      <path d="M73 157 l-6 1.4 M73 159.4 l-6 1.4" stroke="rgba(0,0,0,.15)" strokeWidth="1" fill="none" />
       {/* lower legs */}
       <rect x="43" y="139" width="11" height="20" rx="4" fill={SKIN} />
       <rect x="66" y="139" width="11" height="20" rx="4" fill={SKIN} />
