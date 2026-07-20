@@ -79,7 +79,7 @@ export function HoleCTA({ onStart }: { onStart: () => void }) {
             />
 
             {/* the ball: rolls in from the left, up to the lip, then drops in */}
-            <g transform="translate(343 141)">
+            <g transform="translate(348 141)">
               <g className="hole-cta__roller">
                 <g className="hole-cta__drop">
                   <ellipse
