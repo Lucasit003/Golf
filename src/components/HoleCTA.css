@@ -67,7 +67,7 @@
    the edge and eases it down into the cup, where it fades out. ────── */
 
 .hole-cta__roller {
-  transform: translateX(-330px);
+  transform: translateX(-332px);
 }
 .is-in .hole-cta__roller {
   animation: hc-roll 1500ms cubic-bezier(0.25, 0.85, 0.4, 1) 300ms forwards;
@@ -92,16 +92,16 @@
   }
   /* tips over the near edge it's resting on */
   24% {
-    transform: translate(6px, 4px) rotate(42deg) scale(1);
+    transform: translate(5px, 4px) rotate(42deg) scale(1);
     opacity: 1;
   }
   /* then eases down into the cup, over the liner — a slower fall */
   60% {
-    transform: translate(12px, 16px) rotate(96deg) scale(0.86);
+    transform: translate(11px, 16px) rotate(96deg) scale(0.86);
     opacity: 1;
   }
   100% {
-    transform: translate(15px, 33px) rotate(130deg) scale(0.42);
+    transform: translate(13px, 33px) rotate(130deg) scale(0.42);
     opacity: 0;
   }
 }
