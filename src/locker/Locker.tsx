@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Button } from '../design/Button'
 import { useLocker } from './store'
 import { Golfer, Crest } from './Avatar'
@@ -24,12 +24,11 @@ const BURST = Array.from({ length: 16 }, (_, i) => {
   }
 })
 
-type Phase = { kind: 'idle' } | { kind: 'crate' } | { kind: 'prize'; result: OpenResult }
+type Phase = { kind: 'idle' } | { kind: 'spin'; result: OpenResult }
 
 export function Locker({ onFilm }: { onFilm: () => void }) {
   const { state, level, tier, toNext, open, equip } = useLocker()
   const [phase, setPhase] = useState<Phase>({ kind: 'idle' })
-  const [shaking, setShaking] = useState(false)
 
   const into = state.swings % 5
   const complete = collectionComplete(state)
@@ -37,20 +36,9 @@ export function Locker({ onFilm }: { onFilm: () => void }) {
 
   function startOpen() {
     if (!canOpen) return
-    setShaking(false)
-    setPhase({ kind: 'crate' })
-  }
-
-  function tapCrate() {
-    if (shaking) return
-    setShaking(true)
-    // spend the key + roll only once the crate is actually struck
+    // Roll now, then let the reel spin to the result — case-opening style.
     const result = open()
-    window.setTimeout(() => {
-      if (result) setPhase({ kind: 'prize', result })
-      else setPhase({ kind: 'idle' })
-      setShaking(false)
-    }, 850)
+    if (result) setPhase({ kind: 'spin', result })
   }
 
   function close() {
@@ -132,27 +120,87 @@ export function Locker({ onFilm }: { onFilm: () => void }) {
         ))}
       </ul>
 
-      {phase.kind !== 'idle' && (
+      {phase.kind === 'spin' && (
         <div className="locker__overlay" role="dialog" aria-modal="true" aria-label="Opening a crate">
           <div className="locker__reveal">
-            {phase.kind === 'crate' ? (
-              <>
-                <button
-                  className={`locker__crate${shaking ? ' is-shaking' : ''}`}
-                  onClick={tapCrate}
-                  aria-label="Open the crate"
-                >
-                  <CrateArt />
-                </button>
-                <p className="locker__tap label">{shaking ? '' : 'Tap the crate to open'}</p>
-              </>
-            ) : (
-              <Prize result={phase.result} onClose={close} />
-            )}
+            <Spinner result={phase.result} onClose={close} />
           </div>
         </div>
       )}
     </section>
+  )
+}
+
+// ── Case-opening reel ────────────────────────────────────────────────────────
+// A strip of cosmetics scrolls past a centre marker, decelerating to land your
+// pull under it — the CS:GO case feel. The reel items are just for show; the one
+// at WIN_INDEX is the real reward.
+const TILE = 84 // px, tile width
+const PITCH = TILE + 8 // width + gap
+const WIN_INDEX = 39
+const STRIP_LEN = 44
+const SPIN_MS = 4200
+
+function buildStrip(won: Item): Item[] {
+  const strip = Array.from({ length: STRIP_LEN }, () => ITEMS[Math.floor(Math.random() * ITEMS.length)])
+  strip[WIN_INDEX] = won
+  return strip
+}
+
+function Spinner({ result, onClose }: { result: OpenResult; onClose: () => void }) {
+  const viewRef = useRef<HTMLDivElement>(null)
+  const [tiles] = useState(() => buildStrip(result.item))
+  const [offset, setOffset] = useState<number | null>(null)
+  const [landed, setLanded] = useState(false)
+  const reduce =
+    typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  useEffect(() => {
+    const vw = viewRef.current?.clientWidth ?? 320
+    // Centre the winning tile under the marker, with a little jitter for realism.
+    const target = vw / 2 - (WIN_INDEX * PITCH + TILE / 2) + (Math.random() * 24 - 12)
+    if (reduce) {
+      setOffset(target)
+      setLanded(true)
+      return
+    }
+    const raf = requestAnimationFrame(() => setOffset(target))
+    const t = window.setTimeout(() => setLanded(true), SPIN_MS + 150)
+    return () => {
+      cancelAnimationFrame(raf)
+      window.clearTimeout(t)
+    }
+  }, [reduce])
+
+  return (
+    <div className="locker__spin">
+      <div className="locker__reel-view" ref={viewRef}>
+        <span className="locker__marker" aria-hidden="true" />
+        <div
+          className="locker__reel"
+          style={{
+            transform: `translateX(${offset ?? 0}px)`,
+            transition: offset != null && !reduce ? `transform ${SPIN_MS}ms cubic-bezier(0.08, 0.75, 0.2, 1)` : 'none',
+          }}
+        >
+          {tiles.map((it, i) => (
+            <div
+              key={i}
+              className={`locker__tile${i === WIN_INDEX && landed ? ' is-won' : ''}`}
+              style={{ ['--rc' as string]: RARITY[it.rarity].color }}
+            >
+              <span className="locker__tile-sw" style={{ background: it.color }} />
+            </div>
+          ))}
+        </div>
+      </div>
+      {landed ? (
+        <Prize result={result} onClose={onClose} />
+      ) : (
+        <p className="locker__tap label">Opening…</p>
+      )}
+    </div>
   )
 }
 
@@ -223,15 +271,3 @@ function Prize({ result, onClose }: { result: OpenResult; onClose: () => void })
   )
 }
 
-function CrateArt() {
-  return (
-    <svg viewBox="0 0 100 100" aria-hidden="true">
-      <rect x="16" y="30" width="68" height="56" rx="6" fill="#22381f" stroke="#d9a441" strokeWidth="2.5" />
-      <rect x="16" y="30" width="68" height="18" rx="6" fill="#2f4a2a" stroke="#d9a441" strokeWidth="2.5" />
-      <rect x="44" y="30" width="12" height="56" fill="#d9a441" opacity="0.85" />
-      <rect x="16" y="52" width="68" height="6" fill="#d9a441" opacity="0.5" />
-      <circle cx="50" cy="56" r="9" fill="#2f4a2a" stroke="#d9a441" strokeWidth="2" />
-      <path d="M50 51 v10 M46 56 h8" stroke="#d9a441" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  )
-}
