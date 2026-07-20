@@ -1,6 +1,8 @@
 import type { CSSProperties } from 'react'
 import { Button } from '../design/Button'
 import { useReveal } from '../lib/useReveal'
+import { useLocker } from '../locker/store'
+import { ITEMS_BY_ID } from '../locker/model'
 import './HoleCTA.css'
 
 /*
@@ -31,6 +33,11 @@ const CONFETTI = [
 
 export function HoleCTA({ onStart }: { onStart: () => void }) {
   const { ref, shown } = useReveal<HTMLDivElement>('0px 0px -20% 0px')
+  // The ball that drops wears your equipped ball skin — a small live payoff for
+  // the locker. The default (Tour White) is cream, so first-time visitors see
+  // no change.
+  const { state } = useLocker()
+  const ballColor = ITEMS_BY_ID[state.equip.ball]?.color
 
   return (
     <section className="hole-cta" ref={ref}>
@@ -104,7 +111,7 @@ export function HoleCTA({ onStart }: { onStart: () => void }) {
                     ry="2.3"
                     filter="url(#hc-softshadow)"
                   />
-                  <circle className="hole-cta__ball" r="10.5" fill="url(#hc-ball)" />
+                  <circle className="hole-cta__ball" r="10.5" style={{ fill: ballColor }} />
                   <circle className="hole-cta__dimple" cx="-3.5" cy="-3" r="1.2" />
                   <circle className="hole-cta__dimple" cx="2.5" cy="-2" r="1.2" />
                   <circle className="hole-cta__dimple" cx="0" cy="2.5" r="1.2" />
