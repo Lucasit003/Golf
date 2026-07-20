@@ -68,12 +68,10 @@ export function LockerProvider({ children }: { children: ReactNode }) {
   }
 
   function open(): OpenResult | null {
-    let result: OpenResult | null = null
-    setState((s) => {
-      if (s.keys < 1) return s
-      result = openCratePure(s, Math.random)
-      return result.state
-    })
+    // Roll outside the state updater so it stays pure (no double-roll under
+    // StrictMode). The crate always spends the key and yields a new cosmetic.
+    const result = openCratePure(state, Math.random)
+    if (result) setState(result.state)
     return result
   }
 

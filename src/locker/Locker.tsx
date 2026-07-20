@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Button } from '../design/Button'
 import { useLocker } from './store'
 import { Golfer, Crest } from './Avatar'
-import { ITEMS, RARITY, type Item, type OpenResult } from './model'
+import { ITEMS, RARITY, collectionComplete, type Item, type OpenResult } from './model'
 import './Locker.css'
 
 /*
@@ -32,9 +32,11 @@ export function Locker({ onFilm }: { onFilm: () => void }) {
   const [shaking, setShaking] = useState(false)
 
   const into = state.swings % 5
+  const complete = collectionComplete(state)
+  const canOpen = state.keys >= 1 && !complete
 
   function startOpen() {
-    if (state.keys < 1) return
+    if (!canOpen) return
     setShaking(false)
     setPhase({ kind: 'crate' })
   }
@@ -96,16 +98,18 @@ export function Locker({ onFilm }: { onFilm: () => void }) {
           </div>
 
           <div className="locker__actions">
-            <Button variant="fairway" onClick={startOpen} disabled={state.keys < 1}>
-              Open a crate
-              <span className="locker__cost">1 🔑</span>
+            <Button variant="fairway" onClick={startOpen} disabled={!canOpen}>
+              {complete ? 'Collection complete' : 'Open a crate'}
+              {complete ? null : <span className="locker__cost">1 🔑</span>}
             </Button>
             <Button variant="line" onClick={onFilm}>
               {state.keys < 1 ? 'Film a swing to earn a key' : 'Film a swing · +1 🔑'}
             </Button>
           </div>
           <p className="label locker__odds">
-            Crate odds — 60% common · 26% rare · 11% epic · 3% legendary. Duplicates refund the key.
+            {complete
+              ? 'Every cosmetic collected — nice. Keys keep stacking for whatever lands next.'
+              : 'Crate odds — 60% common · 26% rare · 11% epic · 3% legendary. Every crate is one you don’t have yet.'}
           </p>
         </div>
       </div>
@@ -187,7 +191,7 @@ function Cell({
 }
 
 function Prize({ result, onClose }: { result: OpenResult; onClose: () => void }) {
-  const { item, isNew } = result
+  const { item } = result
   const rc = RARITY[item.rarity].color
   return (
     <div className="locker__prize" style={{ ['--rc' as string]: rc }}>
@@ -211,13 +215,9 @@ function Prize({ result, onClose }: { result: OpenResult; onClose: () => void })
         {RARITY[item.rarity].label}
       </p>
       <p className="locker__prizename">{item.name}</p>
-      {isNew ? (
-        <span className="locker__new label">New — equipped</span>
-      ) : (
-        <p className="locker__dupe label">Duplicate · key refunded</p>
-      )}
+      <span className="locker__new label">New — equipped</span>
       <Button variant="cream" onClick={onClose}>
-        {isNew ? 'Nice' : 'Close'}
+        Nice
       </Button>
     </div>
   )

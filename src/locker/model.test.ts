@@ -3,14 +3,14 @@ import {
   ITEMS,
   RARITY,
   STARTER,
-  rollReward,
+  rollNewReward,
   openCrate,
+  collectionComplete,
   equipItem,
   levelFor,
   tierFor,
   swingsToNext,
   type LockerState,
-  type Rarity,
 } from './model'
 
 // A deterministic generator so reward rolls are reproducible in tests.
@@ -34,39 +34,41 @@ describe('locker catalog', () => {
   })
 })
 
-describe('rollReward', () => {
-  it('a roll near zero yields the first (common) tier', () => {
-    const item = rollReward(seeded([0.0001, 0]))
-    expect(item.rarity).toBe<Rarity>('common')
+describe('rollNewReward', () => {
+  it('never returns an item the player already owns', () => {
+    // Own every common; a common-biased roll must skip to a rarity with stock.
+    const owned = ITEMS.filter((i) => i.rarity === 'common').map((i) => i.id)
+    const item = rollNewReward(owned, seeded([0.0001, 0]))
+    expect(item).not.toBeNull()
+    expect(owned).not.toContain(item!.id)
   })
 
-  it('a roll near one yields the last (legendary) tier', () => {
-    // First call selects the rarity bucket; 0.999 lands past the common/rare/epic
-    // weights into legendary. Second call picks within the pool.
-    const item = rollReward(seeded([0.999, 0]))
-    expect(item.rarity).toBe<Rarity>('legendary')
+  it('returns null once everything is owned', () => {
+    const all = ITEMS.map((i) => i.id)
+    expect(rollNewReward(all, seeded([0.5]))).toBeNull()
   })
 })
 
 describe('openCrate', () => {
   const base: LockerState = { ...STARTER, keys: 1, owned: [...STARTER.owned], equip: { ...STARTER.equip } }
 
-  it('a new item is added, auto-equipped, and costs the key', () => {
-    // Force a legendary (not in the starter kit) so it's guaranteed new.
+  it('always pulls a new item, auto-equips it, and spends the key', () => {
     const r = openCrate(base, seeded([0.999, 0]))
-    expect(r.isNew).toBe(true)
-    expect(r.state.owned).toContain(r.item.id)
-    expect(r.state.equip[r.item.slot]).toBe(r.item.id)
-    expect(r.state.keys).toBe(0)
+    expect(r).not.toBeNull()
+    expect(base.owned).not.toContain(r!.item.id) // brand new
+    expect(r!.state.owned).toContain(r!.item.id)
+    expect(r!.state.equip[r!.item.slot]).toBe(r!.item.id)
+    expect(r!.state.keys).toBe(0) // key spent, never refunded
   })
 
-  it('a duplicate refunds the key and leaves ownership unchanged', () => {
-    // 0.0001 → common bucket; the common pool's first item is a starter item,
-    // so this is a guaranteed duplicate.
-    const r = openCrate(base, seeded([0.0001, 0]))
-    expect(r.isNew).toBe(false)
-    expect(r.state.keys).toBe(1) // spent one, refunded one
-    expect(r.state.owned.length).toBe(base.owned.length)
+  it('refuses to open with no key', () => {
+    expect(openCrate({ ...base, keys: 0 }, seeded([0.5]))).toBeNull()
+  })
+
+  it('refuses to open once the collection is complete', () => {
+    const done: LockerState = { ...base, owned: ITEMS.map((i) => i.id) }
+    expect(collectionComplete(done)).toBe(true)
+    expect(openCrate(done, seeded([0.5]))).toBeNull()
   })
 })
 

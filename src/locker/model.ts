@@ -96,36 +96,56 @@ export function swingsToNext(swings: number): number {
   return 5 - (swings % 5)
 }
 
-/** Roll a reward: pick a rarity by weight, then a uniform item within it. */
-export function rollReward(rand: () => number): Item {
-  const total = (Object.keys(RARITY) as Rarity[]).reduce((s, r) => s + RARITY[r].weight, 0)
+/** Is everything in the catalog already owned? */
+export function collectionComplete(state: LockerState): boolean {
+  return state.owned.length >= ITEMS.length
+}
+
+/**
+ * Roll a reward the player doesn't own yet: pick a rarity by weight (among the
+ * rarities that still have something unowned), then a uniform item within it.
+ * Returns null once the whole catalog is collected. Only pulling new items means
+ * a crate always gives you something — no wasted, refunded duplicate pulls.
+ */
+export function rollNewReward(owned: string[], rand: () => number): Item | null {
+  const ownedSet = new Set(owned)
+  const available = ITEMS.filter((i) => !ownedSet.has(i.id))
+  if (available.length === 0) return null
+  const rarities = Array.from(new Set(available.map((i) => i.rarity)))
+  const total = rarities.reduce((s, r) => s + RARITY[r].weight, 0)
   let roll = rand() * total
-  let picked: Rarity = 'common'
-  for (const r of Object.keys(RARITY) as Rarity[]) {
+  let picked: Rarity = rarities[0]
+  for (const r of rarities) {
     roll -= RARITY[r].weight
     if (roll <= 0) {
       picked = r
       break
     }
   }
-  const pool = ITEMS.filter((i) => i.rarity === picked)
+  const pool = available.filter((i) => i.rarity === picked)
   return pool[Math.min(pool.length - 1, Math.floor(rand() * pool.length))]
 }
 
-export type OpenResult = { state: LockerState; item: Item; isNew: boolean }
+export type OpenResult = { state: LockerState; item: Item }
 
 /**
- * Spend one key and open a crate. A new item is added and auto-equipped; a
- * duplicate refunds the key so no pull is ever wasted. Callers must ensure
- * there's a key to spend.
+ * Spend one key and open a crate. The pull is always a cosmetic you don't own
+ * yet, added and auto-equipped. Returns null when there's no key to spend or the
+ * collection is already complete — so the key only leaves when a reward comes in.
  */
-export function openCrate(state: LockerState, rand: () => number): OpenResult {
-  const item = rollReward(rand)
-  const isNew = !state.owned.includes(item.id)
-  const owned = isNew ? [...state.owned, item.id] : state.owned
-  const equip = isNew ? { ...state.equip, [item.slot]: item.id } : state.equip
-  const keys = state.keys - 1 + (isNew ? 0 : 1)
-  return { state: { ...state, owned, equip, keys }, item, isNew }
+export function openCrate(state: LockerState, rand: () => number): OpenResult | null {
+  if (state.keys < 1) return null
+  const item = rollNewReward(state.owned, rand)
+  if (!item) return null
+  return {
+    state: {
+      ...state,
+      keys: state.keys - 1,
+      owned: [...state.owned, item.id],
+      equip: { ...state.equip, [item.slot]: item.id },
+    },
+    item,
+  }
 }
 
 /** Equip an owned item into its slot; a no-op if it isn't owned. */
