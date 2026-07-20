@@ -11,6 +11,7 @@ import { handTracePoints } from '../pose/trace'
 import { downloadSwing } from '../pose/exportSwing'
 import { detectEvents } from '../metrics/events'
 import { tempoRatio, compareState } from '../metrics'
+import { swingScore } from '../metrics/score'
 import type { Swing, SwingEvents } from '../pose/types'
 import { ConfidenceTrack } from './ConfidenceTrack'
 import './Upload.css'
@@ -293,6 +294,11 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
         : 'out-of-range'
       : undefined
 
+  // The swing score: how close this swing sits to the tour numbers. Fed only the
+  // metrics we actually measure — tempo today — so it's honest now and grows on
+  // its own as the angle metrics are validated. Null until there's a reading.
+  const score = swingScore({ tempo: tempoVal })
+
   function jumpToEvent(key: keyof SwingEvents) {
     if (!events) return
     setSelectedEvent(key)
@@ -418,6 +424,23 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
                   ? 'Solid — the joints are clearly visible.'
                   : 'Low — measurements from this clip would be unreliable. Re-film brighter, fuller in frame.'}
               </div>
+            </div>
+          ) : null}
+
+          {score ? (
+            <div className="swing-score">
+              <div className="swing-score__top">
+                <span className="label">Swing score</span>
+                <span className="label swing-score__tier">{score.label}</span>
+              </div>
+              <div className="swing-score__val data">
+                {score.score}
+                <span className="swing-score__max">/ 100</span>
+              </div>
+              <p className="label swing-score__note">
+                How close this swing sits to the tour numbers. Tempo-weighted for now — the
+                angle metrics join in once they're validated.
+              </p>
             </div>
           ) : null}
 

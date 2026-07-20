@@ -167,6 +167,42 @@
   color: var(--ink-soft);
   margin-left: 0.1em;
 }
+
+/* The headline swing score — the number the leaderboard ranks by. */
+.swing-score {
+  padding: var(--gap-3) 0;
+  border-bottom: var(--line-rest) solid var(--paper-edge);
+}
+.swing-score__top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.swing-score__tier {
+  color: var(--fairway);
+}
+.swing-score__val {
+  font-family: var(--face-display);
+  font-size: 2.75rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--ink);
+  margin-top: var(--gap-1);
+}
+.swing-score__max {
+  font-family: var(--face-data);
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--ink-soft);
+  margin-left: 0.35em;
+}
+.swing-score__note {
+  color: var(--ink-soft);
+  line-height: 1.5;
+  margin-top: var(--gap-1);
+  text-transform: none;
+  letter-spacing: 0;
+}
 .track-confidence__note {
   margin-top: var(--gap-1);
   text-transform: none;
