@@ -1,11 +1,10 @@
 .hole-cta {
   position: relative;
   overflow: hidden;
-  /* A green field, not a dark box: the panel reads as one continuous green so
-     the scene's ground melts into it rather than floating as a bright rect.
-     The top matches the scene's horizon colour; the lower half stays deep
-     enough to keep the cream copy legible. */
-  background: linear-gradient(180deg, #10291b 0%, #143a24 46%, #17432b 100%);
+  /* One flat green surface for the whole section. The flag/hole illustration
+     sits directly on it (no separate lit field), so the scene and the copy read
+     as the same ground and nothing pops. Cream copy stays legible on it. */
+  background: var(--fairway-deep);
   color: var(--cream);
   border-radius: var(--radius);
 }

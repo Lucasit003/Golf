@@ -45,39 +45,19 @@ export function HoleCTA({ onStart }: { onStart: () => void }) {
         <div className="hole-cta__scene" aria-hidden="true">
           <svg viewBox="0 0 520 250" fill="none" className="hole-cta__svg">
             <defs>
-              <linearGradient id="hc-ground" gradientUnits="userSpaceOnUse" x1="0" y1="70" x2="0" y2="250">
-                {/* soft daylight: gently lit toward the horizon, easing darker
-                    into the foreground — no bright band across the middle */}
-                <stop offset="0" stopColor="#245a3c" />
-                <stop offset="0.55" stopColor="#1a4831" />
-                <stop offset="1" stopColor="#113320" />
-              </linearGradient>
               <radialGradient id="hc-depth" cx="0.5" cy="0.32" r="0.85">
                 <stop offset="0" stopColor="#123020" />
                 <stop offset="0.5" stopColor="#08160d" />
                 <stop offset="1" stopColor="#020503" />
               </radialGradient>
-              <radialGradient id="hc-ball" cx="0.38" cy="0.32" r="0.75">
-                <stop offset="0" stopColor="#ffffff" />
-                <stop offset="1" stopColor="#d7dccf" />
-              </radialGradient>
               <filter id="hc-softshadow" x="-80%" y="-80%" width="260%" height="260%">
                 <feGaussianBlur stdDeviation="2" />
               </filter>
-              {/* Fades the field's edges into the panel so the green has no
-                  rectangular border on any layout — solid around the hole. */}
-              <radialGradient id="hc-fieldfade" cx="0.52" cy="0.52" r="0.72">
-                <stop offset="0" stopColor="#fff" />
-                <stop offset="0.62" stopColor="#fff" />
-                <stop offset="1" stopColor="#000" />
-              </radialGradient>
-              <mask id="hc-fieldmask">
-                <rect x="0" y="70" width="520" height="180" fill="url(#hc-fieldfade)" />
-              </mask>
             </defs>
 
-            {/* the green, rising from a soft horizon that melts into the panel */}
-            <rect x="0" y="70" width="520" height="180" fill="url(#hc-ground)" mask="url(#hc-fieldmask)" />
+            {/* No separate ground: the flag and hole sit straight on the section's
+                own green (--fairway-deep), so the scene shares one surface with the
+                copy and never reads as a lit box popping off the panel. */}
 
             {/* the hole, cut flush into the surface */}
             <ellipse cx="368" cy="150" rx="22" ry="7.5" fill="url(#hc-depth)" />
@@ -121,12 +101,13 @@ export function HoleCTA({ onStart }: { onStart: () => void }) {
               </g>
             </g>
 
-            {/* near ground: flat grass in front of the hole, drawn on top so the
-                ball drops behind it — seamless with the ground, no mound. */}
+            {/* near ground: the grass in front of the hole, filled with the exact
+                section colour and drawn on top so the ball drops behind it — an
+                invisible lip against a matching surface, no mound. */}
             <path
               className="hole-cta__lip"
               d="M346 150.5 C354 158.5 382 158.5 390 150.5 L393 188 L343 188 Z"
-              fill="url(#hc-ground)"
+              fill="var(--fairway-deep)"
             />
 
             {/* celebration */}
