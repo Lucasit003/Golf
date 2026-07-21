@@ -45,3 +45,33 @@ create policy "leaderboard own update"
   on public.leaderboard for update
   using (auth.uid() = user_id)
   with check (auth.uid() = user_id);
+
+-- ── Profiles: one reserved username per account ──────────────────────────────
+-- A username belongs to exactly one account and can't be taken by anyone else.
+-- 3–20 chars, letters/numbers/underscore. Case-insensitively unique, so "Birdie"
+-- and "birdie" can't both exist.
+create table if not exists public.profiles (
+  user_id    uuid primary key references auth.users(id) on delete cascade,
+  username   text not null check (char_length(username) between 3 and 20 and username ~ '^[A-Za-z0-9_]+$'),
+  created_at timestamptz not null default now()
+);
+
+create unique index if not exists profiles_username_lower_idx on public.profiles (lower(username));
+
+alter table public.profiles enable row level security;
+
+drop policy if exists "profiles public read" on public.profiles;
+create policy "profiles public read"
+  on public.profiles for select
+  using (true);
+
+drop policy if exists "profiles own insert" on public.profiles;
+create policy "profiles own insert"
+  on public.profiles for insert
+  with check (auth.uid() = user_id);
+
+drop policy if exists "profiles own update" on public.profiles;
+create policy "profiles own update"
+  on public.profiles for update
+  using (auth.uid() = user_id)
+  with check (auth.uid() = user_id);

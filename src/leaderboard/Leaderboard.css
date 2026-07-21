@@ -84,6 +84,39 @@
   color: var(--fairway);
 }
 
+.lb__auth-tabs {
+  display: flex;
+  gap: var(--gap-1);
+  border-bottom: var(--line-rest) solid var(--paper-edge);
+  margin-bottom: var(--gap-1);
+}
+.lb__auth-tabs button {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 0.4rem 0.2rem;
+  margin-bottom: -1px;
+  color: var(--ink-soft);
+  font-family: var(--face-body);
+  font-weight: 500;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+.lb__auth-tabs button.is-active {
+  color: var(--ink);
+  border-bottom-color: var(--fairway);
+}
+.lb__link {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--fairway);
+  font-family: var(--face-body);
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
 .lb__row-form {
   display: flex;
   gap: var(--gap-2);

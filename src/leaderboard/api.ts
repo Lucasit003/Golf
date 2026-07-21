@@ -13,6 +13,44 @@ export type Entry = {
   best_label: string | null
 }
 
+export type Profile = { user_id: string; username: string }
+
+/** The signed-in player's reserved username, or null if they haven't set one. */
+export async function getProfile(userId: string): Promise<Profile | null> {
+  const sb = supabase()
+  if (!sb) return null
+  try {
+    const { data } = await sb
+      .from('profiles')
+      .select('user_id,username')
+      .eq('user_id', userId)
+      .maybeSingle()
+    return (data as Profile) ?? null
+  } catch {
+    return null
+  }
+}
+
+/** Reserve a username. Fails if it's already taken (case-insensitively). */
+export async function claimUsername(userId: string, username: string): Promise<{ error?: string }> {
+  const sb = supabase()
+  if (!sb) return { error: CONFIG_ERROR }
+  const name = username.trim()
+  if (!/^[A-Za-z0-9_]{3,20}$/.test(name)) {
+    return { error: '3–20 letters, numbers or underscores.' }
+  }
+  try {
+    const { error } = await sb.from('profiles').insert({ user_id: userId, username: name })
+    if (error) {
+      if (/duplicate|unique/i.test(error.message)) return { error: 'That username is taken — try another.' }
+      return { error: friendly(error.message) }
+    }
+    return {}
+  } catch {
+    return { error: NET_ERROR }
+  }
+}
+
 const CONFIG_ERROR = 'The leaderboard isn’t connected yet. Try again in a moment.'
 const NET_ERROR = 'Couldn’t reach the leaderboard. Check your connection and retry.'
 

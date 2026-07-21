@@ -34,19 +34,45 @@ export function useAuth(): { session: Session | null; ready: boolean } {
   return { session, ready }
 }
 
-/** Email a magic sign-in link that returns to the app. */
-export async function sendMagicLink(email: string): Promise<{ error?: string }> {
+const NOT_CONNECTED = 'The leaderboard isn’t connected yet.'
+
+/**
+ * Create an account with an email + password. Returns needsConfirm when the
+ * project requires email confirmation (no session yet) — the player must click
+ * the confirmation email before they can post.
+ */
+export async function signUpWithPassword(
+  email: string,
+  password: string,
+): Promise<{ needsConfirm?: boolean; error?: string }> {
   const sb = supabase()
-  if (!sb) return { error: 'The leaderboard isn’t connected yet.' }
+  if (!sb) return { error: NOT_CONNECTED }
   try {
-    const { error } = await sb.auth.signInWithOtp({
+    const { data, error } = await sb.auth.signUp({
       email,
+      password,
       options: { emailRedirectTo: window.location.origin },
     })
     if (error) return { error: error.message }
+    return { needsConfirm: !data.session }
+  } catch {
+    return { error: 'Couldn’t create the account. Check your connection and try again.' }
+  }
+}
+
+/** Sign in with an existing email + password. */
+export async function signInWithPassword(
+  email: string,
+  password: string,
+): Promise<{ error?: string }> {
+  const sb = supabase()
+  if (!sb) return { error: NOT_CONNECTED }
+  try {
+    const { error } = await sb.auth.signInWithPassword({ email, password })
+    if (error) return { error: error.message }
     return {}
   } catch {
-    return { error: 'Couldn’t send the link. Check your connection and try again.' }
+    return { error: 'Couldn’t sign in. Check your connection and try again.' }
   }
 }
 
