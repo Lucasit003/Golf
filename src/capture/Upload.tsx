@@ -676,8 +676,9 @@ function EmptyState({ onPick }: { onPick: (file: File | undefined) => void }) {
               every measurement
             </li>
             <li>
-              <span className="capture-guide__k">Frame rate</span> 240fps if your phone has
-              it; 120 works, 60 is marginal
+              <span className="capture-guide__k">Frame rate</span> set it as high as your phone
+              allows — 60fps works, and 120 or 240 (slow-mo) sharpens the fastest part of the
+              swing. Higher is better, but any of these is fine
             </li>
             <li>
               <span className="capture-guide__k">Framing</span> your whole body, feet to

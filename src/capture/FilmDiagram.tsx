@@ -18,10 +18,17 @@ export function FilmDiagram({ className }: { className?: string }) {
       {/* the ball */}
       <circle cx="150" cy="92" r="4.5" fill="var(--cream)" stroke="var(--ink)" strokeWidth="1" />
 
-      {/* the golfer at address, seen from above: head, shoulders, arms to the ball */}
-      <line x1="150" y1="66" x2="150" y2="88" stroke="var(--ink-soft)" strokeWidth="2" strokeLinecap="round" />
-      <rect x="132" y="56" width="36" height="9" rx="4.5" fill="var(--ink-soft)" />
-      <circle cx="150" cy="50" r="7.5" fill="var(--ink-soft)" />
+      {/* the golfer at address, from above: feet spread at the back, body leaning
+          over the ball, head and hands down at the line */}
+      <ellipse cx="139" cy="50" rx="5.5" ry="3.2" fill="var(--ink-soft)" />
+      <ellipse cx="161" cy="50" rx="5.5" ry="3.2" fill="var(--ink-soft)" />
+      <path
+        d="M135 53 Q130 65 137 79 L163 79 Q170 65 165 53 Q150 59 135 53 Z"
+        fill="var(--ink-soft)"
+      />
+      <circle cx="150" cy="82" r="6.5" fill="var(--ink-soft)" />
+      <path d="M140 77 Q149 85 150 89" stroke="var(--ink-soft)" strokeWidth="2.2" strokeLinecap="round" />
+      <path d="M160 77 Q151 85 150 89" stroke="var(--ink-soft)" strokeWidth="2.2" strokeLinecap="round" />
 
       {/* down-the-line camera: behind the ball, on the line, looking down it */}
       <g>
