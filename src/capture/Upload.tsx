@@ -85,6 +85,9 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
   const [videoError, setVideoError] = useState<string | null>(null)
   const [current, setCurrent] = useState(0)
   const [duration, setDuration] = useState(0)
+  // The clip's own shape, so the well fits it instead of forcing 4:3 — most
+  // phone swings are portrait and were being squeezed into a thin center strip.
+  const [aspect, setAspect] = useState<number | null>(null)
   const [playing, setPlaying] = useState(false)
   const { prefs } = usePrefs()
   const { earnKey } = useLocker()
@@ -183,6 +186,7 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
     setSrc(url)
     setCurrent(0)
     setDuration(0)
+    setAspect(null)
     resetExtraction()
     setEvents(null)
     setSelectedEvent(null)
@@ -367,7 +371,10 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
     <section className="upload" aria-label="Swing survey">
       <div className="upload__grid">
         {/* The drawing — video well, with the skeleton overlay. */}
-        <div className={`upload__well${src ? '' : ' upload__well--empty'}`}>
+        <div
+          className={`upload__well${src ? '' : ' upload__well--empty'}`}
+          style={src && aspect ? { aspectRatio: String(aspect) } : undefined}
+        >
           {src ? (
             <>
               <video
@@ -378,6 +385,11 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
                 controls={false}
                 onLoadedMetadata={(e) => {
                   setDuration(e.currentTarget.duration)
+                  const w = e.currentTarget.videoWidth
+                  const h = e.currentTarget.videoHeight
+                  // Fit the well to the clip, but clamp so an ultra-tall or ultra-wide
+                  // export can't blow out the layout.
+                  if (w && h) setAspect(Math.max(0.5, Math.min(1.9, w / h)))
                   e.currentTarget.playbackRate = rate
                 }}
                 onTimeUpdate={(e) => setCurrent(e.currentTarget.currentTime)}
