@@ -142,6 +142,72 @@
   color: var(--ink-soft);
 }
 
+/* Soft "wrong clip / wrong slot" nudge in the margin. Amber by default, warmer
+   red when there's no golfer at all. Never blocks — it's a heads-up. */
+.framing-hint {
+  display: flex;
+  gap: var(--gap-2);
+  align-items: flex-start;
+  margin: var(--gap-2) 0 var(--gap-3);
+  padding: var(--gap-2) var(--gap-3);
+  border: var(--line-rest) solid color-mix(in srgb, var(--near) 45%, var(--paper-edge));
+  border-left: 3px solid var(--near);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--near) 8%, transparent);
+}
+.framing-hint--no-pose {
+  border-color: color-mix(in srgb, var(--flag) 45%, var(--paper-edge));
+  border-left-color: var(--flag);
+  background: color-mix(in srgb, var(--flag) 8%, transparent);
+}
+.framing-hint__mark {
+  flex: 0 0 auto;
+  display: grid;
+  place-content: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 50%;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--paper);
+  background: var(--near);
+}
+.framing-hint--no-pose .framing-hint__mark {
+  background: var(--flag);
+}
+.framing-hint__body {
+  min-width: 0;
+}
+.framing-hint__title {
+  font-weight: 500;
+  color: var(--ink);
+}
+.framing-hint__msg {
+  margin-top: 2px;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+.framing-hint__action {
+  margin-top: var(--gap-2);
+  padding: 0.35rem 0.7rem;
+  border: var(--line-rest) solid var(--paper-edge);
+  border-radius: var(--radius);
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--face-body);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.framing-hint__action:hover:not(:disabled) {
+  border-color: var(--near);
+}
+.framing-hint__action:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 /* Confidence readout in the margin. */
 .track-confidence {
   padding: var(--gap-3) 0;

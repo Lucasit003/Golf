@@ -13,6 +13,7 @@ import { detectEvents } from '../metrics/events'
 import { tempoRatio, compareState } from '../metrics'
 import { swingScore } from '../metrics/score'
 import { useBestScore } from '../metrics/bestScore'
+import { checkFraming } from '../pose/framing'
 import type { Swing, SwingEvents } from '../pose/types'
 import { ConfidenceTrack } from './ConfidenceTrack'
 import { FilmDiagram } from './FilmDiagram'
@@ -240,6 +241,43 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
     }
   }
 
+  // Relocate the current clip (and its survey) to the other angle slot — the fix
+  // offered when a clip looks like it landed in the wrong spot. Only used when the
+  // target slot is empty, so nothing gets clobbered.
+  function moveClipToAngle(next: Angle) {
+    if (next === angle || !src || busy) return
+    const cur = clips[angle]
+    if (!cur || clips[next]) return
+    const moved: ClipSnap = {
+      file: cur.file,
+      src,
+      events,
+      result:
+        extraction.status === 'done'
+          ? {
+              swing: extraction.swing,
+              confidence: extraction.confidence,
+              coverage: extraction.coverage,
+            }
+          : null,
+    }
+    setClips((prev) => ({ ...prev, [angle]: null, [next]: moved }))
+    setAngle(next)
+    setCurrent(0)
+    setDuration(0)
+    setSelectedEvent(null)
+    setOverlay('skeleton')
+    setSrc(moved.src)
+    setEvents(moved.events)
+    if (moved.result) {
+      restoringRef.current = true
+      hydrate(moved.result.swing, moved.result.confidence, moved.result.coverage)
+    } else {
+      restoringRef.current = false
+      resetExtraction()
+    }
+  }
+
   function seek(fraction: number) {
     const v = videoRef.current
     if (!v || !Number.isFinite(v.duration)) return
@@ -303,6 +341,12 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
   // its own as the angle metrics are validated. Null until there's a reading.
   const score = swingScore({ tempo: tempoVal })
   const { best, isNewBest } = useBestScore(score ? score.score : null)
+
+  // A soft "does this clip match the slot?" read, once the body is tracked. It
+  // catches a face-on clip dropped in the down-the-line slot, a clip with no
+  // golfer, or feet cropped out — surfaced as a gentle nudge, never a block.
+  const framing =
+    extraction.status === 'done' ? checkFraming(extraction.swing, angle, extraction.coverage) : null
 
   function jumpToEvent(key: keyof SwingEvents) {
     if (!events) return
@@ -431,6 +475,33 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
                     : 'no swing'}
             </span>
           </div>
+
+          {framing ? (
+            <div className={`framing-hint framing-hint--${framing.kind}`} role="status">
+              <span className="framing-hint__mark" aria-hidden="true">
+                {framing.kind === 'wrong-angle' ? '↺' : '!'}
+              </span>
+              <div className="framing-hint__body">
+                <p className="framing-hint__title">
+                  {framing.kind === 'no-pose'
+                    ? 'No golfer tracked'
+                    : framing.kind === 'cropped'
+                      ? 'Body is cut off'
+                      : 'This might be the wrong angle'}
+                </p>
+                <p className="framing-hint__msg">{framing.message}</p>
+                {framing.kind === 'wrong-angle' && framing.suggest && !clips[framing.suggest] ? (
+                  <button
+                    className="framing-hint__action"
+                    onClick={() => moveClipToAngle(framing.suggest!)}
+                    disabled={busy}
+                  >
+                    Move it to {framing.suggest === 'face_on' ? 'Face-on' : 'Down-the-line'}
+                  </button>
+                ) : null}
+              </div>
+            </div>
+          ) : null}
 
           {extraction.status === 'done' ? (
             <div className="track-confidence">
