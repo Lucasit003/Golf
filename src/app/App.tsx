@@ -13,6 +13,9 @@ const Community = lazy(() =>
   import('../community/Community').then((m) => ({ default: m.Community })),
 )
 const Locker = lazy(() => import('../locker/Locker').then((m) => ({ default: m.Locker })))
+const Leaderboard = lazy(() =>
+  import('../leaderboard/Leaderboard').then((m) => ({ default: m.Leaderboard })),
+)
 import { Settings } from './Settings'
 import './App.css'
 
@@ -23,7 +26,7 @@ import './App.css'
  * lives below this in context; there's nothing to hold yet.
  */
 
-type View = 'landing' | 'upload' | 'compare' | 'library' | 'locker'
+type View = 'landing' | 'upload' | 'compare' | 'library' | 'locker' | 'leaderboard'
 
 const TITLES: Record<View, string> = {
   landing: "Setji's Swings — swing survey",
@@ -31,6 +34,7 @@ const TITLES: Record<View, string> = {
   compare: "Compare · Setji's Swings",
   library: "Library · Setji's Swings",
   locker: "Locker · Setji's Swings",
+  leaderboard: "Leaderboard · Setji's Swings",
 }
 
 export function App() {
@@ -130,7 +134,11 @@ export function App() {
           </Suspense>
         ) : view === 'locker' ? (
           <Suspense fallback={<p className="app__loading label">Loading the locker…</p>}>
-            <Locker onFilm={() => setView('upload')} />
+            <Locker onFilm={() => setView('upload')} onLeaderboard={() => setView('leaderboard')} />
+          </Suspense>
+        ) : view === 'leaderboard' ? (
+          <Suspense fallback={<p className="app__loading label">Loading the leaderboard…</p>}>
+            <Leaderboard onBack={() => setView('locker')} onFilm={() => setView('upload')} />
           </Suspense>
         ) : (
           <Upload onBack={() => setView('landing')} onCompare={() => goCompare()} />

@@ -1,0 +1,211 @@
+.lb {
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding: var(--gap-5) var(--gap-4) var(--gap-6);
+}
+
+.lb__eyebrow {
+  color: var(--fairway);
+  margin-bottom: var(--gap-2);
+}
+.lb__title {
+  font-family: var(--face-display);
+  font-size: clamp(2rem, 5vw, 3rem);
+  color: var(--ink);
+  letter-spacing: var(--track-display);
+}
+.lb__lede {
+  margin: var(--gap-2) 0 var(--gap-4);
+  max-width: 40rem;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
+/* ── Your card ─────────────────────────────────────────────── */
+.lb__you-card {
+  background: var(--paper-deep);
+  border: var(--line-rest) solid var(--paper-edge);
+  border-radius: var(--radius);
+  padding: var(--gap-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-2);
+}
+.lb__you-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--gap-2);
+}
+.lb__you-title {
+  font-family: var(--face-display);
+  font-size: 1.15rem;
+  color: var(--ink);
+}
+.lb__you-sub {
+  color: var(--ink-soft);
+  margin-top: 2px;
+}
+.lb__signout {
+  background: none;
+  border: none;
+  color: var(--fairway);
+  cursor: pointer;
+  padding: 0;
+}
+.lb__note {
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+.lb__note--warn {
+  color: var(--near);
+}
+.lb__hint {
+  color: var(--ink-soft);
+}
+
+.lb__you-score {
+  display: flex;
+  align-items: baseline;
+  gap: var(--gap-2);
+  flex-wrap: wrap;
+}
+.lb__you-num {
+  font-family: var(--face-display);
+  font-weight: 700;
+  font-size: 2rem;
+  line-height: 1;
+  color: var(--ink);
+}
+.lb__you-best {
+  color: var(--ink-soft);
+}
+.lb__you-standing {
+  color: var(--fairway);
+}
+
+.lb__row-form {
+  display: flex;
+  gap: var(--gap-2);
+  align-items: stretch;
+}
+.lb__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0.55rem 0.7rem;
+  background: var(--paper);
+  border: var(--line-rest) solid var(--paper-edge);
+  border-radius: var(--radius);
+  color: var(--ink);
+  font-family: var(--face-body);
+  font-size: 0.95rem;
+}
+.lb__input:focus-visible {
+  outline: var(--line-active) solid var(--chalk);
+  outline-offset: 1px;
+}
+
+/* ── The board ─────────────────────────────────────────────── */
+.lb__board {
+  margin-top: var(--gap-5);
+}
+.lb__board-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: var(--gap-2);
+  padding-bottom: var(--gap-1);
+  border-bottom: var(--line-rest) solid var(--paper-edge);
+}
+.lb__refresh {
+  border: none;
+  background: none;
+  color: var(--fairway);
+  font-family: var(--face-body);
+  font-size: var(--t-label);
+  text-transform: uppercase;
+  letter-spacing: var(--track-label);
+  cursor: pointer;
+}
+.lb__refresh:disabled {
+  color: var(--ink-soft);
+  cursor: default;
+}
+
+.lb__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.lb__row {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-2);
+  padding: var(--gap-2) var(--gap-1);
+  border-bottom: var(--line-rest) solid var(--ink-line);
+}
+.lb__row.is-me {
+  background: color-mix(in srgb, var(--fairway) 10%, transparent);
+  border-radius: var(--radius);
+}
+.lb__rank {
+  flex: 0 0 2rem;
+  text-align: right;
+  font-size: 1rem;
+  color: var(--ink-soft);
+}
+.lb__rank--1 {
+  color: #e2b23c;
+}
+.lb__rank--2 {
+  color: #9aa7a0;
+}
+.lb__rank--3 {
+  color: #c0872a;
+}
+.lb__crest {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 22px;
+}
+.lb__crest-gap {
+  flex: 0 0 auto;
+  width: 20px;
+}
+.lb__handle {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--ink);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lb__you {
+  margin-left: 0.5em;
+  color: var(--fairway);
+}
+.lb__score {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5em;
+  font-size: 1.1rem;
+  color: var(--ink);
+}
+.lb__tier {
+  color: var(--ink-soft);
+}
+
+.lb__actions {
+  margin-top: var(--gap-4);
+}
+
+@media (max-width: 46rem) {
+  .lb {
+    padding: var(--gap-4) var(--gap-3) var(--gap-5);
+  }
+  .lb__tier {
+    display: none;
+  }
+}

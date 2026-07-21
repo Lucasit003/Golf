@@ -22,7 +22,13 @@ export function supabase(): SupabaseClient | null {
   if (!URL || !KEY) return null
   if (!client) {
     client = createClient(URL, KEY, {
-      auth: { persistSession: false },
+      // Sessions persist so a player stays signed in for the leaderboard, and the
+      // magic-link token in the return URL is picked up automatically.
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+      },
     })
   }
   return client

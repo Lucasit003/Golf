@@ -15,10 +15,24 @@
   letter-spacing: var(--track-display);
 }
 .locker__lede {
-  margin: var(--gap-2) 0 var(--gap-4);
+  margin: var(--gap-2) 0 var(--gap-2);
   max-width: 40rem;
   color: var(--ink-soft);
   line-height: 1.5;
+}
+.locker__leaderboard-link {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-bottom: var(--gap-4);
+  color: var(--fairway);
+  font-family: var(--face-body);
+  font-weight: 500;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+.locker__leaderboard-link:hover {
+  text-decoration: underline;
 }
 
 /* ── Profile: display case + stats ─────────────────────────── */

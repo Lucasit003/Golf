@@ -26,7 +26,7 @@ const BURST = Array.from({ length: 16 }, (_, i) => {
 
 type Phase = { kind: 'idle' } | { kind: 'spin'; result: OpenResult }
 
-export function Locker({ onFilm }: { onFilm: () => void }) {
+export function Locker({ onFilm, onLeaderboard }: { onFilm: () => void; onLeaderboard: () => void }) {
   const { state, level, tier, toNext, open, equip } = useLocker()
   const [phase, setPhase] = useState<Phase>({ kind: 'idle' })
 
@@ -54,6 +54,9 @@ export function Locker({ onFilm }: { onFilm: () => void }) {
           Film swings to earn keys, open crates for cosmetics, and kit out your golfer. It's all
           for looks — nothing here changes a measurement, and nothing leaves your device.
         </p>
+        <button className="locker__leaderboard-link" onClick={onLeaderboard}>
+          View the leaderboard <span aria-hidden="true">→</span>
+        </button>
       </header>
 
       <div className="locker__profile">
