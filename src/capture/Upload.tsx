@@ -12,6 +12,7 @@ import { downloadSwing } from '../pose/exportSwing'
 import { detectEvents } from '../metrics/events'
 import { tempoRatio, compareState } from '../metrics'
 import { swingScore } from '../metrics/score'
+import { useBestScore } from '../metrics/bestScore'
 import type { Swing, SwingEvents } from '../pose/types'
 import { ConfidenceTrack } from './ConfidenceTrack'
 import { FilmDiagram } from './FilmDiagram'
@@ -299,6 +300,7 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
   // metrics we actually measure — tempo today — so it's honest now and grows on
   // its own as the angle metrics are validated. Null until there's a reading.
   const score = swingScore({ tempo: tempoVal })
+  const { best, isNewBest } = useBestScore(score ? score.score : null)
 
   function jumpToEvent(key: keyof SwingEvents) {
     if (!events) return
@@ -437,6 +439,11 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
               <div className="swing-score__val data">
                 {score.score}
                 <span className="swing-score__max">/ 100</span>
+                {isNewBest ? (
+                  <span className="swing-score__best swing-score__best--new">★ New best</span>
+                ) : best != null ? (
+                  <span className="swing-score__best">Best {best}</span>
+                ) : null}
               </div>
               <p className="label swing-score__note">
                 How close this swing sits to the tour numbers. Tempo-weighted for now — the

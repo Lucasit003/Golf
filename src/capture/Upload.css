@@ -196,6 +196,19 @@
   color: var(--ink-soft);
   margin-left: 0.35em;
 }
+.swing-score__best {
+  font-family: var(--face-data);
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  margin-left: 0.6em;
+  vertical-align: 0.35em;
+}
+.swing-score__best--new {
+  color: var(--fairway);
+  font-weight: 500;
+}
 .swing-score__note {
   color: var(--ink-soft);
   line-height: 1.5;
