@@ -1,5 +1,5 @@
 /*
- * Setji's Swings service worker — makes the app usable offline once it's been opened.
+ * Setji's Swing service worker — makes the app usable offline once it's been opened.
  *
  * Conservative on purpose: navigations are network-first (so a new build is
  * always picked up when online), and same-origin static assets are cache-first

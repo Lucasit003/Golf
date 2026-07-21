@@ -1,4 +1,4 @@
-# Setji's Swings
+# Setji's Swing
 
 **▶︎ Open the app: https://golf-two-beta.vercel.app**
 

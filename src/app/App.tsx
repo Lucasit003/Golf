@@ -29,12 +29,12 @@ import './App.css'
 type View = 'landing' | 'upload' | 'compare' | 'library' | 'locker' | 'leaderboard'
 
 const TITLES: Record<View, string> = {
-  landing: "Setji's Swings — swing survey",
-  upload: "Survey · Setji's Swings",
-  compare: "Compare · Setji's Swings",
-  library: "Library · Setji's Swings",
-  locker: "Locker · Setji's Swings",
-  leaderboard: "Leaderboard · Setji's Swings",
+  landing: "Setji's Swing — swing survey",
+  upload: "Survey · Setji's Swing",
+  compare: "Compare · Setji's Swing",
+  library: "Library · Setji's Swing",
+  locker: "Locker · Setji's Swing",
+  leaderboard: "Leaderboard · Setji's Swing",
 }
 
 export function App() {
@@ -76,7 +76,7 @@ export function App() {
         <button
           className="masthead__mark"
           onClick={() => setView('landing')}
-          aria-label="Setji's Swings — home"
+          aria-label="Setji's Swing — home"
         >
           <img
             className="masthead__logo"
@@ -88,7 +88,7 @@ export function App() {
           />
           <span className="masthead__wordmark">
             <span className="masthead__wordmark-set">Setji's</span>{' '}
-            <span className="masthead__wordmark-swing">Swings</span>
+            <span className="masthead__wordmark-swing">Swing</span>
           </span>
         </button>
         <div className="masthead__meta">
@@ -146,7 +146,7 @@ export function App() {
       </main>
 
       <footer className="colophon">
-        <span className="label">Setji's Swings · a swing, surveyed</span>
+        <span className="label">Setji's Swing · a swing, surveyed</span>
         <span className="label colophon__note">
           Client-side · analysis runs on your device
         </span>
