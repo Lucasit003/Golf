@@ -353,16 +353,22 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
         : 'out-of-range'
       : undefined
 
-  // The swing score: how close this swing sits to the tour numbers. Fed only the
-  // metrics we actually measure — tempo today — so it's honest now and grows on
-  // its own as the angle metrics are validated. Null until there's a reading.
-  const score = swingScore({ tempo: tempoVal })
-  const { best, isNewBest } = useBestScore(score ? score.score : null)
-
   // The angle metrics, measured at the detected events. Estimates from a single
   // camera — each carries the catalog's confidence badge so a rough one reads as
   // rough. Recomputes as the user corrects the events below.
   const measures = swing && events ? computeSwingMetrics(swing.frames, events) : {}
+
+  // The swing score: how close this swing sits to the tour numbers. Fed tempo
+  // plus whatever the current angle can honestly measure — swingScore weights
+  // each by confidence, so tempo leads and the rough rotations only nudge. Null
+  // until there's a reading.
+  const scoreReadings: Partial<Record<BenchmarkId, number | null>> = { tempo: tempoVal }
+  for (const id of ANGLE_METRICS[angle]) {
+    const v = measures[id]
+    if (v != null) scoreReadings[id] = v
+  }
+  const score = swingScore(scoreReadings)
+  const { best, isNewBest } = useBestScore(score ? score.score : null)
 
   // A soft "does this clip match the slot?" read, once the body is tracked. It
   // catches a face-on clip dropped in the down-the-line slot, a clip with no
@@ -570,8 +576,9 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
                 ) : null}
               </div>
               <p className="label swing-score__note">
-                How close this swing sits to the tour numbers. Tempo-weighted for now — the
-                angle metrics join in once they're validated.
+                How close this swing sits to the tour numbers. Tempo leads; the angle
+                metrics count too, each weighted by how much we trust it — so a rough
+                estimate only nudges the total.
               </p>
             </div>
           ) : null}
