@@ -637,6 +637,24 @@
   content: ' ↑';
 }
 
+.capture-guide__diagram {
+  display: block;
+  width: 100%;
+  max-width: 22rem;
+  height: auto;
+  margin: var(--gap-3) 0 var(--gap-2);
+}
+.film-dia__t {
+  font-family: var(--face-data);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  fill: var(--ink-soft);
+  text-transform: uppercase;
+}
+.film-dia__t--key {
+  fill: var(--fairway);
+}
+
 .capture-guide__list {
   margin: var(--gap-2) 0 0;
   padding: 0;

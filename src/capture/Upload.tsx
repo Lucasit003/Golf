@@ -14,6 +14,7 @@ import { tempoRatio, compareState } from '../metrics'
 import { swingScore } from '../metrics/score'
 import type { Swing, SwingEvents } from '../pose/types'
 import { ConfidenceTrack } from './ConfidenceTrack'
+import { FilmDiagram } from './FilmDiagram'
 import './Upload.css'
 
 /*
@@ -662,6 +663,7 @@ function EmptyState({ onPick }: { onPick: (file: File | undefined) => void }) {
 
         <details className="capture-guide">
           <summary className="capture-guide__summary">How to film it</summary>
+          <FilmDiagram className="capture-guide__diagram" />
           <ul className="capture-guide__list">
             <li>
               <span className="capture-guide__k">Angles</span> film two — down-the-line
