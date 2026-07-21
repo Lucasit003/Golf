@@ -25,6 +25,8 @@ export type ExtractOptions = {
   onProgress?: (p: ExtractProgress) => void
   signal?: AbortSignal
 }
+/** The tracked swing plus the fraction of sampled frames a body was found in. */
+export type ExtractResult = { swing: Swing; coverage: number }
 
 // Sample rate for the walk. We don't trust the file's fps (phone "slo-mo" is
 // interpolated and the container's rate lies), so we sample uniformly. 30/s is
@@ -59,7 +61,7 @@ export async function extractSwing(
   video: HTMLVideoElement,
   landmarker: PoseLandmarker,
   opts: ExtractOptions = {},
-): Promise<Swing> {
+): Promise<ExtractResult> {
   if (!Number.isFinite(video.duration) || video.duration === 0) {
     throw new Error('Video metadata isn’t loaded yet — wait for loadedmetadata before extracting.')
   }
@@ -92,7 +94,11 @@ export async function extractSwing(
     opts.onProgress?.({ frames: frames.length, seconds: video.currentTime, duration })
   }
 
-  return { fps: estimateFps(frames), frames, events: null }
+  // Coverage = fraction of sampled frames a body was actually found in. This is
+  // the real "did we see a golfer" signal; a poseless clip lands near 0 even
+  // though the frames we kept are all valid.
+  const coverage = count > 0 ? frames.length / count : 0
+  return { swing: { fps: estimateFps(frames), frames, events: null }, coverage }
 }
 
 /**

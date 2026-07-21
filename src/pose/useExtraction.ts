@@ -64,8 +64,9 @@ export function useExtraction() {
       const watchdog = setTimeout(() => controller.abort(), budgetMs)
 
       let swing
+      let coverage
       try {
-        swing = await extractSwing(video, landmarkerRef.current, {
+        const result = await extractSwing(video, landmarkerRef.current, {
           signal: controller.signal,
           onProgress: (p) =>
             setState({
@@ -74,6 +75,8 @@ export function useExtraction() {
               progress: p.duration ? p.seconds / p.duration : 0,
             }),
         })
+        swing = result.swing
+        coverage = result.coverage
       } finally {
         clearTimeout(watchdog)
       }
@@ -91,10 +94,10 @@ export function useExtraction() {
       }
 
       // Confidence is the mean visibility of the joints we measure — the signal
-      // that actually matters. Coverage (frames with a pose) is implicit: extract
-      // drops poseless frames, so a tracked swing has full coverage by definition.
+      // that actually matters. Coverage is the fraction of sampled frames a body
+      // was found in, straight from extraction — the honest "did we see a golfer
+      // the whole way through" read the framing check leans on.
       const confidence = overallConfidence(swing)
-      const coverage = tracked.length ? 1 : 0
 
       setState({ status: 'done', swing, confidence, coverage })
     } catch (err) {
