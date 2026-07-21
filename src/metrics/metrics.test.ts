@@ -1,16 +1,19 @@
 import { describe, it, expect } from 'vitest'
-import type { Vec3 } from '../lib/vec'
+import { radians, type Vec3 } from '../lib/vec'
 import { Landmark } from '../pose/landmarks'
 import {
   spineAngleDeg,
   kneeFlexDeg,
   shoulderTiltDeg,
   xFactorDeg,
+  axialTurnDeg,
   headMovement,
   tempoRatio,
   compareState,
   toMetric,
+  computeSwingMetrics,
 } from './index'
+import type { PoseFrame } from '../pose/types'
 
 // Build a 33-length world array with specific joints set; the rest are origin.
 function world(set: Partial<Record<Landmark, Vec3>>): Vec3[] {
@@ -101,6 +104,68 @@ describe('xFactorDeg', () => {
       [Landmark.RIGHT_SHOULDER]: { x: 1, y: 0, z: 0 },
     })
     expect(xFactorDeg(w)).toBeCloseTo(0)
+  })
+})
+
+describe('axialTurnDeg', () => {
+  // shoulder line along x at address; rotated 40° about vertical at "top"
+  const flat = world({
+    [Landmark.LEFT_SHOULDER]: { x: -1, y: 0, z: 0 },
+    [Landmark.RIGHT_SHOULDER]: { x: 1, y: 0, z: 0 },
+  })
+  const turned = world({
+    [Landmark.LEFT_SHOULDER]: { x: -Math.cos(radians(40)), y: 0, z: Math.sin(radians(40)) },
+    [Landmark.RIGHT_SHOULDER]: { x: Math.cos(radians(40)), y: 0, z: -Math.sin(radians(40)) },
+  })
+  it('is 0° with no turn', () => {
+    expect(axialTurnDeg(flat, flat, 'shoulders')).toBeCloseTo(0)
+  })
+  it('reads the turn magnitude between two frames', () => {
+    expect(Math.abs(axialTurnDeg(flat, turned, 'shoulders'))).toBeCloseTo(40)
+  })
+})
+
+describe('computeSwingMetrics', () => {
+  const w = (set: Partial<Record<Landmark, Vec3>>): Vec3[] => world(set)
+  const frame = (world: Vec3[]): PoseFrame => ({ index: 0, timeMs: 0, landmarks: [], world, visibility: [] })
+  // address, top, impact frames with a vertical spine and a level base
+  const frames: PoseFrame[] = [
+    frame(w({
+      [Landmark.LEFT_SHOULDER]: { x: -1, y: 1, z: 0 },
+      [Landmark.RIGHT_SHOULDER]: { x: 1, y: 1, z: 0 },
+      [Landmark.LEFT_HIP]: { x: -1, y: 0, z: 0 },
+      [Landmark.RIGHT_HIP]: { x: 1, y: 0, z: 0 },
+    })),
+    frame(w({
+      // top: shoulders turned 45° about vertical
+      [Landmark.LEFT_SHOULDER]: { x: -Math.cos(radians(45)), y: 1, z: Math.sin(radians(45)) },
+      [Landmark.RIGHT_SHOULDER]: { x: Math.cos(radians(45)), y: 1, z: -Math.sin(radians(45)) },
+      [Landmark.LEFT_HIP]: { x: -1, y: 0, z: 0 },
+      [Landmark.RIGHT_HIP]: { x: 1, y: 0, z: 0 },
+    })),
+    frame(w({
+      [Landmark.LEFT_SHOULDER]: { x: -1, y: 1, z: 0 },
+      [Landmark.RIGHT_SHOULDER]: { x: 1, y: 1, z: 0 },
+      [Landmark.LEFT_HIP]: { x: -1, y: 0, z: 0 },
+      [Landmark.RIGHT_HIP]: { x: 1, y: 0, z: 0 },
+    })),
+  ]
+
+  it('produces values at the event frames', () => {
+    const m = computeSwingMetrics(frames, { address: 0, top: 1, impact: 2 })
+    expect(m.shoulderTurn).toBeCloseTo(45)
+    expect(m.shoulderTilt).toBeCloseTo(0)
+    expect(m.spineAngle).toBeCloseTo(0) // vertical at both address and impact
+  })
+
+  it('returns nothing without events', () => {
+    expect(computeSwingMetrics(frames, null)).toEqual({})
+  })
+
+  it('skips metrics whose event frame is out of range', () => {
+    const m = computeSwingMetrics(frames, { address: 0, top: 99, impact: 2 })
+    expect(m.shoulderTurn).toBeUndefined() // needs top
+    expect(m.spineAngle).toBeCloseTo(0) // needs address + impact only
   })
 })
 

@@ -10,7 +10,14 @@ import { drawSkeleton, drawPolyline, type Ctx2D } from '../pose/skeleton'
 import { handTracePoints } from '../pose/trace'
 import { downloadSwing } from '../pose/exportSwing'
 import { detectEvents } from '../metrics/events'
-import { tempoRatio, compareState } from '../metrics'
+import {
+  tempoRatio,
+  compareState,
+  computeSwingMetrics,
+  BENCHMARK_BY_ID,
+  type Benchmark,
+  type BenchmarkId,
+} from '../metrics'
 import { swingScore } from '../metrics/score'
 import { useBestScore } from '../metrics/bestScore'
 import { checkFraming } from '../pose/framing'
@@ -54,19 +61,25 @@ const ANGLE_TABS: { v: Angle; label: string; hint: string }[] = [
   },
 ]
 
-// Which readouts each angle can honestly speak to. Tempo is angle-independent
-// (pure frame counting) so it shows on both.
-const ANGLE_READOUTS: Record<Angle, { label: string; range: string }[]> = {
-  down_the_line: [
-    { label: 'Spine angle', range: '±2° address' },
-    { label: 'Shoulder turn', range: '85–95°' },
-  ],
-  face_on: [
-    { label: 'Hip rotation', range: '35–45°' },
-    { label: 'X-factor', range: '40–50°' },
-    { label: 'Shoulder tilt', range: '33–39°' },
-    { label: 'Lead knee flex', range: '25–41°' },
-  ],
+// Which measurements each angle can honestly speak to, by benchmark id. Tempo is
+// angle-independent (pure frame counting) so it's shown separately, above these.
+const ANGLE_METRICS: Record<Angle, BenchmarkId[]> = {
+  down_the_line: ['spineAngle', 'shoulderTurn'],
+  face_on: ['hipRotationImpact', 'xFactor', 'shoulderTilt', 'leadKneeFlex'],
+}
+
+// Short label (drop the "· top / · impact" event tag) and a compact range for a
+// benchmark's tour band.
+function shortLabel(b: Benchmark): string {
+  return b.label.split(' · ')[0]
+}
+function fmtRange(b: Benchmark): string {
+  const { lo, hi } = b.band
+  return lo === -hi ? `±${hi}${b.unit}` : `${lo}–${hi}${b.unit}`
+}
+function fmtValue(id: BenchmarkId, b: Benchmark, v: number): string {
+  const decimals = b.decimals ?? (id === 'spineAngle' ? 1 : 0)
+  return v.toFixed(decimals)
 }
 
 // A saved clip for one angle: the file, its object URL, corrected events, and
@@ -346,6 +359,11 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
   const score = swingScore({ tempo: tempoVal })
   const { best, isNewBest } = useBestScore(score ? score.score : null)
 
+  // The angle metrics, measured at the detected events. Estimates from a single
+  // camera — each carries the catalog's confidence badge so a rough one reads as
+  // rough. Recomputes as the user corrects the events below.
+  const measures = swing && events ? computeSwingMetrics(swing.frames, events) : {}
+
   // A soft "does this clip match the slot?" read, once the body is tracked. It
   // catches a face-on clip dropped in the down-the-line slot, a clip with no
   // golfer, or feet cropped out — surfaced as a gentle nudge, never a block.
@@ -565,16 +583,30 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
             unit=": 1"
             state={tempoState}
           />
-          {ANGLE_READOUTS[angle].map((r) => (
-            <Readout key={r.label} label={r.label} range={r.range} />
-          ))}
+          {ANGLE_METRICS[angle].map((id) => {
+            const b = BENCHMARK_BY_ID[id]
+            const v = measures[id]
+            const has = v != null && Number.isFinite(v)
+            const cs = has ? compareState(id, v!) : null
+            return (
+              <Readout
+                key={id}
+                label={shortLabel(b)}
+                range={fmtRange(b)}
+                value={has ? fmtValue(id, b, v!) : undefined}
+                unit={has ? b.unit : undefined}
+                state={cs ? (cs === 'in' ? 'in-range' : 'out-of-range') : undefined}
+                confidence={has ? b.confidence : undefined}
+              />
+            )
+          })}
           <p className="upload__margin-note">
-            These are the measurements a{' '}
-            {angle === 'down_the_line' ? 'down-the-line' : 'face-on'} camera can actually
-            see. Tempo is live — it's just backswing ÷ downswing frames, so it's honest the
-            moment the events are right (verify them below). The angle metrics stay empty
-            until the geometry is validated on real swings; we won't show a value we can't
-            stand behind. An empty readout is honest, a plausible one isn't.
+            What a {angle === 'down_the_line' ? 'down-the-line' : 'face-on'} camera can see.
+            Tempo is the solid one — pure backswing ÷ downswing frames. The angle metrics are
+            measured off the tracked body at the events below, so correct those and everything
+            here updates. They're single-camera estimates: spine, tilt and knee flex are
+            fairly reliable; the rotations (turn, X-factor) are depth-limited, so they're
+            badged <em>rough</em> — read them as a ballpark, not a launch monitor.
           </p>
         </aside>
 

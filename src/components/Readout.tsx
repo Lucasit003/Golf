@@ -20,9 +20,18 @@ type Props = {
   unit?: string
   /** Only meaningful when a value is present. */
   state?: 'in-range' | 'out-of-range'
+  /** How much to trust the value — badged next to it so a rough estimate reads
+   *  as rough. Only shown when a value is present. */
+  confidence?: 'good' | 'moderate' | 'low'
 }
 
-export function Readout({ label, range, value, unit, state }: Props) {
+const CONF_LABEL: Record<NonNullable<Props['confidence']>, string> = {
+  good: 'solid',
+  moderate: 'estimate',
+  low: 'rough',
+}
+
+export function Readout({ label, range, value, unit, state, confidence }: Props) {
   const awaiting = value == null
   return (
     <div className={`readout${awaiting ? ' readout--awaiting' : ''}`}>
@@ -30,6 +39,9 @@ export function Readout({ label, range, value, unit, state }: Props) {
       <div className={`readout__value data readout__value--${awaiting ? 'awaiting' : state}`}>
         {awaiting ? '—' : value}
         {!awaiting && unit ? <span className="readout__unit">{unit}</span> : null}
+        {!awaiting && confidence ? (
+          <span className={`readout__conf readout__conf--${confidence}`}>{CONF_LABEL[confidence]}</span>
+        ) : null}
       </div>
       <div className="label readout__range">
         <span className="readout__range-key">tour</span> {range}

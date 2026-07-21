@@ -11,6 +11,7 @@ import { scoreAgainstBand, type CompareState } from '../lib/compare'
 export * from './geometry'
 export * from './benchmarks'
 export * from './events'
+export * from './swingMetrics'
 
 /** Tempo = backswing frames ÷ downswing frames. Null when events are degenerate. */
 export function tempoRatio(events: SwingEvents): number | null {

@@ -76,6 +76,26 @@ export function xFactorDeg(world: Vec3[]): number {
 }
 
 /**
+ * Axial turn of a body line (shoulders or hips) about vertical, between two
+ * frames, in signed degrees. Address→top gives shoulder/hip turn; address→impact
+ * gives how far the hips have opened. The magnitude is the turn; the sign is the
+ * direction and depends on which way the golfer faces the camera — so callers
+ * that just want "how much" should take the absolute value.
+ *
+ * Like x-factor this leans on the horizontal (depth-bearing) plane, so it's the
+ * weak spot of single-camera pose. Report it, but low-confidence.
+ */
+export function axialTurnDeg(fromWorld: Vec3[], toWorld: Vec3[], joint: 'shoulders' | 'hips'): number {
+  const [l, r] =
+    joint === 'shoulders'
+      ? [Landmark.LEFT_SHOULDER, Landmark.RIGHT_SHOULDER]
+      : [Landmark.LEFT_HIP, Landmark.RIGHT_HIP]
+  const from = projectOntoPlane(sub(at(fromWorld, r), at(fromWorld, l)), VERTICAL)
+  const to = projectOntoPlane(sub(at(toWorld, r), at(toWorld, l)), VERTICAL)
+  return degrees(signedAngle(from, to, VERTICAL))
+}
+
+/**
  * Head movement from an address frame, normalized by shoulder width so it's
  * comparable across body sizes. Lateral and vertical reported separately — they
  * mean different things, and some drift is normal in a tour swing.
