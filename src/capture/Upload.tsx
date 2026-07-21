@@ -81,6 +81,7 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [src, setSrc] = useState<string | null>(null)
+  const [videoError, setVideoError] = useState<string | null>(null)
   const [current, setCurrent] = useState(0)
   const [duration, setDuration] = useState(0)
   const [playing, setPlaying] = useState(false)
@@ -177,6 +178,7 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
     const url = URL.createObjectURL(file)
     urlsRef.current.add(url)
     restoringRef.current = false
+    setVideoError(null)
     setSrc(url)
     setCurrent(0)
     setDuration(0)
@@ -338,8 +340,23 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
                 onPlay={() => setPlaying(true)}
                 onPause={() => setPlaying(false)}
                 onClick={togglePlay}
+                onError={() => {
+                  const code = videoRef.current?.error?.code
+                  setVideoError(
+                    code === 4 || code === 3
+                      ? 'This browser can’t play this clip’s format. Try a video straight from your camera roll, or re-save/export it as MP4.'
+                      : 'The video couldn’t load. If your phone is in Low Power Mode, turn it off and try again.',
+                  )
+                }}
               />
               <canvas ref={canvasRef} className="upload__overlay" aria-hidden="true" />
+
+              {videoError ? (
+                <div className="track-fail" role="alert">
+                  <p className="track-fail__title">Can’t play this video</p>
+                  <p className="track-fail__msg">{videoError}</p>
+                </div>
+              ) : null}
 
               {extraction.status === 'extracting' ? (
                 <div className="track-status" role="status">
