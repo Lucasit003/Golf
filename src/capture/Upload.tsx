@@ -405,13 +405,19 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
               {extraction.status === 'extracting' ? (
                 <div className="track-status" role="status">
                   <div className="track-status__label label">
-                    Tracking the body · {Math.round(extraction.progress * 100)}%
+                    {extraction.stage === 'loading'
+                      ? 'Loading the tracker…'
+                      : `Tracking the body · ${Math.round(extraction.progress * 100)}%`}
                   </div>
-                  <div className="track-status__bar">
-                    <span style={{ width: `${extraction.progress * 100}%` }} />
+                  <div className={`track-status__bar${extraction.stage === 'loading' ? ' track-status__bar--indeterminate' : ''}`}>
+                    <span
+                      style={extraction.stage === 'loading' ? undefined : { width: `${extraction.progress * 100}%` }}
+                    />
                   </div>
                   <div className="track-status__note label">
-                    Playing through once to read every frame. This is a one-time pass.
+                    {extraction.stage === 'loading'
+                      ? 'Downloading the pose model — one time on the first swing.'
+                      : 'Playing through once to read every frame. This is a one-time pass.'}
                   </div>
                 </div>
               ) : null}

@@ -17,7 +17,9 @@ import { overallConfidence } from './confidence'
 
 export type ExtractionState =
   | { status: 'idle' }
-  | { status: 'extracting'; progress: number }
+  // stage 'loading' = fetching the pose model the first time (no progress yet);
+  // stage 'reading' = walking the clip frame by frame (progress is real).
+  | { status: 'extracting'; progress: number; stage: 'loading' | 'reading' }
   | { status: 'done'; swing: Swing; confidence: number; coverage: number }
   | { status: 'failed'; message: string }
 
@@ -45,10 +47,13 @@ export function useExtraction() {
 
   const run = useCallback(async (video: HTMLVideoElement) => {
     try {
-      setState({ status: 'extracting', progress: 0 })
+      // First run downloads the pose model — that can take a few seconds, so say
+      // "loading" rather than parking at 0% and looking frozen.
+      setState({ status: 'extracting', progress: 0, stage: 'loading' })
       if (!landmarkerRef.current) {
         landmarkerRef.current = await createPoseLandmarker()
       }
+      setState({ status: 'extracting', progress: 0, stage: 'reading' })
       video.currentTime = 0
 
       // Watchdog: extraction plays the clip at ~1×, so a stalled decode or a clip
@@ -63,7 +68,11 @@ export function useExtraction() {
         swing = await extractSwing(video, landmarkerRef.current, {
           signal: controller.signal,
           onProgress: (p) =>
-            setState({ status: 'extracting', progress: p.duration ? p.seconds / p.duration : 0 }),
+            setState({
+              status: 'extracting',
+              stage: 'reading',
+              progress: p.duration ? p.seconds / p.duration : 0,
+            }),
         })
       } finally {
         clearTimeout(watchdog)

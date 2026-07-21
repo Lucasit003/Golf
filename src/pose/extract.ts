@@ -50,7 +50,27 @@ export async function extractSwing(
   video.playbackRate = 1
 
   await new Promise<void>((resolve, reject) => {
+    // Stall guard: if the clip never presents a single frame, the frame callback
+    // never fires and we'd sit at 0% until the outer watchdog gives up 30s later.
+    // The usual cause on a phone is Low Power Mode throttling/pausing the muted
+    // background playback the tracker rides on — so fail fast and say so.
+    let stall: ReturnType<typeof setTimeout> | undefined = setTimeout(() => {
+      if (index === 0) {
+        video.pause()
+        reject(
+          new Error(
+            'The video isn’t playing through to be read. If your phone is in Low Power Mode, turn it off — it pauses the background playback tracking needs. Then tap Track again.',
+          ),
+        )
+      }
+    }, 8000)
+    const clearStall = () => {
+      if (stall) clearTimeout(stall)
+      stall = undefined
+    }
+
     const abort = () => {
+      clearStall()
       video.pause()
       reject(new DOMException('Extraction aborted', 'AbortError'))
     }
@@ -60,6 +80,7 @@ export async function extractSwing(
     }
 
     const onFrame = (_now: number, meta: RVFCMeta) => {
+      clearStall()
       // MediaPipe VIDEO mode throws if timestamps don't strictly increase.
       let ts = Math.round(meta.mediaTime * 1000)
       if (ts <= lastTs) ts = lastTs + 1
@@ -80,6 +101,7 @@ export async function extractSwing(
     video.addEventListener(
       'ended',
       () => {
+        clearStall()
         opts.signal?.removeEventListener('abort', abort)
         resolve()
       },
@@ -87,7 +109,14 @@ export async function extractSwing(
     )
 
     v.requestVideoFrameCallback!(onFrame)
-    video.play().catch(reject)
+    video.play().catch(() => {
+      clearStall()
+      reject(
+        new Error(
+          'This browser blocked the clip from playing, so it can’t be read. Tap the video once to start it, then tap Track again.',
+        ),
+      )
+    })
   })
 
   return { fps: estimateFps(frames), frames, events: null }
