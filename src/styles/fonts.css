@@ -1,0 +1,53 @@
+/*
+ * Self-hosted fonts. Previously loaded from Google Fonts, which meant a
+ * render-blocking request to a third party on every visit, a flash of unstyled
+ * text, no display until the network answered, and a hard dependency that broke
+ * the offline PWA. These are the same faces (latin subset), served from our own
+ * origin so they cache with the app and work offline.
+ *
+ * Archivo and Public Sans are the real variable fonts, so the design's
+ * font-stretch (115–125% on display type) and 400/500 weights render exactly as
+ * before. IBM Plex Mono ships as two static instances (400/500).
+ */
+
+/* Archivo — display. Variable: weight 600–700, width 62.5–125%. */
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 600 700;
+  font-stretch: 62.5% 125%;
+  font-display: swap;
+  src: url('/fonts/archivo.woff2') format('woff2');
+}
+
+/* Public Sans — body. Variable: weight 400–500. */
+@font-face {
+  font-family: 'Public Sans';
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: swap;
+  src: url('/fonts/public-sans.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Public Sans';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/public-sans-italic.woff2') format('woff2');
+}
+
+/* IBM Plex Mono — data readouts. Static 400 + 500. */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/plex-mono-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/plex-mono-500.woff2') format('woff2');
+}

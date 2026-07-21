@@ -35,12 +35,10 @@
     />
     <meta name="twitter:image" content="/icon-512.png" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@115..125,600..700&family=Public+Sans:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap"
-      rel="stylesheet"
-    />
+    <!-- Fonts are self-hosted (see src/styles/fonts.css) — no third-party request.
+         Preload the display + body faces so first paint has them ready. -->
+    <link rel="preload" href="/fonts/archivo.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/public-sans.woff2" as="font" type="font/woff2" crossorigin />
 
     <!-- Splash styles + no-flash theme. Both run before first paint so neither
          the splash nor the app flashes the wrong theme. -->
