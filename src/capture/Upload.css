@@ -126,6 +126,13 @@
   0% { transform: translateX(-110%); }
   100% { transform: translateX(320%); }
 }
+/* No sweeping for reduced-motion — show a steady full bar instead. */
+@media (prefers-reduced-motion: reduce) {
+  .track-status__bar--indeterminate span {
+    width: 100%;
+    animation: none;
+  }
+}
 .track-status__note {
   color: color-mix(in srgb, var(--paper) 70%, transparent);
   text-transform: none;
