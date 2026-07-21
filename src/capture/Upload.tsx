@@ -417,7 +417,7 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
                   <div className="track-status__note label">
                     {extraction.stage === 'loading'
                       ? 'Downloading the pose model — one time on the first swing.'
-                      : 'Playing through once to read every frame. This is a one-time pass.'}
+                      : 'Scanning the clip frame by frame. This is a one-time pass.'}
                   </div>
                 </div>
               ) : null}

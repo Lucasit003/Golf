@@ -56,11 +56,11 @@ export function useExtraction() {
       setState({ status: 'extracting', progress: 0, stage: 'reading' })
       video.currentTime = 0
 
-      // Watchdog: extraction plays the clip at ~1×, so a stalled decode or a clip
-      // that never fires "ended" would hang the UI forever. Abort after a generous
-      // multiple of the clip length so a stall fails cleanly instead.
+      // Watchdog: the seek-walk steps through the clip frame by frame, and a slow
+      // phone (or a flaky decoder) could drag. Abort after a generous multiple of
+      // the clip length so a genuine stall fails cleanly instead of hanging.
       const controller = new AbortController()
-      const budgetMs = Math.max(30_000, (video.duration || 0) * 1000 * 4)
+      const budgetMs = Math.max(45_000, (video.duration || 0) * 1000 * 8)
       const watchdog = setTimeout(() => controller.abort(), budgetMs)
 
       let swing
