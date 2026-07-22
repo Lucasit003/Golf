@@ -52,7 +52,7 @@
   color: var(--ink);
 }
 
-/* The Setji's Swing mark — golfer + swing trace. Held small in the corner. */
+/* The Setjis Swing mark — golfer + swing trace. Held small in the corner. */
 .masthead__logo {
   height: 2.2rem;
   width: auto;
@@ -226,11 +226,19 @@
   .masthead__mark {
     gap: var(--gap-1);
   }
-  /* Three nav items + the mark won't fit a phone alongside the wordmark, so the
-     mark carries the brand here; the SETJI'S SWINGS wordmark returns on wider
-     screens. This also kills the horizontal overflow that made scrolling wobble. */
+  /* The brand + three nav items won't fit one phone row, so let the bar wrap:
+     logo + wordmark take the top row, the nav + chip + settings the next. The
+     name stays at the top instead of being dropped for space. */
+  .masthead {
+    flex-wrap: wrap;
+    row-gap: var(--gap-2);
+  }
   .masthead__wordmark {
-    display: none;
+    font-size: 1.05rem;
+  }
+  .masthead__meta {
+    flex: 1 0 100%;
+    justify-content: space-between;
   }
   .masthead__logo {
     height: 2rem;

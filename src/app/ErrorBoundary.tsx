@@ -19,7 +19,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error) {
     // No backend to report to — surface it in the console for local debugging.
-    console.error("Setji's Swing hit an unexpected error:", error)
+    console.error("Setjis Swing hit an unexpected error:", error)
   }
 
   render() {
@@ -30,7 +30,7 @@ export class ErrorBoundary extends Component<Props, State> {
           <p className="label crash__eyebrow">Something broke</p>
           <h1 className="crash__title">The survey stopped.</h1>
           <p className="crash__body">
-            Setji's Swing hit an error it didn't expect. Nothing left your device, and reloading
+            Setjis Swing hit an error it didn't expect. Nothing left your device, and reloading
             starts clean.
           </p>
           <button className="crash__btn" onClick={() => window.location.reload()}>
