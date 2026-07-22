@@ -28,10 +28,14 @@ export type ExtractOptions = {
 /** The tracked swing plus the fraction of sampled frames a body was found in. */
 export type ExtractResult = { swing: Swing; coverage: number }
 
-// Sample rate for the walk. We don't trust the file's fps (phone "slo-mo" is
-// interpolated and the container's rate lies), so we sample uniformly. 30/s is
-// ample for a swing; the total is capped so long clips don't seek forever.
-const SAMPLE_FPS = 30
+// Sample rate for the walk. We step finely — 60/s — so the fast part of the
+// swing (transition, impact) is pinned tightly: an angle read at the top or at
+// impact is only as accurate as the frame we caught it on, and ±1/60s beats
+// ±1/30s where the club is moving fastest. On a clip whose real rate is lower,
+// the extra seeks land on frames we've already read and are skipped (see the
+// dedup below), so we never sample finer than the footage actually is. The total
+// seek count is capped so a long clip doesn't seek forever.
+const SAMPLE_FPS = 60
 const MAX_SAMPLES = 240
 
 /** Seek to `t` and resolve once the frame has settled. A short fallback timer
@@ -70,6 +74,7 @@ export async function extractSwing(
   const duration = video.duration
   const frames: PoseFrame[] = []
   let lastTs = -1
+  let seen = 0
 
   video.muted = true
   video.pause()
@@ -83,9 +88,15 @@ export async function extractSwing(
     const target = Math.min(i * step, Math.max(0, duration - 1e-3))
     await seekTo(video, target, signal)
 
-    let ts = Math.round(video.currentTime * 1000)
-    if (ts <= lastTs) ts = lastTs + 1
+    // The real time this seek settled on. If it's not past the last frame we
+    // kept, the seek landed on a frame we already read (sampling finer than the
+    // clip's own rate) — skip it. That keeps timestamps strictly increasing for
+    // MediaPipe, avoids duplicate frames skewing the fps estimate, and saves the
+    // inference. `seen` counts the distinct frames, so coverage stays honest.
+    const ts = Math.round(video.currentTime * 1000)
+    if (ts <= lastTs) continue
     lastTs = ts
+    seen += 1
 
     const result = landmarker.detectForVideo(video, ts)
     const frame = toPoseFrame(frames.length, ts, result)
@@ -94,10 +105,10 @@ export async function extractSwing(
     opts.onProgress?.({ frames: frames.length, seconds: video.currentTime, duration })
   }
 
-  // Coverage = fraction of sampled frames a body was actually found in. This is
-  // the real "did we see a golfer" signal; a poseless clip lands near 0 even
+  // Coverage = fraction of the distinct frames we saw that a body was found in.
+  // The real "did we see a golfer" signal; a poseless clip lands near 0 even
   // though the frames we kept are all valid.
-  const coverage = count > 0 ? frames.length / count : 0
+  const coverage = seen > 0 ? frames.length / seen : 0
   return { swing: { fps: estimateFps(frames), frames, events: null }, coverage }
 }
 
