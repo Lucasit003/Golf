@@ -316,6 +316,12 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
         : 'out-of-range'
       : undefined
 
+  // A real swing's tempo lives near 2–4 : 1. A value way outside that means the
+  // auto-detected top/impact are wrong — and since every angle metric is read AT
+  // those frames, they're wrong too. Flag it and hold the score back rather than
+  // present impossible numbers (or bank a "best") off bad events.
+  const eventsLikelyWrong = tempoVal != null && (tempoVal < 1.2 || tempoVal > 5)
+
   // The angle metrics, measured at the detected events. Estimates from a single
   // camera — each carries the catalog's confidence badge so a rough one reads as
   // rough. Recomputes as the user corrects the events below.
@@ -330,7 +336,8 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
     const v = measures[id]
     if (v != null) scoreReadings[id] = v
   }
-  const score = swingScore(scoreReadings)
+  // Don't score (or record a best) off events we already think are wrong.
+  const score = eventsLikelyWrong ? null : swingScore(scoreReadings)
   const { best, isNewBest } = useBestScore(score ? score.score : null)
 
   // A soft "does this clip look usable?" read, once the body is tracked — a clip
@@ -503,6 +510,21 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
                 {extraction.confidence >= 0.7
                   ? 'Solid — the joints are clearly visible.'
                   : 'Low — measurements from this clip would be unreliable. Re-film brighter, fuller in frame.'}
+              </div>
+            </div>
+          ) : null}
+
+          {eventsLikelyWrong ? (
+            <div className="framing-hint" role="status">
+              <span className="framing-hint__mark" aria-hidden="true">!</span>
+              <div className="framing-hint__body">
+                <p className="framing-hint__title">Set the swing points</p>
+                <p className="framing-hint__msg">
+                  The top and impact weren’t found automatically, so tempo (
+                  {tempoVal!.toFixed(1)} : 1) and the angle numbers below are off. Scrub to
+                  each point under the video and tap “Set&nbsp;… to here” — everything updates
+                  live, and the score comes back once they’re right.
+                </p>
               </div>
             </div>
           ) : null}
