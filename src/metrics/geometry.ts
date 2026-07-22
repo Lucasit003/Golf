@@ -31,7 +31,12 @@ const at = (world: Vec3[], i: Landmark): Vec3 => world[i]
 export function spineAngleDeg(world: Vec3[]): number {
   const shoulderMid = midpoint(at(world, Landmark.LEFT_SHOULDER), at(world, Landmark.RIGHT_SHOULDER))
   const hipMid = midpoint(at(world, Landmark.LEFT_HIP), at(world, Landmark.RIGHT_HIP))
-  return degrees(angleBetween(sub(shoulderMid, hipMid), VERTICAL))
+  const raw = degrees(angleBetween(sub(shoulderMid, hipMid), VERTICAL))
+  // The spine is a line, so its tilt from vertical is the acute angle. Folding
+  // [90,180] back also makes this independent of whether world-up is +y or −y —
+  // MediaPipe's world Y runs downward, so a real address would otherwise read
+  // ~160° instead of ~20°. The change (address→impact) is unaffected either way.
+  return raw > 90 ? 180 - raw : raw
 }
 
 /**

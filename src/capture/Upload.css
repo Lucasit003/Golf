@@ -207,6 +207,57 @@
   line-height: 1.45;
   color: var(--ink-soft);
 }
+
+/* Live per-frame angle strip under the video (the "angles" overlay). Follows the
+   playhead; the spine cell goes red when posture drifts past address. */
+.live-angles {
+  margin-top: var(--gap-3);
+  padding: var(--gap-3);
+  border: var(--line-rest) solid var(--paper-edge);
+  border-radius: var(--radius);
+  background: var(--paper-deep);
+}
+.live-angles__label {
+  color: var(--fairway);
+}
+.live-angles__row {
+  display: flex;
+  gap: var(--gap-4);
+  flex-wrap: wrap;
+  margin-top: var(--gap-2);
+}
+.live-angles__cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.live-angles__cell .data {
+  font-size: 1.6rem;
+  line-height: 1;
+  color: var(--ink);
+}
+.live-angles__cell.is-off .data,
+.live-angles__cell.is-off .live-angles__drift {
+  color: var(--flag);
+}
+.live-angles__k {
+  font-size: var(--t-label);
+  text-transform: uppercase;
+  letter-spacing: var(--track-label);
+  color: var(--ink-soft);
+}
+.live-angles__drift {
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  font-family: var(--face-data);
+}
+.live-angles__hint {
+  margin-top: var(--gap-2);
+  color: var(--ink-soft);
+  text-transform: none;
+  letter-spacing: 0;
+}
+
 /* Confidence readout in the margin. */
 .track-confidence {
   padding: var(--gap-3) 0;

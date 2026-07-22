@@ -7,6 +7,7 @@ import { usePrefs } from '../app/prefs'
 import { useLocker } from '../locker/store'
 import { useExtraction } from '../pose/useExtraction'
 import { drawSkeleton, drawPolyline, type Ctx2D } from '../pose/skeleton'
+import { frameAngles, drawAngles } from '../pose/annotate'
 import { handTracePoints } from '../pose/trace'
 import { downloadSwing } from '../pose/exportSwing'
 import { detectEvents } from '../metrics/events'
@@ -124,7 +125,7 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
   // becomes a fixture that validates the detector (SWING_SPEC / M2).
   const [events, setEvents] = useState<SwingEvents | null>(null)
   const [selectedEvent, setSelectedEvent] = useState<keyof SwingEvents | null>(null)
-  const [overlay, setOverlay] = useState<'skeleton' | 'trace' | 'off'>('skeleton')
+  const [overlay, setOverlay] = useState<'skeleton' | 'angles' | 'trace' | 'off'>('skeleton')
 
   // When a fresh extraction lands, run first-pass detection on it. When we're
   // restoring a saved clip, keep its already-corrected events instead.
@@ -168,6 +169,8 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
     const css = getComputedStyle(document.documentElement)
     const chalk = css.getPropertyValue('--chalk').trim() || '#2547c8'
     const cream = css.getPropertyValue('--cream').trim() || '#f2f0e6'
+    const flag = css.getPropertyValue('--flag').trim() || '#c2410c'
+    const ink = css.getPropertyValue('--ink').trim() || '#16211c'
 
     if (overlay === 'trace') {
       // The signature hand trace, drawn from the real swing.
@@ -182,8 +185,19 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
         jointRadius: Math.max(3, canvas.width / 200),
         minVisibility: 0.4,
       })
+      if (overlay === 'angles') {
+        // Live angle readouts on the body — spine (red when posture drifts from
+        // address), knee flex — so scrubbing shows where the swing breaks down.
+        const refSpine = events ? frameAngles(swing.frames[events.address]).spine : null
+        drawAngles(ctx as CanvasRenderingContext2D, frame, refSpine, canvas.width, canvas.height, {
+          chalk,
+          flag,
+          ink,
+          paper: cream,
+        })
+      }
     }
-  }, [current, swing, overlay])
+  }, [current, swing, overlay, events])
 
   // Keep the element's playback rate in sync with the chosen speed.
   useEffect(() => {
@@ -345,6 +359,15 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
   // block. (It does NOT guess camera angle; that isn't reliable from one camera.)
   const framing = extraction.status === 'done' ? checkFraming(extraction.swing, extraction.coverage) : null
 
+  // Live per-frame angles that follow the playhead — the readout beside the
+  // skeleton for spotting the frame where the swing breaks down. Spine drift is
+  // measured against the address frame (losing posture is the classic fault).
+  const liveFrame = swing ? nearestFrame(swing, current * 1000) : null
+  const liveAngles = liveFrame ? frameAngles(liveFrame) : null
+  const addressFrame = swing && events ? swing.frames[events.address] : null
+  const liveSpineDrift =
+    liveAngles && addressFrame ? liveAngles.spine - frameAngles(addressFrame).spine : null
+
   function jumpToEvent(key: keyof SwingEvents) {
     if (!events) return
     setSelectedEvent(key)
@@ -436,7 +459,7 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
 
               {swing ? (
                 <div className="overlay-toggle" role="group" aria-label="Overlay">
-                  {(['skeleton', 'trace', 'off'] as const).map((m) => (
+                  {(['skeleton', 'angles', 'trace', 'off'] as const).map((m) => (
                     <button
                       key={m}
                       className={`overlay-toggle__btn${overlay === m ? ' is-active' : ''}`}
@@ -646,6 +669,35 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
             <p className="transport__hint label">
               <kbd>space</kbd> play · <kbd>←</kbd> <kbd>→</kbd> step a frame
             </p>
+          ) : null}
+
+          {overlay === 'angles' && liveAngles ? (
+            <div className="live-angles" aria-live="off">
+              <span className="live-angles__label label">at this frame</span>
+              <div className="live-angles__row">
+                <span className={`live-angles__cell${liveSpineDrift != null && Math.abs(liveSpineDrift) > 2 ? ' is-off' : ''}`}>
+                  <span className="live-angles__k">spine</span>
+                  <span className="data">{liveAngles.spine.toFixed(0)}°</span>
+                  {liveSpineDrift != null ? (
+                    <span className="live-angles__drift">
+                      {liveSpineDrift >= 0 ? '+' : '−'}
+                      {Math.abs(liveSpineDrift).toFixed(0)}° vs address
+                    </span>
+                  ) : null}
+                </span>
+                <span className="live-angles__cell">
+                  <span className="live-angles__k">L knee</span>
+                  <span className="data">{liveAngles.leftKnee.toFixed(0)}°</span>
+                </span>
+                <span className="live-angles__cell">
+                  <span className="live-angles__k">R knee</span>
+                  <span className="data">{liveAngles.rightKnee.toFixed(0)}°</span>
+                </span>
+              </div>
+              <p className="live-angles__hint label">
+                Scrub the swing — spine turns red when you drift past 2° of your address posture.
+              </p>
+            </div>
           ) : null}
 
           {events && swing ? (
