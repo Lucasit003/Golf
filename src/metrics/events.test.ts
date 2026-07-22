@@ -51,4 +51,24 @@ describe('detectEvents', () => {
     expect(detectEvents([])).toBeNull()
     expect(detectEvents(Array.from({ length: 20 }, (_, i) => frameAt(i, 0)))).toBeNull()
   })
+
+  it('is not fooled by a single-frame jitter spike after the top', () => {
+    // A real top around frame 18, then a lone noisy frame at 26 (mid-downswing)
+    // that pokes just above it. Reading the raw vertical extreme would call 26
+    // the top and collapse the downswing to a couple of frames (the 47:1 tempo
+    // bug at high sample rates); smoothing the top search must ignore the spike.
+    const ys: number[] = []
+    for (let i = 0; i < 5; i++) ys.push(0) // still 0–4
+    for (let i = 1; i <= 13; i++) ys.push((10 / 13) * i) // backswing 5–17 → 10
+    ys.push(10, 10) // plateau 18–19 (true top ~18)
+    for (let i = 1; i <= 18; i++) ys.push(10 - (10 / 18) * i) // downswing 20–37 → 0
+    for (let i = 1; i <= 5; i++) ys.push(i) // follow-through 38–42
+    ys[26] = 11 // the jitter spike, above the real top
+
+    const e = detectEvents(ys.map((y, i) => frameAt(i, y)))!
+    expect(e).not.toBeNull()
+    expect(e.top).toBeLessThan(24) // the real top, not the spike at 26
+    expect(e.impact - e.top).toBeGreaterThan(4) // downswing didn't collapse
+    expect(e.address).toBeLessThan(e.top)
+  })
 })

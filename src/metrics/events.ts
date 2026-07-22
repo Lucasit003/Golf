@@ -22,6 +22,22 @@ import { midpoint, sub, length } from '../lib/vec'
 const handMid = (f: PoseFrame): Vec3 =>
   midpoint(f.world[Landmark.LEFT_WRIST], f.world[Landmark.RIGHT_WRIST])
 
+/** Centered moving average, window ±w, edges clamped. Smooths per-frame pose
+ *  jitter so a single noisy frame can't masquerade as an extreme — the finer we
+ *  sample, the smaller each frame's real motion is next to that jitter. */
+function smooth(values: number[], w: number): number[] {
+  const n = values.length
+  return values.map((_, i) => {
+    let sum = 0
+    let count = 0
+    for (let j = Math.max(0, i - w); j <= Math.min(n - 1, i + w); j++) {
+      sum += values[j]
+      count += 1
+    }
+    return sum / count
+  })
+}
+
 /** Hand-midpoint speed per frame (distance from the previous frame). */
 export function handSpeeds(frames: PoseFrame[]): number[] {
   const pos = frames.map(handMid)
@@ -58,12 +74,16 @@ export function detectEvents(frames: PoseFrame[]): SwingEvents | null {
 
   // Top: the vertical extreme in the backswing direction. Restrict the search to
   // roughly the first two-thirds after address — the top sits at the end of the
-  // backswing, well before the follow-through's own vertical extreme.
+  // backswing, well before the follow-through's own vertical extreme. Search a
+  // smoothed vertical signal so pose jitter can't plant a false extreme on one
+  // frame (which, at higher sample rates, would drag "top" late and collapse the
+  // downswing — a tempo like 47:1 instead of ~3:1).
+  const svy = smooth(vy, 2)
   const searchEnd = address + Math.max(2, Math.floor((n - 1 - address) * 0.7))
   let top = address + 1
   let bestRise = -Infinity
   for (let i = address + 1; i <= searchEnd; i++) {
-    const rise = dir * (vy[i] - vy[address])
+    const rise = dir * (svy[i] - svy[address])
     if (rise > bestRise) {
       bestRise = rise
       top = i
