@@ -25,6 +25,8 @@ import { checkFraming } from '../pose/framing'
 import type { Swing, SwingEvents } from '../pose/types'
 import { ConfidenceTrack } from './ConfidenceTrack'
 import { FilmDiagram } from './FilmDiagram'
+import { ScoreReveal } from './ScoreReveal'
+import { swingFeedback } from '../metrics/feedback'
 import './Upload.css'
 
 /*
@@ -126,9 +128,12 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
   const [events, setEvents] = useState<SwingEvents | null>(null)
   const [selectedEvent, setSelectedEvent] = useState<keyof SwingEvents | null>(null)
   const [overlay, setOverlay] = useState<'skeleton' | 'angles' | 'trace' | 'off'>('skeleton')
+  // The post-track score reveal, shown once when a fresh track lands.
+  const [reveal, setReveal] = useState(false)
 
-  // When a fresh extraction lands, run first-pass detection on it. When we're
-  // restoring a saved clip, keep its already-corrected events instead.
+  // When a fresh extraction lands, run first-pass detection on it and pop the
+  // score reveal. When we're restoring a saved clip, keep its already-corrected
+  // events and don't re-reveal.
   useEffect(() => {
     if (extraction.status === 'done') {
       if (restoringRef.current) {
@@ -137,6 +142,7 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
       }
       setEvents(detectEvents(extraction.swing.frames))
       setSelectedEvent(null)
+      setReveal(true)
     } else if (!restoringRef.current) {
       setEvents(null)
     }
@@ -353,6 +359,7 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
   // Don't score (or record a best) off events we already think are wrong.
   const score = eventsLikelyWrong ? null : swingScore(scoreReadings)
   const { best, isNewBest } = useBestScore(score ? score.score : null)
+  const feedback = swingFeedback(eventsLikelyWrong ? {} : scoreReadings)
 
   // A soft "does this clip look usable?" read, once the body is tracked — a clip
   // with no golfer, or feet cropped out. Surfaced as a gentle nudge, never a
@@ -772,6 +779,15 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
           </label>
         ) : null}
       </div>
+
+      <ScoreReveal
+        open={reveal}
+        onClose={() => setReveal(false)}
+        score={score}
+        feedback={feedback}
+        best={best}
+        isNewBest={isNewBest}
+      />
     </section>
   )
 }
