@@ -545,9 +545,9 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
                 ) : null}
               </div>
               <p className="label swing-score__note">
-                How close this swing sits to the tour numbers. Tempo leads; the angle
-                metrics count too, each weighted by how much we trust it — so a rough
-                estimate only nudges the total.
+                Each number as a percent of the way to the tour range, averaged. Every
+                metric counts equally — check the badges below to see which are solid and
+                which are rough single-camera estimates.
               </p>
             </div>
           ) : null}

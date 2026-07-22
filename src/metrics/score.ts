@@ -2,35 +2,37 @@
  * Swing score — one number, 0–100, for how close a swing sits to the tour
  * benchmarks. This is what the leaderboard ranks by.
  *
- * Two honesty rules baked in:
- *  - Only real, measured readings count. A null (unmeasured) metric is skipped,
- *    never guessed. With just tempo measured today, the score is a tempo score;
- *    it strengthens on its own as more metrics come online.
- *  - Each metric is weighted by the confidence we hold in it (see benchmarks.ts),
- *    so the trustworthy tempo dominates and the depth-limited angle metrics only
- *    nudge the total. We never let a shaky number swing the score.
+ * The model: each measured metric scores its percentage closeness to the tour
+ * band, and the swing score is the plain average of those percentages. Every
+ * measured metric counts equally; a null (unmeasured) metric is skipped, never
+ * guessed. Simple and legible — "you were, on average, 78% of the way to tour."
  *
  * Pure and side-effect free — feed it real values or don't call it.
  */
 
-import { BENCHMARK_BY_ID, type BenchmarkId, type Confidence } from './benchmarks'
-import { distanceToBand, scoreAgainstBand, type CompareState } from '../lib/compare'
-
-/** How much each metric counts, by how much we trust it. */
-const CONFIDENCE_WEIGHT: Record<Confidence, number> = { good: 1, moderate: 0.5, low: 0.25 }
+import { BENCHMARK_BY_ID, type BenchmarkId } from './benchmarks'
+import { scoreAgainstBand, type CompareState } from '../lib/compare'
 
 /**
- * 0–100 for a single metric: full marks anywhere inside the tour band (being in
- * range is tour-level), then a linear decay by distance from the nearest edge.
- * It reaches zero about a third of the metric's on-screen scale beyond the band,
- * so the falloff is proportionate to what's plausible for that metric.
+ * 0–100 for a single metric: how close it sits to the tour band, as a percentage.
+ * Full marks anywhere inside the band. Outside it, the score is 100 minus how far
+ * past the band the value sits, taken as a percentage of the tour number it
+ * missed — so "12° short of a 90° turn" reads as ~86, not an abstract distance.
+ *
+ * One special case: a metric whose tour band straddles zero (spine-angle change,
+ * where tour is "hold it, within ±2°") has no meaningful nonzero target to take a
+ * percentage of, so its miss is measured against half its plausible on-screen
+ * range instead — otherwise a tiny absolute drift reads as a huge percentage.
  */
 export function scoreMetric(id: BenchmarkId, value: number): number {
   const b = BENCHMARK_BY_ID[id]
-  const d = distanceToBand(value, b.band)
-  if (d === 0) return 100
-  const zeroAt = (b.scale.max - b.scale.min) * 0.35
-  return Math.max(0, Math.round((1 - d / zeroAt) * 100))
+  const { lo, hi } = b.band
+  if (value >= lo && value <= hi) return 100
+  const beyond = value < lo ? lo - value : value - hi
+  const zeroCentered = lo < 0 && hi > 0
+  const reference = zeroCentered ? (b.scale.max - b.scale.min) / 2 : Math.abs(value < lo ? lo : hi)
+  const pctAway = reference > 0 ? (beyond / reference) * 100 : 100
+  return Math.max(0, Math.round(100 - pctAway))
 }
 
 export type MetricScore = {
@@ -38,11 +40,10 @@ export type MetricScore = {
   value: number
   score: number
   state: CompareState
-  weight: number
 }
 
 export type SwingScore = {
-  /** 0–100, confidence-weighted mean of the measured metrics. */
+  /** 0–100, the average of the measured metrics' closeness to tour. */
   score: number
   /** A golf-flavoured tier for the number. */
   label: string
@@ -51,24 +52,21 @@ export type SwingScore = {
 }
 
 /**
- * The overall swing score: a confidence-weighted mean of every measured metric's
+ * The overall swing score: the plain average of every measured metric's percent
  * closeness to its tour band. Returns null when nothing has been measured yet.
  */
 export function swingScore(readings: Partial<Record<BenchmarkId, number | null>>): SwingScore | null {
   const breakdown: MetricScore[] = []
-  let weightSum = 0
-  let acc = 0
+  let sum = 0
   for (const id of Object.keys(readings) as BenchmarkId[]) {
     const value = readings[id]
     if (value == null) continue
     const s = scoreMetric(id, value)
-    const weight = CONFIDENCE_WEIGHT[BENCHMARK_BY_ID[id].confidence]
-    breakdown.push({ id, value, score: s, state: scoreAgainstBand(value, BENCHMARK_BY_ID[id].band), weight })
-    acc += s * weight
-    weightSum += weight
+    breakdown.push({ id, value, score: s, state: scoreAgainstBand(value, BENCHMARK_BY_ID[id].band) })
+    sum += s
   }
-  if (weightSum === 0) return null
-  const score = Math.round(acc / weightSum)
+  if (breakdown.length === 0) return null
+  const score = Math.round(sum / breakdown.length)
   return { score, label: scoreLabel(score), breakdown }
 }
 

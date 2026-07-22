@@ -8,12 +8,25 @@ describe('scoreMetric', () => {
     expect(scoreMetric('tempo', 3.2)).toBe(100) // hi edge
   })
 
-  it('decays with distance outside the band', () => {
+  it('scores the percentage away from the nearest tour number', () => {
+    // tempo 2.24 is 20% below the 2.8 lower edge → 80.
+    expect(scoreMetric('tempo', 2.24)).toBe(80)
+    // shoulder turn 12° short of the 85° edge → ~86%.
+    expect(scoreMetric('shoulderTurn', 73)).toBe(86)
+  })
+
+  it('decays further the further outside the band', () => {
     const near = scoreMetric('tempo', 2.6) // 0.2 below
     const far = scoreMetric('tempo', 2.0) // 0.8 below
     expect(near).toBeLessThan(100)
     expect(far).toBeLessThan(near)
     expect(far).toBeGreaterThanOrEqual(0)
+  })
+
+  it('measures a zero-centred metric against its scale, not its tiny edge', () => {
+    // spine drift 4.4° is 2.4° past the ±2° band; against half the ±6 scale (6°)
+    // that's 40% away → 60, not the 0 an edge-relative percentage would give.
+    expect(scoreMetric('spineAngle', 4.4)).toBe(60)
   })
 
   it('never goes below zero for a wild reading', () => {
@@ -34,12 +47,12 @@ describe('swingScore', () => {
     expect(r?.breakdown).toHaveLength(1)
   })
 
-  it('weights trusted metrics above shaky ones', () => {
-    // tempo (good, weight 1) perfect; xFactor (low, weight 0.25) at zero.
-    // The weighted mean must sit well above the plain average of 50.
+  it('is the plain average of the measured metrics', () => {
+    // tempo perfect (100), xFactor way off (0) → average 50.
     const r = swingScore({ tempo: 3.0, xFactor: 200 })
     expect(r).not.toBeNull()
-    expect(r!.score).toBeGreaterThan(75)
+    expect(r!.score).toBe(50)
+    expect(r!.breakdown).toHaveLength(2)
   })
 
   it('reports each measured metric in the breakdown with a state', () => {
