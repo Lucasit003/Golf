@@ -13,7 +13,7 @@ export type Entry = {
   best_label: string | null
 }
 
-export type Profile = { user_id: string; username: string }
+export type Profile = { user_id: string; username: string; handicap: number | null }
 
 /** The signed-in player's reserved username, or null if they haven't set one. */
 export async function getProfile(userId: string): Promise<Profile | null> {
@@ -22,7 +22,7 @@ export async function getProfile(userId: string): Promise<Profile | null> {
   try {
     const { data } = await sb
       .from('profiles')
-      .select('user_id,username')
+      .select('user_id,username,handicap')
       .eq('user_id', userId)
       .maybeSingle()
     return (data as Profile) ?? null
@@ -31,8 +31,12 @@ export async function getProfile(userId: string): Promise<Profile | null> {
   }
 }
 
-/** Reserve a username. Fails if it's already taken (case-insensitively). */
-export async function claimUsername(userId: string, username: string): Promise<{ error?: string }> {
+/** Reserve a username (and optional handicap). Fails if the name is taken. */
+export async function claimUsername(
+  userId: string,
+  username: string,
+  handicap: number | null = null,
+): Promise<{ error?: string }> {
   const sb = supabase()
   if (!sb) return { error: CONFIG_ERROR }
   const name = username.trim()
@@ -40,7 +44,7 @@ export async function claimUsername(userId: string, username: string): Promise<{
     return { error: '3–20 letters, numbers or underscores.' }
   }
   try {
-    const { error } = await sb.from('profiles').insert({ user_id: userId, username: name })
+    const { error } = await sb.from('profiles').insert({ user_id: userId, username: name, handicap })
     if (error) {
       if (/duplicate|unique/i.test(error.message)) return { error: 'That username is taken — try another.' }
       return { error: friendly(error.message) }

@@ -23,6 +23,16 @@ import './Leaderboard.css'
  */
 
 const PENDING_KEY = 'setjis.pendingUsername'
+const PENDING_HCP = 'setjis.pendingHandicap'
+
+/** A golf handicap index runs roughly -10 (plus) to 54 (max). */
+function isValidHandicap(s: string): boolean {
+  const n = Number(s)
+  return s.trim() !== '' && Number.isFinite(n) && n >= -10 && n <= 54
+}
+function parseHandicap(s: string | null): number | null {
+  return s && isValidHandicap(s) ? Number(s) : null
+}
 
 export function Leaderboard({ onBack, onFilm }: { onBack: () => void; onFilm: () => void }) {
   const { session, ready } = useAuth()
@@ -158,6 +168,7 @@ function YourCard({
       userId={userId}
       email={email}
       username={profile.username}
+      handicap={profile.handicap}
       rank={rank}
       onChanged={onChanged}
       onFilm={onFilm}
@@ -170,6 +181,7 @@ function AuthForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [username, setUsername] = useState('')
+  const [handicap, setHandicap] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [confirm, setConfirm] = useState(false)
@@ -181,6 +193,10 @@ function AuthForm() {
       setError('Username: 3–20 letters, numbers or underscores.')
       return
     }
+    if (mode === 'signup' && handicap.trim() && !isValidHandicap(handicap)) {
+      setError('Handicap: a number from -10 to 54 (leave blank if unsure).')
+      return
+    }
     setBusy(true)
     if (mode === 'signup') {
       const { needsConfirm, error } = await signUpWithPassword(email.trim(), password)
@@ -189,9 +205,10 @@ function AuthForm() {
         setError(error)
         return
       }
-      // Remember the desired username to claim once there's a session.
+      // Remember the desired username + handicap to save once there's a session.
       try {
         localStorage.setItem(PENDING_KEY, username.trim())
+        localStorage.setItem(PENDING_HCP, handicap.trim())
       } catch {
         /* ignore */
       }
@@ -255,15 +272,28 @@ function AuthForm() {
           : 'Your username is reserved to you — no one else can take it.'}
       </p>
       {mode === 'signup' ? (
-        <input
-          className="lb__input"
-          type="text"
-          placeholder="username"
-          value={username}
-          maxLength={20}
-          autoComplete="username"
-          onChange={(e) => setUsername(e.target.value)}
-        />
+        <>
+          <input
+            className="lb__input"
+            type="text"
+            placeholder="username"
+            value={username}
+            maxLength={20}
+            autoComplete="username"
+            onChange={(e) => setUsername(e.target.value)}
+          />
+          <input
+            className="lb__input"
+            type="number"
+            inputMode="numeric"
+            placeholder="rough handicap (optional)"
+            value={handicap}
+            min={-10}
+            max={54}
+            step={1}
+            onChange={(e) => setHandicap(e.target.value)}
+          />
+        </>
       ) : null}
       <input
         className="lb__input"
@@ -306,14 +336,25 @@ function ClaimUsername({
       return ''
     }
   })
+  const [handicap, setHandicap] = useState(() => {
+    try {
+      return localStorage.getItem(PENDING_HCP) ?? ''
+    } catch {
+      return ''
+    }
+  })
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   async function claim(e: FormEvent) {
     e.preventDefault()
+    if (handicap.trim() && !isValidHandicap(handicap)) {
+      setError('Handicap: a number from -10 to 54 (leave blank if unsure).')
+      return
+    }
     setBusy(true)
     setError(null)
-    const { error } = await claimUsername(userId, username.trim())
+    const { error } = await claimUsername(userId, username.trim(), parseHandicap(handicap))
     setBusy(false)
     if (error) {
       setError(error)
@@ -321,10 +362,11 @@ function ClaimUsername({
     }
     try {
       localStorage.removeItem(PENDING_KEY)
+      localStorage.removeItem(PENDING_HCP)
     } catch {
       /* ignore */
     }
-    onClaimed({ user_id: userId, username: username.trim() })
+    onClaimed({ user_id: userId, username: username.trim(), handicap: parseHandicap(handicap) })
   }
 
   return (
@@ -344,6 +386,17 @@ function ClaimUsername({
           {busy ? 'Claiming…' : 'Claim'}
         </Button>
       </div>
+      <input
+        className="lb__input"
+        type="number"
+        inputMode="numeric"
+        placeholder="rough handicap (optional)"
+        value={handicap}
+        min={-10}
+        max={54}
+        step={1}
+        onChange={(e) => setHandicap(e.target.value)}
+      />
       {error ? <p className="lb__note lb__note--warn">{error}</p> : null}
       <button type="button" className="lb__signout label" onClick={() => void signOut()}>
         Sign out
@@ -356,6 +409,7 @@ function PostPanel({
   userId,
   email,
   username,
+  handicap,
   rank,
   onChanged,
   onFilm,
@@ -363,6 +417,7 @@ function PostPanel({
   userId: string
   email: string | null
   username: string
+  handicap: number | null
   rank: number | null
   onChanged: () => void
   onFilm: () => void
@@ -404,7 +459,10 @@ function PostPanel({
     <div className="lb__you-card">
       <div className="lb__you-top">
         <div>
-          <p className="lb__you-title">@{username}</p>
+          <p className="lb__you-title">
+            @{username}
+            {handicap != null ? <span className="lb__you-hcp"> · {handicap} hcp</span> : null}
+          </p>
           {email ? <p className="label lb__you-sub">{email}</p> : null}
         </div>
         <button className="lb__signout label" onClick={() => void signOut()}>

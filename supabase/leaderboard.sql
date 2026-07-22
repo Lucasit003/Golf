@@ -53,8 +53,13 @@ create policy "leaderboard own update"
 create table if not exists public.profiles (
   user_id    uuid primary key references auth.users(id) on delete cascade,
   username   text not null check (char_length(username) between 3 and 20 and username ~ '^[A-Za-z0-9_]+$'),
+  handicap   numeric check (handicap is null or (handicap >= -10 and handicap <= 54)),
   created_at timestamptz not null default now()
 );
+
+-- Already have a profiles table from an earlier run? Add the column:
+--   alter table public.profiles add column if not exists handicap numeric
+--     check (handicap is null or (handicap >= -10 and handicap <= 54));
 
 create unique index if not exists profiles_username_lower_idx on public.profiles (lower(username));
 

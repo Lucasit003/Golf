@@ -46,6 +46,12 @@
   color: var(--ink-soft);
   margin-top: 2px;
 }
+.lb__you-hcp {
+  font-family: var(--face-data);
+  font-size: 0.9rem;
+  color: var(--fairway);
+  font-weight: 500;
+}
 .lb__signout {
   background: none;
   border: none;
