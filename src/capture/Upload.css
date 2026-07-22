@@ -207,25 +207,6 @@
   line-height: 1.45;
   color: var(--ink-soft);
 }
-.framing-hint__action {
-  margin-top: var(--gap-2);
-  padding: 0.35rem 0.7rem;
-  border: var(--line-rest) solid var(--paper-edge);
-  border-radius: var(--radius);
-  background: var(--paper);
-  color: var(--ink);
-  font-family: var(--face-body);
-  font-size: 0.85rem;
-  cursor: pointer;
-}
-.framing-hint__action:hover:not(:disabled) {
-  border-color: var(--near);
-}
-.framing-hint__action:disabled {
-  opacity: 0.5;
-  cursor: default;
-}
-
 /* Confidence readout in the margin. */
 .track-confidence {
   padding: var(--gap-3) 0;
