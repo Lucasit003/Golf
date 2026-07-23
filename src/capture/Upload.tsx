@@ -417,6 +417,7 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
 
   return (
     <section className="upload" aria-label="Swing survey">
+      <h1 className="sr-only">Swing survey</h1>
       <div className="upload__grid">
         {/* The drawing — video well, with the skeleton overlay. */}
         <div
