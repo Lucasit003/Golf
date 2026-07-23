@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Button } from '../design/Button'
+import { useDialog } from '../lib/useDialog'
 import { useLocker } from './store'
 import { Golfer, Crest } from './Avatar'
 import { ITEMS, RARITY, collectionComplete, type Item, type OpenResult } from './model'
@@ -30,6 +31,7 @@ export function Locker({ onFilm, onLeaderboard }: { onFilm: () => void; onLeader
   const { state, level, tier, toNext, open, equip } = useLocker()
   const [phase, setPhase] = useState<Phase>({ kind: 'idle' })
   const [wardrobe, setWardrobe] = useState(false)
+  const crateRef = useDialog<HTMLDivElement>(phase.kind === 'spin', () => setPhase({ kind: 'idle' }))
 
   const into = state.swings % 5
   const complete = collectionComplete(state)
@@ -138,7 +140,14 @@ export function Locker({ onFilm, onLeaderboard }: { onFilm: () => void; onLeader
       </ul>
 
       {phase.kind === 'spin' && (
-        <div className="locker__overlay" role="dialog" aria-modal="true" aria-label="Opening a crate">
+        <div
+          ref={crateRef}
+          tabIndex={-1}
+          className="locker__overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Opening a crate"
+        >
           <div className="locker__reveal">
             <Spinner result={phase.result} onClose={close} />
           </div>
@@ -193,9 +202,10 @@ function LegendaryWardrobe({
 }) {
   const legendary = ITEMS.filter((i) => i.rarity === 'legendary')
   const have = legendary.filter((i) => owned.includes(i.id)).length
+  const cardRef = useDialog<HTMLDivElement>(true, onClose)
   return (
     <div className="ward" role="dialog" aria-modal="true" aria-label="The Legendary Wardrobe" onClick={onClose}>
-      <div className="ward__card" onClick={(e) => e.stopPropagation()}>
+      <div ref={cardRef} tabIndex={-1} className="ward__card" onClick={(e) => e.stopPropagation()}>
         <button className="ward__close" onClick={onClose} aria-label="Close">
           ✕
         </button>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useCountUp } from '../lib/useCountUp'
+import { useDialog } from '../lib/useDialog'
 import type { SwingScore } from '../metrics/score'
 import type { SwingFeedback } from '../metrics/feedback'
 import './ScoreReveal.css'
@@ -23,6 +24,8 @@ type Props = {
 export function ScoreReveal({ open, onClose, score, feedback, best, isNewBest }: Props) {
   const [armed, setArmed] = useState(false)
   const value = useCountUp(score?.score ?? 0, open, { duration: 1100 })
+  // Scroll lock, Escape-to-close, focus trap + restore.
+  const cardRef = useDialog<HTMLDivElement>(open, onClose)
 
   useEffect(() => {
     if (!open) {
@@ -30,13 +33,8 @@ export function ScoreReveal({ open, onClose, score, feedback, best, isNewBest }:
       return
     }
     const t = requestAnimationFrame(() => setArmed(true))
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
-    window.addEventListener('keydown', onKey)
-    return () => {
-      cancelAnimationFrame(t)
-      window.removeEventListener('keydown', onKey)
-    }
-  }, [open, onClose])
+    return () => cancelAnimationFrame(t)
+  }, [open])
 
   if (!open) return null
 
@@ -46,7 +44,12 @@ export function ScoreReveal({ open, onClose, score, feedback, best, isNewBest }:
 
   return (
     <div className="score-reveal" role="dialog" aria-modal="true" aria-label="Your swing score" onClick={onClose}>
-      <div className={`score-reveal__card${armed ? ' is-in' : ''}`} onClick={(e) => e.stopPropagation()}>
+      <div
+        ref={cardRef}
+        tabIndex={-1}
+        className={`score-reveal__card${armed ? ' is-in' : ''}`}
+        onClick={(e) => e.stopPropagation()}
+      >
         <button className="score-reveal__close" onClick={onClose} aria-label="Close">
           ✕
         </button>
