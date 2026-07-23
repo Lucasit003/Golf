@@ -421,6 +421,19 @@
   grid-area: scrub;
 }
 
+/* Track button sitting directly under the video — the primary action, close to
+   the clip it reads. */
+.upload__track-cta {
+  width: 100%;
+  margin-bottom: var(--gap-3);
+  font-size: 1.05rem;
+}
+.upload__track-key {
+  opacity: 0.8;
+  font-size: 0.85em;
+  font-weight: 500;
+}
+
 /* Transport — play, frame-step, and slow-motion speeds. */
 .transport {
   display: flex;

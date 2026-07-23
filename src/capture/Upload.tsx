@@ -122,6 +122,10 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
   // Every object URL we create, revoked together on unmount (a clip may be held
   // by an inactive angle, so we can't revoke eagerly on src change).
   const urlsRef = useRef<Set<string>>(new Set())
+  // Watchdog for a video that loads to nothing — on iOS (esp. Low Power Mode) a
+  // clip can silently fail to decode without ever firing an error. If metadata
+  // hasn't arrived in a few seconds, surface the "it's not loading" hint.
+  const metaTimerRef = useRef<number | undefined>(undefined)
   // Detected events, editable by the user. These are UNVERIFIED — the whole
   // point of the UI is to scrub to each and correct it, which is how a swing
   // becomes a fixture that validates the detector (SWING_SPEC / M2).
@@ -154,6 +158,7 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
     return () => {
       urls.forEach((u) => URL.revokeObjectURL(u))
       urls.clear()
+      window.clearTimeout(metaTimerRef.current)
     }
   }, [])
 
@@ -224,9 +229,29 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
     setEvents(null)
     setSelectedEvent(null)
     setClips((prev) => ({ ...prev, [angle]: { file, src: url, events: null, result: null } }))
-    // Filming a swing earns a locker key — the one reward tied to actually
-    // using the survey. Cosmetic only; it never touches a measurement.
-    earnKey()
+    // If the video never reports its dimensions, it isn't decoding — warn.
+    window.clearTimeout(metaTimerRef.current)
+    metaTimerRef.current = window.setTimeout(() => {
+      const v = videoRef.current
+      if (v && (!v.videoWidth || !Number.isFinite(v.duration) || v.duration === 0)) {
+        setVideoError(
+          'This video isn’t loading. If your phone is in Low Power Mode, turn it off — it can block video from decoding. Otherwise try a clip straight from your camera roll, or re-export it as MP4.',
+        )
+      }
+    }, 6000)
+  }
+
+  // Track the loaded clip. Pressing Track earns a locker key — but only the first
+  // time a given clip is tracked, so re-tracking doesn't farm keys. Cosmetic only;
+  // it never touches a measurement. Extraction plays the clip muted at 1×, so the
+  // chosen speed is restored afterward.
+  function track() {
+    const v = videoRef.current
+    if (!v) return
+    if (extraction.status !== 'done') earnKey()
+    void runExtraction(v).then(() => {
+      v.playbackRate = rate
+    })
   }
 
   // Swap to the other angle, saving the current one's clip + survey so nothing
@@ -407,6 +432,7 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
                 playsInline
                 controls={false}
                 onLoadedMetadata={(e) => {
+                  window.clearTimeout(metaTimerRef.current)
                   setDuration(e.currentTarget.duration)
                   const w = e.currentTarget.videoWidth
                   const h = e.currentTarget.videoHeight
@@ -618,6 +644,15 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
 
         {/* The measuring stick, with its transport. */}
         <div className={`upload__scrub${src ? '' : ' upload__scrub--empty'}`}>
+          {/* Track sits right under the video — press it to read the swing (and
+              earn a locker key the first time). */}
+          {src && extraction.status !== 'extracting' ? (
+            <Button variant="fairway" className="upload__track-cta" onClick={track}>
+              {extraction.status === 'done' ? 'Re-track the swing' : 'Track the swing'}
+              {extraction.status !== 'done' ? <span className="upload__track-key"> · +1 🔑</span> : null}
+            </Button>
+          ) : null}
+
           <div className={`transport${canTransport ? '' : ' transport--disabled'}`}>
             <div className="transport__group">
               <button
@@ -744,22 +779,6 @@ export function Upload({ onBack, onCompare }: { onBack: () => void; onCompare: (
         <Button variant="line" onClick={onBack} disabled={busy}>
           Back
         </Button>
-        {src && extraction.status !== 'extracting' ? (
-          <Button
-            variant="fairway"
-            onClick={() => {
-              const v = videoRef.current
-              if (!v) return
-              // extraction plays the clip at 1× and mutes it; restore the user's
-              // chosen speed afterward.
-              void runExtraction(v).then(() => {
-                v.playbackRate = rate
-              })
-            }}
-          >
-            {extraction.status === 'done' ? 'Re-track' : 'Track the swing'}
-          </Button>
-        ) : null}
         {swing ? (
           <Button variant="line" onClick={() => downloadSwing({ ...swing, events })}>
             Export data ↓
