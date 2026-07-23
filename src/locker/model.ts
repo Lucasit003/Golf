@@ -36,11 +36,13 @@ export const ITEMS: Item[] = [
   { id: 'cap_navy', slot: 'cap', name: 'Navy', rarity: 'rare', color: '#23415f' },
   { id: 'cap_sand', slot: 'cap', name: 'Bunker', rarity: 'rare', color: '#ddcda6' },
   { id: 'cap_gold', slot: 'cap', name: 'Champion Gold', rarity: 'epic', color: '#d9a441' },
+  { id: 'cap_crown', slot: 'cap', name: 'Gold Crown', rarity: 'legendary', color: '#e2b23c' },
   // shirts
   { id: 'shirt_cream', slot: 'shirt', name: 'Cream Polo', rarity: 'common', color: '#f2f0e6' },
   { id: 'shirt_fair', slot: 'shirt', name: 'Fairway Polo', rarity: 'common', color: '#2e7d46' },
   { id: 'shirt_sky', slot: 'shirt', name: 'Sky Polo', rarity: 'rare', color: '#6aa6c9' },
   { id: 'shirt_sun', slot: 'shirt', name: 'Sunset Polo', rarity: 'epic', color: '#e0794a' },
+  { id: 'shirt_gold', slot: 'shirt', name: 'Gold Polo', rarity: 'legendary', color: '#e2b23c' },
   // clubs
   { id: 'club_steel', slot: 'club', name: 'Steel Iron', rarity: 'common', color: '#b7bcc2' },
   { id: 'club_brass', slot: 'club', name: 'Brass Iron', rarity: 'rare', color: '#b08a3e' },

@@ -29,6 +29,7 @@ type Phase = { kind: 'idle' } | { kind: 'spin'; result: OpenResult }
 export function Locker({ onFilm, onLeaderboard }: { onFilm: () => void; onLeaderboard: () => void }) {
   const { state, level, tier, toNext, open, equip } = useLocker()
   const [phase, setPhase] = useState<Phase>({ kind: 'idle' })
+  const [wardrobe, setWardrobe] = useState(false)
 
   const into = state.swings % 5
   const complete = collectionComplete(state)
@@ -56,6 +57,19 @@ export function Locker({ onFilm, onLeaderboard }: { onFilm: () => void; onLeader
         </p>
         <button className="locker__leaderboard-link" onClick={onLeaderboard}>
           View the leaderboard <span aria-hidden="true">→</span>
+        </button>
+
+        <button className="locker__legendary-btn" onClick={() => setWardrobe(true)}>
+          <span className="locker__legendary-emblem" aria-hidden="true">
+            <Laurel />
+          </span>
+          <span className="locker__legendary-copy">
+            <span className="locker__legendary-name">The Legendary Wardrobe</span>
+            <span className="locker__legendary-sub label">
+              Thrifted gold — the rarest finds. Pulled at 3%.
+            </span>
+          </span>
+          <span className="locker__legendary-go" aria-hidden="true">→</span>
         </button>
       </header>
 
@@ -130,7 +144,100 @@ export function Locker({ onFilm, onLeaderboard }: { onFilm: () => void; onLeader
           </div>
         </div>
       )}
+
+      {wardrobe && (
+        <LegendaryWardrobe
+          owned={state.owned}
+          equip={state.equip}
+          onEquip={(slot, id) => equip(slot, id)}
+          onClose={() => setWardrobe(false)}
+        />
+      )}
     </section>
+  )
+}
+
+// A small gold laurel — the legendary mark.
+function Laurel() {
+  return (
+    <svg viewBox="0 0 32 32" width="26" height="26" aria-hidden="true">
+      <path
+        d="M16 5l2.2 4.6 5 .7-3.6 3.6.9 5-4.5-2.4-4.5 2.4.9-5L4.8 10.3l5-.7z"
+        fill="currentColor"
+      />
+      <path
+        d="M6 15c0 6 4.5 10 10 11 5.5-1 10-5 10-11"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        opacity="0.7"
+      />
+    </svg>
+  )
+}
+
+// ── The Legendary Wardrobe ───────────────────────────────────────────────────
+// A gold showcase of just the legendary-rarity cosmetics — a full thrifted set,
+// one per slot. Shows which you've unearthed and lets you equip them.
+function LegendaryWardrobe({
+  owned,
+  equip,
+  onEquip,
+  onClose,
+}: {
+  owned: string[]
+  equip: Record<string, string>
+  onEquip: (slot: Item['slot'], id: string) => void
+  onClose: () => void
+}) {
+  const legendary = ITEMS.filter((i) => i.rarity === 'legendary')
+  const have = legendary.filter((i) => owned.includes(i.id)).length
+  return (
+    <div className="ward" role="dialog" aria-modal="true" aria-label="The Legendary Wardrobe" onClick={onClose}>
+      <div className="ward__card" onClick={(e) => e.stopPropagation()}>
+        <button className="ward__close" onClick={onClose} aria-label="Close">
+          ✕
+        </button>
+        <div className="ward__emblem" aria-hidden="true">
+          <Laurel />
+        </div>
+        <p className="ward__eyebrow label">Thrifted gold</p>
+        <h2 className="ward__title">The Legendary Wardrobe</h2>
+        <p className="ward__sub">
+          The rarest finds in the locker — one per slot. Pull them from crates at 3%.
+        </p>
+        <p className="ward__count data">
+          {have} / {legendary.length} unearthed
+        </p>
+
+        <ul className="ward__grid">
+          {legendary.map((it) => {
+            const isOwned = owned.includes(it.id)
+            const isOn = equip[it.slot] === it.id
+            return (
+              <li key={it.id}>
+                <button
+                  className={`ward__item${isOwned ? '' : ' is-locked'}${isOn ? ' is-on' : ''}`}
+                  onClick={isOwned ? () => onEquip(it.slot, it.id) : undefined}
+                  disabled={!isOwned}
+                  aria-label={
+                    isOwned ? `${it.name}${isOn ? ', equipped' : ', tap to equip'}` : `${it.name}, locked`
+                  }
+                >
+                  <span className="ward__swatch" style={isOwned ? { background: it.color } : undefined}>
+                    {isOwned ? null : <span className="ward__lock" aria-hidden="true">🔒</span>}
+                  </span>
+                  <span className="ward__name">{it.name}</span>
+                  <span className="ward__slot label">{it.slot}</span>
+                  {isOn ? <span className="ward__on label">On</span> : null}
+                </button>
+              </li>
+            )
+          })}
+        </ul>
+      </div>
+    </div>
   )
 }
 
@@ -194,6 +301,7 @@ function Spinner({ result, onClose }: { result: OpenResult; onClose: () => void 
               style={{ ['--rc' as string]: RARITY[it.rarity].color }}
             >
               <span className="locker__tile-sw" style={{ background: it.color }} />
+              <span className="locker__tile-name">{it.name}</span>
             </div>
           ))}
         </div>

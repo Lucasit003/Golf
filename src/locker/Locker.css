@@ -236,7 +236,7 @@
 .locker__reel-view {
   position: relative;
   width: 100%;
-  height: 100px;
+  height: 120px;
   overflow: hidden;
   border-radius: var(--radius);
   background: #0b2214;
@@ -283,12 +283,16 @@
 .locker__tile {
   flex: 0 0 84px;
   width: 84px;
-  height: 84px;
+  height: 100px;
   border-radius: var(--radius);
   border: 2px solid var(--rc);
   background: #14331f;
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 4px 10px;
   position: relative;
   overflow: hidden;
 }
@@ -302,9 +306,25 @@
   background: var(--rc);
 }
 .locker__tile-sw {
-  width: 44px;
-  height: 44px;
+  width: 38px;
+  height: 38px;
   border-radius: var(--radius);
+  flex: 0 0 auto;
+}
+.locker__tile-name {
+  font-family: var(--face-body);
+  font-size: 0.5rem;
+  font-weight: 600;
+  line-height: 1.15;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: rgba(242, 240, 230, 0.82);
+  max-width: 100%;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .locker__tile.is-won {
   box-shadow: inset 0 0 0 2px var(--rc), 0 0 18px var(--rc);
@@ -419,5 +439,206 @@
   }
   .locker__case {
     min-height: 220px;
+  }
+}
+
+/* ── Legendary Wardrobe entry ────────────────────────────────────────────── */
+.locker__legendary-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-3);
+  width: 100%;
+  margin-top: var(--gap-3);
+  padding: var(--gap-3);
+  border-radius: var(--radius);
+  border: 1px solid rgba(226, 178, 60, 0.5);
+  background: linear-gradient(120deg, rgba(226, 178, 60, 0.14), rgba(226, 178, 60, 0.03));
+  cursor: pointer;
+  text-align: left;
+  color: var(--ink);
+  transition: border-color 140ms var(--ease-out), transform 140ms var(--ease-out);
+}
+.locker__legendary-btn:hover {
+  border-color: rgba(226, 178, 60, 0.95);
+  transform: translateY(-1px);
+}
+.locker__legendary-emblem {
+  flex: 0 0 auto;
+  display: grid;
+  place-content: center;
+  width: 2.7rem;
+  height: 2.7rem;
+  border-radius: 50%;
+  color: #e2b23c;
+  background: radial-gradient(circle at 50% 35%, rgba(226, 178, 60, 0.4), rgba(226, 178, 60, 0.06));
+  box-shadow: 0 0 14px rgba(226, 178, 60, 0.4);
+}
+.locker__legendary-copy {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.locker__legendary-name {
+  font-family: var(--face-display);
+  font-weight: 700;
+  font-stretch: 110%;
+  color: #e2b23c;
+  font-size: 1.02rem;
+}
+.locker__legendary-sub {
+  color: var(--ink-soft);
+  text-transform: none;
+  letter-spacing: 0;
+}
+.locker__legendary-go {
+  flex: 0 0 auto;
+  color: #e2b23c;
+  font-size: 1.2rem;
+}
+
+/* ── The Wardrobe modal ──────────────────────────────────────────────────── */
+.ward {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: var(--gap-3);
+  background: color-mix(in srgb, #0a0e07 74%, transparent);
+  overflow-y: auto;
+  animation: ward-fade 200ms ease-out both;
+}
+@keyframes ward-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.ward__card {
+  position: relative;
+  width: min(30rem, 100%);
+  max-height: calc(100dvh - var(--gap-5));
+  overflow-y: auto;
+  text-align: center;
+  padding: var(--gap-5) var(--gap-4) var(--gap-4);
+  border-radius: calc(var(--radius) * 1.4);
+  background: linear-gradient(180deg, #15200f 0%, #0f1a0b 100%);
+  border: 1px solid rgba(226, 178, 60, 0.45);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), inset 0 0 40px rgba(226, 178, 60, 0.06);
+  animation: ward-rise 320ms var(--ease-out) both;
+}
+@keyframes ward-rise {
+  from { opacity: 0; transform: translateY(14px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.ward__close {
+  position: absolute;
+  top: var(--gap-2);
+  right: var(--gap-2);
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(242, 240, 230, 0.8);
+  cursor: pointer;
+}
+.ward__emblem {
+  display: grid;
+  place-content: center;
+  width: 3.4rem;
+  height: 3.4rem;
+  margin: 0 auto var(--gap-2);
+  border-radius: 50%;
+  color: #e2b23c;
+  background: radial-gradient(circle at 50% 35%, rgba(226, 178, 60, 0.42), rgba(226, 178, 60, 0.05));
+  box-shadow: 0 0 20px rgba(226, 178, 60, 0.5);
+}
+.ward__eyebrow {
+  color: #e2b23c;
+}
+.ward__title {
+  font-family: var(--face-display);
+  font-weight: 700;
+  font-stretch: 115%;
+  font-size: clamp(1.5rem, 6vw, 2rem);
+  color: #f2e6c8;
+  margin: 2px 0 var(--gap-2);
+}
+.ward__sub {
+  color: rgba(242, 240, 230, 0.72);
+  line-height: 1.5;
+  max-width: 22rem;
+  margin: 0 auto;
+}
+.ward__count {
+  color: #e2b23c;
+  margin-top: var(--gap-2);
+  font-size: 0.95rem;
+}
+.ward__grid {
+  list-style: none;
+  margin: var(--gap-4) 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--gap-2);
+}
+.ward__item {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: var(--gap-2) 4px;
+  border-radius: var(--radius);
+  border: 1px solid rgba(226, 178, 60, 0.4);
+  background: rgba(226, 178, 60, 0.06);
+  cursor: pointer;
+  color: #f2e6c8;
+}
+.ward__item.is-locked {
+  border-color: rgba(242, 240, 230, 0.12);
+  background: rgba(242, 240, 230, 0.03);
+  cursor: default;
+}
+.ward__item.is-on {
+  border-color: #e2b23c;
+  box-shadow: 0 0 0 1px #e2b23c, 0 0 14px rgba(226, 178, 60, 0.4);
+}
+.ward__swatch {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius);
+  background: rgba(242, 240, 230, 0.08);
+  display: grid;
+  place-content: center;
+}
+.ward__lock {
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+.ward__name {
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.1;
+  text-align: center;
+}
+.ward__item.is-locked .ward__name {
+  color: rgba(242, 240, 230, 0.4);
+}
+.ward__slot {
+  color: rgba(242, 240, 230, 0.45);
+  font-size: 0.6rem;
+}
+.ward__on {
+  color: #e2b23c;
+  font-size: 0.6rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ward,
+  .ward__card {
+    animation: none;
   }
 }
